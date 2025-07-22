@@ -6,11 +6,14 @@ const { protect } = require('../middlewares/auth');
 
 const router = express.Router();
 
+// POST /api/auth/login
 router.post(
     '/login',
     validate({ body: loginSchema }),
     authController.login
 );
+
+// PUT /api/auth/change-password
 router.put(
     '/change-password',
     protect,
