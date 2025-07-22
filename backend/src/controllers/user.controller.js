@@ -5,7 +5,11 @@ const { uploadToCloudinary } = require('../utils/cloudinary');
 
 const getAllUsers = asyncHandler(async (req, res) => {
     const users = await userService.getAllUsers();
-    res.status(200).json({ success: true, message: "Users retrieved", data: users });
+    res.status(200).json({
+        success: true,
+        message: "Users retrieved",
+        data: users
+    });
 });
 
 const getUserById = asyncHandler(async (req, res) => {
@@ -13,7 +17,11 @@ const getUserById = asyncHandler(async (req, res) => {
     if (!user) {
         throw new ApiError(404, "User not found");
     }
-    res.status(200).json({ success: true, message: "User retrieved", data: user });
+    res.status(200).json({
+        success: true,
+        message: "User retrieved",
+        data: user
+    });
 });
 
 const createUser = asyncHandler(async (req, res) => {
@@ -34,17 +42,29 @@ const createUser = asyncHandler(async (req, res) => {
     userData.selfiePhotoUrl = selfieResult.url;
 
     const newUser = await userService.createUser(userData);
-    res.status(201).json({ success: true, message: "User created successfully. Please wait for verification.", data: newUser });
+    res.status(201).json({
+        success: true,
+        message: "User created successfully. Please wait for verification.",
+        data: newUser
+    });
 });
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     const updatedUser = await userService.updateUserProfile(req.user.sub, req.body);
-    res.status(200).json({ success: true, message: "Profile updated", data: updatedUser });
+    res.status(200).json({
+        success: true,
+        message: "Profile updated",
+        data: updatedUser
+    });
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
     const updatedUser = await userService.updateUserProfile(req.params.id, req.body);
-    res.status(200).json({ success: true, message: "User updated by admin", data: updatedUser });
+    res.status(200).json({
+        success: true,
+        message: "User updated by admin",
+        data: updatedUser
+    });
 });
 
 const adminDeleteUser = asyncHandler(async (req, res) => {
