@@ -7,7 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// --- Enums (ชนิดข้อมูลที่กำหนดค่าได้) ---
 enum Role {
   PASSENGER
   DRIVER
@@ -32,9 +31,6 @@ enum BookingStatus {
   REJECTED
 }
 
-
-// --- Models (จะถูกแปลงเป็น Tables ใน PostgreSQL) ---
-
 model User {
   id                    String   @id @default(cuid())
   username              String   @unique
@@ -57,7 +53,6 @@ model User {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  // --- ความสัมพันธ์ (Relations) ---
   driverVerification    DriverVerification?
   vehicles              Vehicle[]
   createdRoutes         Route[]             @relation("DriverRoutes")
