@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require("../controllers/user.controller");
 const validate = require('../middlewares/validate');
+const upload = require('../middlewares/upload.middleware');
 const { idParamSchema, createUserSchema, updateUserSchema, updateUserStatusSchema } = require('../validations/user.validation');
 const { protect, requireAdmin } = require('../middlewares/auth');
 
@@ -8,7 +9,7 @@ const router = express.Router();
 
 // --- Admin Routes ---
 router.get(
-    '/admin/users',
+    '/admin',
     protect,
     requireAdmin,
     userController.getAllUsers
@@ -21,14 +22,14 @@ router.put(
     userController.adminUpdateUser
 );
 router.delete(
-    '/admin/users/:id',
+    '/admin/:id',
     protect,
     requireAdmin,
     validate({ params: idParamSchema }),
     userController.adminDeleteUser
 );
 router.patch(
-    '/admin/users/:id/status',
+    '/admin/:id/status',
     protect,
     requireAdmin,
     validate({ params: idParamSchema, body: updateUserStatusSchema }),
@@ -38,17 +39,21 @@ router.patch(
 
 // --- Public / User-specific Routes ---
 router.get(
-    '/users/:id',
+    '/:id',
     validate({ params: idParamSchema }),
     userController.getUserById
 );
 router.post(
-    '/users',
-    validate({ body: createUserSchema }),
-    userController.createUser
-);
+        '/',
+        upload.fields([
+            { name: 'nationalIdPhotoUrl', maxCount: 1 },
+            { name: 'selfiePhotoUrl', maxCount: 1 }
+        ]),
+        validate({ body: createUserSchema }),
+        userController.createUser
+    );
 router.put(
-    '/users/me',
+    '/me',
     protect,
     validate({ body: updateUserSchema }),
     userController.updateCurrentUserProfile

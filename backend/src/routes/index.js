@@ -5,7 +5,6 @@ const userRoutes = require('./user.routes');
 const router = express.Router();
 
 router.use('/auth', authRoutes);
-router.use('/', userRoutes); // User routes will be at /api/users, /api/admin/users etc.
-
+router.use('/users', userRoutes);
 
 module.exports = router;

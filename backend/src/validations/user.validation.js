@@ -4,9 +4,13 @@ const { Role } = require('@prisma/client')
 const createUserSchema = z.object({
     email: z.string().email("Invalid email format"),
     username: z.string().min(6, "username is require"),
-    firstName: z.string().min(1, "firstname is require").optional(),
-    lastName: z.string().min(1, "lastname is require").optional(),
-    password: z.string().min(6, "password must be at least 6 characters"),
+    password: z.string().min(8, "password must be at least 8 characters"),
+    firstName: z.string().min(1, "firstname is require"),
+    lastName: z.string().min(1, "lastname is require"),
+    phoneNumber: z.string().min(10, "phoneNumber is require"),
+    gender: z.string().min(1, "gender is require"), // หรือ z.enum(['MALE', 'FEMALE'])
+    nationalIdNumber: z.string().length(13, "nationalIdNumber must be 13 digits"),
+    nationalIdExpiryDate: z.string().datetime({ message: "Invalid date format for nationalIdExpiryDate" }),
     role: z.nativeEnum(Role).optional()
 })
 

@@ -50,18 +50,24 @@ const getUserById = async (id) => {
 }
 
 const createUser = async (data) => {
-
     const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
     const createData = {
         email: data.email,
         username: data.username,
+        password: hashedPassword,
         firstName: data.firstName,
         lastName: data.lastName,
-        password: hashedPassword,
+        phoneNumber: data.phoneNumber,
+        gender: data.gender,
+        nationalIdNumber: data.nationalIdNumber,
+        nationalIdExpiryDate: new Date(data.nationalIdExpiryDate), // แปลง string เป็น Date object
+        nationalIdPhotoUrl: data.nationalIdPhotoUrl, // URL จาก Cloudinary
+        selfiePhotoUrl: data.selfiePhotoUrl, // URL จาก Cloudinary
         role: data.role || 'PASSENGER'
-    }
-    const user = await prisma.user.create({ data: createData })
+    };
+
+    const user = await prisma.user.create({ data: createData });
 
     const { password, ...safeUser } = user;
     return safeUser;
@@ -99,7 +105,7 @@ const updateUserProfile = async (id, data) => {
 
 const deleteUser = async (id) => {
     const deletedUser = await prisma.user.delete({ where: { id } });
-    
+
     const { password, ...safeDeletedUser } = deletedUser;
     return safeDeletedUser;
 };
