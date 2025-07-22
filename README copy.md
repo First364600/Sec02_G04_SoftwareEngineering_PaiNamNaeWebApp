@@ -124,40 +124,37 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ## API Endpoints
 
-Visit [**http://localhost:3000/documentation**](http://localhost:3000/documentation) for interactive Swagger UI and full API reference.
+Visit [**http://localhost:3000/documentation**](http://localhost:3000/documentation) for interactive Swagger UI and a full API reference.
 
 ### Authentication
 
-- `POST /api/auth/login` – Login with email/username & password
-- `PUT /api/auth/change-password` – Change current user's password
+-   `POST /api/auth/login` – Login with email/username & password
+-   `PUT /api/auth/change-password` – Change current user's password
 
 ### Users
 
-- `POST /api/users` – Register a new user with identity verification photos
-- `GET /api/users/admin` – List all active users (Admin only)
-- `GET /api/users/{id}` – Get user by ID
-- `PUT /api/users/me` – Update current user's profile
-- `PUT /api/users/admin/users/{id}` – Update user by ID (Admin only)
-- `DELETE /api/users/admin/{id}` – Delete user by ID (Admin only)
-- `PATCH /api/users/admin/{id}/status` – Set user's active status (Admin only)
+-   `POST /api/users` – Register a new user with identity verification photos
+-   `GET /api/users/admin` – List all active users (Admin only)
+-   `GET /api/users/{id}` – Get user by ID
+-   `PUT /api/users/me` – Update current user's profile
+-   `PUT /api/users/admin/users/{id}` – Update user by ID (Admin only)
+-   `DELETE /api/users/admin/{id}` – Delete user by ID (Admin only)
+-   `PATCH /api/users/admin/{id}/status` – Set user's active status (Admin only)
 
 ### Vehicles (Authenticated users)
 
-- `GET /api/vehicles` – List all vehicles for the current user
-- `GET /api/vehicles/{id}` – Get vehicle by ID
-- `POST /api/vehicles` – Create a new vehicle
-- `PUT /api/vehicles/{id}` – Update a vehicle
-- `DELETE /api/vehicles/{id}` – Delete a vehicle
-- `PUT /api/vehicles/{id}/default` – Set a vehicle as the default
+-   `GET /api/vehicles` – List all vehicles for the current user
+-   `GET /api/vehicles/{id}` – Get vehicle by ID
+-   `POST /api/vehicles` – Create a new vehicle
+-   `PUT /api/vehicles/{id}` – Update a vehicle
+-   `DELETE /api/vehicles/{id}` – Delete a vehicle
+-   `PUT /api/vehicles/{id}/default` – Set a vehicle as the default
 
 ### Health-check & Metrics
 
-- `GET /health` – Check application & database health (200 OK or 503)
-- `GET /metrics` – Expose Prometheus-compatible metrics (CPU, memory, HTTP latency, request counts, etc.)
+-   `GET /health` – Check application & database health (200 OK or 503)
+-   `GET /metrics` – Expose Prometheus-compatible metrics (CPU, memory, HTTP latency, request counts, etc.)
 
 ## Contact
 
-For questions or feedback, reach out to:
-
-**Email:** [jonathandoillon2002@gmail.com](mailto\:jonathandoillon2002@gmail.com)
-**Email:** [seth.s@kkumail.com](mailto\:seth.s@kkumail.com)
+For questions or feedback, please open an issue on the GitHub repository.
