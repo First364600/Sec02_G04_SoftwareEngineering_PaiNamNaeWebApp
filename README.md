@@ -46,10 +46,10 @@ A safe ride-sharing application with a **Nuxt.js** frontend and **Express.js** b
 - PostgreSQL instance
 - Cloudinary Account (for API Key, Secret, and Cloud Name)
 
-## Security & Rate Limiting
+<!-- ## Security & Rate Limiting
 
 - **Rate Limiting:** 100 requests per 15 minutes per IP (returns 429 Too Many Requests when exceeded)
-- **Security Headers:** Helmet is used to set various security-related HTTP headers
+- **Security Headers:** Helmet is used to set various security-related HTTP headers -->
 
 ## Installation
 
