@@ -8,12 +8,15 @@ const { protect, requireAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
 // --- Admin Routes ---
+// GET /api/users/admin
 router.get(
     '/admin',
     protect,
     requireAdmin,
     userController.getAllUsers
 );
+
+// PUT /api/users/admin/:id
 router.put(
     '/admin/users/:id',
     protect,
@@ -21,6 +24,8 @@ router.put(
     validate({ params: idParamSchema, body: updateUserSchema }),
     userController.adminUpdateUser
 );
+
+// DELETE /api/users/admin/:id
 router.delete(
     '/admin/:id',
     protect,
@@ -28,6 +33,8 @@ router.delete(
     validate({ params: idParamSchema }),
     userController.adminDeleteUser
 );
+
+// PATCH /api/users/admin/:id/status
 router.patch(
     '/admin/:id/status',
     protect,
@@ -37,11 +44,14 @@ router.patch(
 );
 
 // --- Public / User-specific Routes ---
+// GET /api/users/:id
 router.get(
     '/:id',
     validate({ params: idParamSchema }),
     userController.getUserById
 );
+
+// POST /api/users
 router.post(
         '/',
         upload.fields([
@@ -51,6 +61,8 @@ router.post(
         validate({ body: createUserSchema }),
         userController.createUser
     );
+    
+// PUT /api/users/me
 router.put(
     '/me',
     protect,

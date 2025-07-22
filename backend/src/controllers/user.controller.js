@@ -87,5 +87,5 @@ module.exports = {
     adminUpdateUser,
     adminDeleteUser,
     setUserStatus,
-    
+
 };
