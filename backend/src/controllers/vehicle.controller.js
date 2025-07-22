@@ -98,10 +98,23 @@ const deleteVehicle = asyncHandler(async (req, res) => {
   });
 });
 
+const setDefaultVehicle = asyncHandler(async (req, res) => {
+  const ownerId = req.user.sub;
+  const { id } = req.params;
+  const result = await vehicleService.setDefaultVehicle(id, ownerId);
+
+  res.status(200).json({
+    success: true,
+    message: "Vehicle set Default successfully.",
+    data: result,
+  });
+});
+
 module.exports = {
   getVehicles,
   getVehicleById,
   createVehicle,
   updateVehicle,
   deleteVehicle,
+  setDefaultVehicle
 };

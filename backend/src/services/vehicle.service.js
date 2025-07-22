@@ -88,10 +88,37 @@ const deleteVehicle = async (vehicleId, userId) => {
   await prisma.vehicle.delete({ where: { id: vehicleId } });
   return { id: vehicleId };
 };
+
+const setDefaultVehicle = async (vehicleId, userId) => {
+  const vehicleToSetDefault = await prisma.vehicle.findFirst({
+    where: { id: vehicleId, userId },
+  });
+  if (!vehicleToSetDefault) {
+    throw new Error("Vehicle not found or access denied");
+  }
+
+  if (vehicleToSetDefault.isDefault) {
+    return vehicleToSetDefault;
+  }
+
+  return prisma.$transaction(async (tx) => {
+    await tx.vehicle.updateMany({
+      where: { userId, isDefault: true },
+      data: { isDefault: false },
+    });
+    const updatedVehicle = await tx.vehicle.update({
+      where: { id: vehicleId },
+      data: { isDefault: true },
+    });
+    return updatedVehicle;
+  });
+};
+
 module.exports = {
   getAllVehicles,
   getVehicleById,
   createVehicle,
   updateVehicle,
   deleteVehicle,
+  setDefaultVehicle
 };

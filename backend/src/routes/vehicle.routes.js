@@ -45,4 +45,12 @@ router.delete(
   vehicleController.deleteVehicle
 );
 
+// PUT /api/vehicles/:id/default
+router.put(
+  '/:id/default',
+    protect,
+  validate({ params: idParamSchema }),
+  vehicleController.setDefaultVehicle
+);
+
 module.exports = router;
