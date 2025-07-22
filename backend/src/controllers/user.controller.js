@@ -56,23 +56,23 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
     });
 });
 
-const uploadImage = asyncHandler(async (req, res) => {
+// const uploadImage = asyncHandler(async (req, res) => {
 
-    const imageFile = req.body.image
-    if (imageFile && imageFile.hapi && imageFile.hapi.filename) {
+//     const imageFile = req.body.image
+//     if (imageFile && imageFile.hapi && imageFile.hapi.filename) {
 
-        console.log("Uploading image to Cloudinary...");
-        const result = await uploadToCloudinary(
-            imageFile,
-            "my_app/upload"
-        );
-        Data.imageUrl = result.url;
-        Data.imagePublicId = result.public_id;
-        console.log("Upload successful:", result.url);
-    }
-    const createDate = await userService.uploadImage(Data)
-    return res.status(201).json({ success: true, message: "Upload successful", data: createDate });
-})
+//         console.log("Uploading image to Cloudinary...");
+//         const result = await uploadToCloudinary(
+//             imageFile,
+//             "my_app/upload"
+//         );
+//         Data.imageUrl = result.url;
+//         Data.imagePublicId = result.public_id;
+//         console.log("Upload successful:", result.url);
+//     }
+//     const createDate = await userService.uploadImage(Data)
+//     return res.status(201).json({ success: true, message: "Upload successful", data: createDate });
+// })
 
 const setUserStatus = asyncHandler(async (req, res) => {
     const updatedUser = await userService.setUserStatus(req.params.id, req.body.isActive);
@@ -87,4 +87,5 @@ module.exports = {
     adminUpdateUser,
     adminDeleteUser,
     setUserStatus,
+    
 };

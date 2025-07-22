@@ -34,7 +34,6 @@ router.patch(
     requireAdmin,
     validate({ params: idParamSchema, body: updateUserStatusSchema }),
     userController.setUserStatus
-
 );
 
 // --- Public / User-specific Routes ---
