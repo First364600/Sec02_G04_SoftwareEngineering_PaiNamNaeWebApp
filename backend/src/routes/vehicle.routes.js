@@ -6,12 +6,14 @@ const { protect } = require('../middlewares/auth');
 
 const router = express.Router();
 
+// GET /api/vehicles
 router.get(
   '/',
   protect,
   vehicleController.getVehicles
 );
 
+// GET /api/vehicles/:id
 router.get(
   '/:id',
    protect,
@@ -19,6 +21,7 @@ router.get(
   vehicleController.getVehicleById
 );
 
+// POST /api/vehicles
 router.post(
   '/',
    protect,
@@ -26,6 +29,7 @@ router.post(
   vehicleController.createVehicle
 );
 
+// PUT /api/vehicles/:id
 router.put(
   '/:id',
     protect,
@@ -33,6 +37,7 @@ router.put(
   vehicleController.updateVehicle
 );
 
+// DELETE /api/vehicles/:id
 router.delete(
   '/:id',
    protect,
