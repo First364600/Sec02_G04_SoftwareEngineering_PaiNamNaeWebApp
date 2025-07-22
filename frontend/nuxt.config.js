@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      apiBase:"http://localhost:3000",
+      apiBase:"http://localhost:3000/api/",
     },
     // public: {
     //   apiBase:"https://mini-shop-2xsa.onrender.com" ,

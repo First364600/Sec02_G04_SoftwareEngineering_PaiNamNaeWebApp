@@ -1,442 +1,403 @@
 <template>
-  <div class="bg-gray-50 min-h-screen">
-    <!-- Main Login Section -->
-    <main class="flex-1 flex items-center justify-center py-12 px-6 relative">
+  <div class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-['Kanit']">
+    <main class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 sm:p-8">
+      <h1 class="text-3xl font-bold text-blue-600 mb-8 text-center">สมัครสมาชิก</h1>
 
-      <div class="w-full max-w-md relative z-10">
-        <!-- Login Card -->
-        <div class="bg-white rounded-3xl shadow-2xl p-8 animate-slideUp">
-          <!-- Logo Section -->
-          <div class="text-center mb-8">
-            <div
-              class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#F53D2D] to-[#FF6633] rounded-full flex items-center justify-center shadow-lg animate-pulse-custom">
-              <span class="text-3xl font-bold text-white">S</span>
+      <!-- Stepper Indicator -->
+      <div class="relative mb-10">
+        <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2"></div>
+        <div class="absolute top-1/2 left-0 h-0.5 bg-blue-600 -translate-y-1/2 transition-all duration-500"
+          :style="{ width: stepProgress }"></div>
+        <div class="flex justify-between items-center relative">
+          <div v-for="step in totalSteps" :key="step" class="flex flex-col items-center w-1/3 z-10">
+            <div :class="getStepClass(step)">
+              <span>{{ step }}</span>
             </div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">สมัครสมาชิก</h2>
-            <p class="text-gray-600">เริ่มต้นช้อปปิ้งกับเราวันนี้</p>
+            <span :class="getLabelClass(step)">{{ getStepLabel(step) }}</span>
           </div>
+        </div>
+      </div>
 
-          <!-- reg Form -->
-          <form @submit.prevent="submitRegister" class="space-y-6" id="loginForm">
-            <!-- name Field -->
-            <div class="space-y-2">
-              <label for="firstName" class="block text-sm font-medium text-gray-700">ชื่อ</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                  </svg>
-                </div>
-                <input id="firstName" v-model="firstName" required
-                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 input-focus"
-                  placeholder="กรอกชื่อของคุณ">
-              </div>
+      <!-- Registration Form -->
+      <form @submit.prevent="handleRegister" novalidate>
+        <!-- Step 1: Account Info -->
+        <div v-if="currentStep === 1">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">ข้อมูลบัญชีผู้ใช้</h2>
+          <div class="mb-4">
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้ <span
+                class="text-red-500">*</span></label>
+            <input type="text" id="username" v-model="formData.username" placeholder="example123"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.username }">
+            <p v-if="errors.username" class="text-red-600 text-xs mt-1">{{ errors.username }}</p>
+            <p v-else class="mt-1 text-xs text-gray-500">ความยาว 4–20 ตัวอักษร ภาษาอังกฤษ ตัวเลข หรือขีดล่าง (_)
+              เท่านั้น</p>
+          </div>
+          <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">อีเมล <span
+                class="text-red-500">*</span></label>
+            <input type="email" id="email" v-model="formData.email" placeholder="example@example.com"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.email }">
+            <p v-if="errors.email" class="text-red-600 text-xs mt-1">{{ errors.email }}</p>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน <span
+                class="text-red-500">*</span></label>
+            <input type="password" id="password" v-model="formData.password" placeholder="อย่างน้อย 8 ตัวอักษร"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.password }">
+            <p v-if="errors.password" class="text-red-600 text-xs mt-1">{{ errors.password }}</p>
+            <p v-else class="mt-1 text-xs text-gray-500">ต้องประกอบด้วย A–Z, a–z และตัวเลข 0–9</p>
+          </div>
+          <div class="mb-6">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">ยืนยันรหัสผ่าน <span
+                class="text-red-500">*</span></label>
+            <input type="password" id="confirmPassword" v-model="formData.confirmPassword"
+              placeholder="กรอกรหัสผ่านอีกครั้ง"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.confirmPassword }">
+            <p v-if="errors.confirmPassword" class="text-red-600 text-xs mt-1">{{ errors.confirmPassword }}</p>
+          </div>
+          <button type="button" @click="nextStep"
+            class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition">ถัดไป</button>
+        </div>
+
+        <!-- Step 2: Personal Info -->
+        <div v-if="currentStep === 2">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">ข้อมูลส่วนตัว</h2>
+          <div class="mb-4">
+            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">ชื่อจริง <span
+                class="text-red-500">*</span></label>
+            <input type="text" id="firstName" v-model="formData.firstName" placeholder="กรอกชื่อจริง"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.firstName }">
+            <p v-if="errors.firstName" class="text-red-600 text-xs mt-1">{{ errors.firstName }}</p>
+          </div>
+          <div class="mb-4">
+            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">นามสกุล <span
+                class="text-red-500">*</span></label>
+            <input type="text" id="lastName" v-model="formData.lastName" placeholder="กรอกนามสกุล"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.lastName }">
+            <p v-if="errors.lastName" class="text-red-600 text-xs mt-1">{{ errors.lastName }}</p>
+          </div>
+          <div class="mb-4">
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">เบอร์โทรศัพท์ <span
+                class="text-red-500">*</span></label>
+            <input type="tel" id="phoneNumber" v-model="formData.phoneNumber" placeholder="เช่น 0891234567"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.phoneNumber }">
+            <p v-if="errors.phoneNumber" class="text-red-600 text-xs mt-1">{{ errors.phoneNumber }}</p>
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">เพศ <span class="text-red-500">*</span></label>
+            <div class="flex gap-6">
+              <label class="flex items-center"><input type="radio" name="gender" value="male" v-model="formData.gender"
+                  class="mr-2 text-blue-600 focus:ring-blue-500"> ชาย</label>
+              <label class="flex items-center"><input type="radio" name="gender" value="female"
+                  v-model="formData.gender" class="mr-2 text-blue-600 focus:ring-blue-500"> หญิง</label>
             </div>
-
-            <!-- name Field -->
-            <div class="space-y-2">
-              <label for="lastName" class="block text-sm font-medium text-gray-700">นามสกุล</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                  </svg>
-                </div>
-                <input id="lastName" v-model="lastName" required
-                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 input-focus"
-                  placeholder="กรอกนามสกุลของคุณ">
-              </div>
-            </div>
-
-            <!-- Email Field -->
-            <div class="space-y-2">
-              <label for="email" class="block text-sm font-medium text-gray-700">อีเมล</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                  </svg>
-                </div>
-                <input id="email" type="email" v-model="email" required
-                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 input-focus"
-                  placeholder="กรอกอีเมลของคุณ">
-              </div>
-            </div>
-
-            <!-- Password Field -->
-            <div class="space-y-2">
-              <label for="password" class="block text-sm font-medium text-gray-700">รหัสผ่าน</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                  </svg>
-                </div>
-                <input type="password" id="password" v-model="password" required
-                  class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 input-focus"
-                  placeholder="กรอกรหัสผ่านของคุณ">
-                <div id="togglePassword"
-                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5" id="eyeIcon">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- confirm Password Field -->
-            <div class="space-y-2">
-              <label for="confirmPassword" class="block text-sm font-medium text-gray-700">ยืนยันรหัสผ่าน</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5 text-gray-400">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                  </svg>
-                </div>
-                <input type="password" id="confirmPassword" v-model="confirmPassword" required
-                  class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 input-focus"
-                  placeholder="ยืนยันรหัสผ่านของคุณ">
-                <div id="toggleConfirmPassword"
-                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5" id="eyeIcon">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- ข้อตกลงและเงื่อนไข -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <input id="remember" name="remember" type="checkbox"
-                  class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
-                <label for="terms" class="ml-3 block text-sm text-gray-700">
-                  ฉันยอมรับ <a href="#"
-                    class="text-orange-600 hover:text-orange-500 font-medium hover:underline">ข้อตกลงและเงื่อนไข</a>
-                  และ <a href="#"
-                    class="text-orange-600 hover:text-orange-500 font-medium hover:underline">นโยบายความเป็นส่วนตัว</a>
-                </label>
-              </div>
-            </div>
-
-            <!-- reg Button -->
-            <button type="submit"
-              class="w-full bg-gradient-to-r from-[#F53D2D] to-[#FF6633] text-white py-3 px-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 btn-hover group">
-              <span class="flex items-center justify-center">
-                สมัครสมาชิก
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </span>
-            </button>
-
-            <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
-            <p v-if="successMessage" style="color: green;">{{ successMessage }}</p>
-          </form>
-
-          <!-- Sign in Link -->
-          <div class="text-center mt-8 pt-6 border-t border-gray-200">
-            <p class="text-gray-600">
-              มีบัญชีอยู่แล้ว?
-              <NuxtLink to="/login" class="text-orange-600 hover:text-orange-500 font-medium hover:underline">
-                เข้าสู่ระบบ</NuxtLink>
-            </p>
+            <p v-if="errors.gender" class="text-red-600 text-xs mt-1">{{ errors.gender }}</p>
+          </div>
+          <div class="flex gap-4">
+            <button type="button" @click="prevStep"
+              class="w-full py-3 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition">ย้อนกลับ</button>
+            <button type="button" @click="nextStep"
+              class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition">ถัดไป</button>
           </div>
         </div>
 
-      </div>
+        <!-- Step 3: Verification -->
+        <div v-if="currentStep === 3">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">ยืนยันตัวตน</h2>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">บัตรประชาชน <span
+                class="text-red-500">*</span></label>
+            <div v-if="!idCardPreview" @click="triggerFileUpload('idCardFile')"
+              class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.idCardFile }">
+              <i class="fa-regular fa-image text-4xl text-gray-400"></i>
+              <p class="mt-2 text-sm text-gray-600">กดเพื่อเลือกรูปภาพ</p>
+            </div>
+            <div v-else class="relative">
+              <img :src="idCardPreview" alt="ID Card Preview" class="w-full rounded-md mt-2" />
+              <button type="button" @click="removeImage('idCard')"
+                class="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center">&times;</button>
+            </div>
+            <input type="file" id="idCardFile" @change="handleFileUpload($event, 'idCard')" accept="image/*"
+              class="hidden">
+            <p v-if="errors.idCardFile" class="text-red-600 text-xs mt-1">{{ errors.idCardFile }}</p>
+          </div>
+          <div class="mb-4">
+            <label for="idNumber" class="block text-sm font-medium text-gray-700 mb-1">หมายเลขบัตรประชาชน <span
+                class="text-red-500">*</span></label>
+            <input type="text" id="idNumber" v-model="formData.idNumber" placeholder="กรอกหมายเลข 13 หลัก"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.idNumber }">
+            <p v-if="errors.idNumber" class="text-red-600 text-xs mt-1">{{ errors.idNumber }}</p>
+          </div>
+          <div class="mb-4">
+            <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">วันหมดอายุบัตร <span
+                class="text-red-500">*</span></label>
+            <input type="text" id="expiryDate" v-model="formData.expiryDate" placeholder="วว/ดด/ปปปป"
+              @input="formatExpiryDate" maxlength="10"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.expiryDate }">
+            <p v-if="errors.expiryDate" class="text-red-600 text-xs mt-1">{{ errors.expiryDate }}</p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">รูปถ่ายใบหน้าปกติ (Selfie) <span
+                class="text-red-500">*</span></label>
+            <div v-if="!selfiePreview" @click="triggerFileUpload('selfieFile')"
+              class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-blue-500 transition"
+              :class="{ 'border-red-500 ring-1 ring-red-500': errors.selfieFile }">
+              <i class="fa-regular fa-image text-4xl text-gray-400"></i>
+              <p class="mt-2 text-sm text-gray-600">กดเพื่อเลือกรูปภาพ</p>
+            </div>
+            <div v-else class="relative">
+              <img :src="selfiePreview" alt="Selfie Preview" class="w-full rounded-md mt-2" />
+              <button type="button" @click="removeImage('selfie')"
+                class="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center">&times;</button>
+            </div>
+            <input type="file" id="selfieFile" @change="handleFileUpload($event, 'selfie')" accept="image/*"
+              class="hidden">
+            <p v-if="errors.selfieFile" class="text-red-600 text-xs mt-1">{{ errors.selfieFile }}</p>
+          </div>
+          <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">
+            <p class="font-semibold mb-2">ข้อควรหลีกเลี่ยง:</p>
+            <ul class="space-y-1">
+              <li class="flex items-center"><i
+                  class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>ใบหน้าไม่ชัดหรือถูกบัง</li>
+              <li class="flex items-center"><i
+                  class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>บัตรไม่ชัดหรือไม่เต็ม</li>
+              <li class="flex items-center"><i class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>แสงน้อยเกินไป</li>
+              <li class="flex items-center"><i class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>ระยะไกลเกินไป</li>
+            </ul>
+          </div>
+          <div class="mb-6">
+            <label class="flex items-start">
+              <input type="checkbox" v-model="formData.pdpa"
+                class="mr-3 mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+              <span class="text-sm text-gray-700">ข้าพเจ้ายินยอมรับ <a href="#"
+                  class="text-blue-600 hover:underline">ข้อตกลงและเงื่อนไขฯ</a> และได้อ่าน <a href="#"
+                  class="text-blue-600 hover:underline">นโยบายความเป็นส่วนตัว</a> แล้ว</span>
+            </label>
+            <p v-if="errors.pdpa" class="text-red-600 text-xs mt-1">{{ errors.pdpa }}</p>
+          </div>
+          <div class="flex gap-4">
+            <button type="button" @click="prevStep"
+              class="w-full py-3 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition">ย้อนกลับ</button>
+            <button type="submit"
+              class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition">สมัครสมาชิก</button>
+          </div>
+        </div>
+      </form>
+
+      <p class="mt-8 text-center text-gray-600 text-sm">
+        มีบัญชีแล้ว? <NuxtLink to="/login" class="text-blue-600 hover:underline font-medium">เข้าสู่ระบบ</NuxtLink>
+      </p>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
+import { ref, reactive, computed, onMounted } from 'vue';
+import { useAuth } from '~/composables/useAuth';
+import { useRouter } from '#app';
 
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const firstName = ref('')
-const lastName = ref('')
-const errorMessage = ref('')
-const successMessage = ref('')
-const router = useRouter()
-const { register } = useAuth()
+const { register } = useAuth();
+const router = useRouter();
 
-const submitRegister = async () => {
-  errorMessage.value = ''
-  successMessage.value = ''
+const currentStep = ref(1);
+const totalSteps = 3;
 
-  if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง'
-    return
+const formData = reactive({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  firstName: '',
+  lastName: '',
+  phoneNumber: '',
+  gender: '',
+  idCardFile: null,
+  idNumber: '',
+  expiryDate: '',
+  selfieFile: null,
+  pdpa: false,
+});
+
+const errors = reactive({});
+const idCardPreview = ref(null);
+const selfiePreview = ref(null);
+
+onMounted(() => {
+  const faScript = document.createElement('script');
+  faScript.src = 'https://kit.fontawesome.com/a076d05399.js';
+  faScript.crossOrigin = 'anonymous';
+  document.head.appendChild(faScript);
+
+  const fontLink = document.createElement('link');
+  fontLink.href = 'https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap';
+  fontLink.rel = 'stylesheet';
+  document.head.appendChild(fontLink);
+});
+
+const stepProgress = computed(() => {
+  if (totalSteps <= 1) return '0%';
+  return `${((currentStep.value - 1) / (totalSteps - 1)) * 100}%`;
+});
+
+const getStepLabel = (step) => {
+  return ['บัญชีผู้ใช้', 'ข้อมูลส่วนตัว', 'ยืนยันตัวตน'][step - 1];
+};
+
+const getStepClass = (step) => {
+  let baseClasses = 'flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-all duration-500';
+  if (step < currentStep.value) {
+    return `${baseClasses} bg-blue-600 text-white`;
+  } else if (step === currentStep.value) {
+    return `${baseClasses} bg-blue-600 text-white ring-4 ring-blue-200`;
+  } else {
+    return `${baseClasses} bg-gray-300 text-gray-500`;
   }
-  try {
-    await register(
-      email.value,
-      password.value,
-      firstName.value,
-      lastName.value
-    )
-    successMessage.value = 'สมัครสมาชิกสำเร็จ กรุณาไปล็อกอิน'
-    setTimeout(() => router.push('/login'), 1500)
-  } catch (err) {
-    console.error(err)
-    errorMessage.value = 'เกิดข้อผิดพลาดในการสมัคร กรุณาลองใหม่'
+};
+
+const getLabelClass = (step) => {
+  let baseClasses = 'text-xs text-center mt-2 transition-all duration-500';
+  if (step < currentStep.value) {
+    return `${baseClasses} font-semibold text-blue-600`;
+  } else if (step === currentStep.value) {
+    return `${baseClasses} font-semibold text-blue-600`;
+  } else {
+    return `${baseClasses} text-gray-500`;
+  }
+};
+
+const clearErrors = () => {
+  Object.keys(errors).forEach(key => delete errors[key]);
+};
+
+const validationFunctions = [
+  () => {
+    clearErrors();
+    if (!formData.username || formData.username.length < 4) errors.username = 'ชื่อผู้ใช้ต้องมีอย่างน้อย 4 ตัวอักษร';
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = 'รูปแบบอีเมลไม่ถูกต้อง';
+    if (!formData.password || formData.password.length < 8) errors.password = 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
+    if (formData.password !== formData.confirmPassword || !formData.confirmPassword) errors.confirmPassword = 'รหัสผ่านไม่ตรงกัน';
+    return Object.keys(errors).length === 0;
+  },
+  () => {
+    clearErrors();
+    if (!formData.firstName.trim()) errors.firstName = 'กรุณากรอกชื่อจริง';
+    if (!formData.lastName.trim()) errors.lastName = 'กรุณากรอกนามสกุล';
+    if (!/^\d{9,10}$/.test(formData.phoneNumber)) errors.phoneNumber = 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง';
+    if (!formData.gender) errors.gender = 'กรุณาเลือกเพศ';
+    return Object.keys(errors).length === 0;
+  },
+  () => {
+    clearErrors();
+    if (!formData.idCardFile) errors.idCardFile = 'กรุณาอัปโหลดรูปบัตรประชาชน';
+    if (!/^\d{13}$/.test(formData.idNumber)) errors.idNumber = 'กรุณากรอกหมายเลขบัตรประชาชน 13 หลัก';
+    if (!formData.expiryDate.trim() || !/^\d{2}\/\d{2}\/\d{4}$/.test(formData.expiryDate)) errors.expiryDate = 'กรุณากรอกวันหมดอายุบัตรในรูปแบบ วว/ดด/ปปปป';
+    if (!formData.selfieFile) errors.selfieFile = 'กรุณาอัปโหลดรูปถ่ายใบหน้า';
+    if (!formData.pdpa) errors.pdpa = 'กรุณายอมรับข้อตกลงและเงื่อนไข';
+    return Object.keys(errors).length === 0;
+  }
+];
+
+const nextStep = () => {
+  if (validationFunctions[currentStep.value - 1]()) {
+    if (currentStep.value < totalSteps) {
+      currentStep.value++;
+    }
+  }
+};
+
+const prevStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+    clearErrors();
+  }
+};
+
+const handleRegister = async () => {
+  if (validationFunctions[currentStep.value - 1]()) {
+    console.log('Form is valid, preparing data to submit...');
+    const parts = formData.expiryDate.split('/');
+    const isoDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).toISOString();
+    const dataToSubmit = new FormData();
+    dataToSubmit.append('email', formData.email);
+    dataToSubmit.append('username', formData.username);
+    dataToSubmit.append('password', formData.password);
+    dataToSubmit.append('firstName', formData.firstName);
+    dataToSubmit.append('lastName', formData.lastName);
+    dataToSubmit.append('phoneNumber', formData.phoneNumber);
+    dataToSubmit.append('gender', formData.gender.toUpperCase());
+    dataToSubmit.append('nationalIdNumber', formData.idNumber);
+    dataToSubmit.append('nationalIdExpiryDate', isoDate);
+    dataToSubmit.append('nationalIdPhotoUrl', formData.idCardFile);
+    dataToSubmit.append('selfiePhotoUrl', formData.selfieFile);
+
+    try {
+      await register(dataToSubmit);
+      alert('สมัครสมาชิกสำเร็จ!');
+      router.push('/login');
+    } catch (err) {
+      console.error('Registration failed:', err);
+      alert('สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+    }
+  }
+};
+
+const triggerFileUpload = (inputId) => {
+  document.getElementById(inputId)?.click();
+};
+
+const handleFileUpload = (event, type) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const result = e.target?.result;
+    if (type === 'idCard') {
+      idCardPreview.value = result;
+      formData.idCardFile = file;
+      if (errors.idCardFile) delete errors.idCardFile;
+    } else if (type === 'selfie') {
+      selfiePreview.value = result;
+      formData.selfieFile = file;
+      if (errors.selfieFile) delete errors.selfieFile;
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+const removeImage = (type) => {
+  if (type === 'idCard') {
+    idCardPreview.value = null;
+    formData.idCardFile = null;
+  } else if (type === 'selfie') {
+    selfiePreview.value = null;
+    formData.selfieFile = null;
   }
 }
 
-import { onMounted } from 'vue';
-
-// onMounted จะสั่งให้โค้ดข้างในทั้งหมดเริ่มทำงาน
-// ก็ต่อเมื่อหน้าเว็บแสดงผลบนเบราว์เซอร์ของผู้ใช้เรียบร้อยแล้ว
-onMounted(() => {
-
-  // --- Toggle Password Visibility ---
-  const togglePasswordBtn = document.getElementById('togglePassword');
-
-  // เพิ่มการตรวจสอบว่ามีปุ่มนี้ในหน้าจริงหรือไม่ ก่อนจะเพิ่ม event listener
-  if (togglePasswordBtn) {
-    togglePasswordBtn.addEventListener('click', function () {
-      const passwordInput = document.getElementById('password');
-      const eyeIcon = document.getElementById('eyeIcon');
-
-      // เพิ่มการตรวจสอบว่า element ของ input และ icon มีอยู่จริง
-      if (passwordInput && eyeIcon) {
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          eyeIcon.innerHTML = `
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 11-4.243-4.243m4.242 4.242L9.88 9.88" />
-          `;
-        } else {
-          passwordInput.type = 'password';
-          eyeIcon.innerHTML = `
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          `;
-        }
-      }
-    });
+const formatExpiryDate = () => {
+  let value = formData.expiryDate;
+  const digits = value.replace(/\D/g, '');
+  if (digits.length <= 2) {
+    formData.expiryDate = digits;
+  } else if (digits.length <= 4) {
+    formData.expiryDate = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  } else {
+    formData.expiryDate = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
   }
-
-  // --- Add CSS for ripple animation ---
-  // การสร้าง style tag แบบนี้จะทำงานได้เมื่ออยู่ใน onMounted
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-  `;
-  document.head.appendChild(style);
-
-});
-
-onMounted(() => {
-
-  // --- Toggle Confirm Password Visibility ---
-  const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
-
-  if (toggleConfirmPasswordBtn) {
-    toggleConfirmPasswordBtn.addEventListener('click', function () {
-      const passwordInput = document.getElementById('confirmPassword');
-
-      // แก้ไข #1: ค้นหา eyeIcon ที่อยู่ "ข้างใน" ปุ่มที่ถูกคลิกโดยตรง
-      // เพื่อแก้ปัญหาการมี id ซ้ำกัน
-      const eyeIcon = this.querySelector('svg'); // 'this' ในที่นี้คือตัวปุ่มที่ถูกคลิก
-
-      if (passwordInput && eyeIcon) {
-
-        // แก้ไข #2: ตรวจสอบ type ที่ถูกต้องคือ "password"
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          eyeIcon.innerHTML = `
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 11-4.243-4.243m4.242 4.242L9.88 9.88" />
-          `;
-        } else {
-          // แก้ไข #3: กำหนด type กลับไปเป็น "password"
-          passwordInput.type = 'password';
-          eyeIcon.innerHTML = `
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          `;
-        }
-      }
-    });
-  }
-
-  // --- Add CSS for ripple animation ---
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-  `;
-  document.head.appendChild(style);
-
-});
+};
 </script>
 
 <style scoped>
-/* Custom animations */
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.animate-slideUp {
-  animation: slideUp 0.8s ease-out;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 1s ease-out;
-}
-
-.animate-pulse-custom {
-  animation: pulse 2s infinite;
-}
-
-.shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #F53D2D, #FF6633, #FFB84D);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.glass-effect {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.input-focus {
-  transition: all 0.3s ease;
-}
-
-.input-focus:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(245, 61, 45, 0.2);
-}
-
-.btn-hover {
-  transition: all 0.3s ease;
-}
-
-.btn-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(245, 61, 45, 0.4);
-}
-
-.floating-shapes {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.floating-shapes::before,
-.floating-shapes::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  background: linear-gradient(45deg, rgba(245, 61, 45, 0.1), rgba(255, 102, 51, 0.1));
-  animation: float 6s ease-in-out infinite;
-}
-
-.floating-shapes::before {
-  width: 300px;
-  height: 300px;
-  top: -150px;
-  right: -150px;
-  animation-delay: 0s;
-}
-
-.floating-shapes::after {
-  width: 200px;
-  height: 200px;
-  bottom: -100px;
-  left: -100px;
-  animation-delay: 3s;
-}
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-20px) rotate(180deg);
-  }
-}
+/* Scoped styles for the parent component can remain here if any */
 </style>

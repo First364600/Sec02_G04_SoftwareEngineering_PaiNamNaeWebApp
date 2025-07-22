@@ -50,6 +50,14 @@ const getUserById = async (id) => {
 }
 
 const createUser = async (data) => {
+    const existingUserByEmail = await getUserByEmail(data.email);
+    if (existingUserByEmail) {
+        throw new ApiError(409, "This email is already in use.");
+    }
+    const existingUserByUsername = await getUserByUsername(data.username);
+    if (existingUserByUsername) {
+        throw new ApiError(409, "This username is already taken.");
+    }
     const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
     const createData = {
