@@ -63,10 +63,10 @@ const createVehicle = asyncHandler(async (req, res) => {
 
 const updateVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
-  const vehicleId = req.params
+  const { id } = req.params
   const payload = req.body;
 
-  const updated = await vehicleService.updateVehicle(vehicleId,ownerId,payload)
+  const updated = await vehicleService.updateVehicle(id, ownerId, payload)
 
   res.status(200).json({
     success: true,
@@ -89,7 +89,7 @@ const updateVehicle = asyncHandler(async (req, res) => {
 const deleteVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const { id } = req.params;
-  const result = await vehicleService.deleteVehicle(id,ownerId);
+  const result = await vehicleService.deleteVehicle(id, ownerId);
 
   res.status(200).json({
     success: true,

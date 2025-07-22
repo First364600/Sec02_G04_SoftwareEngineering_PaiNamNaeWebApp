@@ -79,14 +79,14 @@ const updateVehicle = async (vehicleId, userId, updateData) => {
 
 const deleteVehicle = async (vehicleId, userId) => {
   const existingVehicle = await prisma.vehicle.findFirst({
-    where: {id:vehicleId,userId}
+    where: { id: vehicleId, userId }
   })
   if (!existingVehicle) {
     throw new Error("Vehicle not found or access denied");
   }
 
-  await prisma.vehicle.delete({ where: { id:vehicleId } });
-  return id;
+  await prisma.vehicle.delete({ where: { id: vehicleId } });
+  return { id: vehicleId };
 };
 module.exports = {
   getAllVehicles,
