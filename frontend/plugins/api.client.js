@@ -16,13 +16,18 @@ export default defineNuxtPlugin(() => {
             };
           }
         },
-        
+
         async onResponse({ request, response, options }) {
 
           if (response._data && response._data.hasOwnProperty('data')) {
             response._data = response._data.data;
           }
+        },
+        
+        onResponseError({ response }) {
+          if (response.status === 401) return navigateTo('/login')
         }
+
       }),
     },
   };

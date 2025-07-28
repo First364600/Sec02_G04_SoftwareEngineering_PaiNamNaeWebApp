@@ -3,17 +3,25 @@ import { useRouter } from 'vue-router'
 
 export function useAuth() {
   const { $api } = useNuxtApp()
-  const token = useCookie('token')
-  const user = useCookie('user')
+  const token = useCookie('token', { maxAge: 60 * 60 * 24 * 7, secure: true })
+  const user = useCookie('user', { maxAge: 60 * 60 * 24 * 7, secure: true })
   const router = useRouter()
 
-  const login = async (email, password) => {
+  const login = async (identifier, password) => {
+    const payload = { password }
+    if (identifier.includes('@')) {
+      payload.email = identifier
+    } else {
+      payload.username = identifier
+    }
+
     const res = await $api('/auth/login', {
       method: 'POST',
-      body: { email, password }
+      body: payload
     })
     token.value = res.token
     user.value = res.user
+    return res
   }
 
   const register = async (email, password, firstName, lastName) => {

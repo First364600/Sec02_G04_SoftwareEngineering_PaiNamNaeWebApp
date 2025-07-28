@@ -21,7 +21,7 @@ export default defineNuxtConfig({
       // update Nuxt defaults
       title: "ร้านค้าโจอี้",
       meta: [{ name: "description", content: "รายละเอียด" }],
-      charset: "utf-16",
+      charset: "utf-8",
       viewport: "width=device-width, initial-scale=1, maximum-scale=1",
     },
   },

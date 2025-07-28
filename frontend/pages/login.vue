@@ -5,9 +5,9 @@
       <form @submit.prevent="submit" id="loginForm">
         <!-- username / Email -->
         <div class="mb-4">
-          <label for="identifier" class="block text-sm font-medium text-gray-700 mb-1">เบอร์โทรศัพท์ หรือ อีเมล <span
+          <label for="identifier" class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้ หรือ อีเมล<span
               class="text-red-500">*</span></label>
-          <input type="text" id="email" v-model="email" required placeholder="กรอกชื่อผู้ใช้หรืออีเมล"
+          <input type="text" id="identifier" v-model="identifier" required placeholder="กรอกชื่อผู้ใช้หรืออีเมล"
             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
         </div>
 
@@ -40,7 +40,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 
-const email = ref('')
+const identifier = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const router = useRouter()
@@ -49,11 +49,11 @@ const { login } = useAuth()
 const submit = async () => {
   errorMessage.value = ''
   try {
-    await login(email.value, password.value)
+    await login(identifier.value, password.value)
     router.push('/register')
   } catch (e) {
     console.error(e)
-    errorMessage.value = 'เข้าสู่ระบบไม่สำเร็จ'
+    errorMessage.value = e?.data?.message || 'เข้าสู่ระบบไม่สำเร็จ'
   }
 }
 
