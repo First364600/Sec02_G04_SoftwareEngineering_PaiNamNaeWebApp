@@ -50,7 +50,7 @@ const submit = async () => {
   errorMessage.value = ''
   try {
     await login(identifier.value, password.value)
-    router.push('/register')
+    router.push('/')
   } catch (e) {
     console.error(e)
     errorMessage.value = e?.data?.message || 'เข้าสู่ระบบไม่สำเร็จ'
