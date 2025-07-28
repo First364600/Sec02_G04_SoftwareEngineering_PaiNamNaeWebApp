@@ -7,19 +7,19 @@ export function useAuth() {
   const user = useCookie('user')
   const router = useRouter()
 
-  const login = async (email, username, password) => {
+  const login = async (email, password) => {
     const res = await $api('/auth/login', {
       method: 'POST',
-      body: { email, username, password }
+      body: { email, password }
     })
     token.value = res.token
     user.value = res.user
   }
 
-  const register = async (formData) => {
+  const register = async (email, password, firstName, lastName) => {
     const res = await $api('/users', {
       method: 'POST',
-      body: formData
+      body: { email, password, firstName, lastName }
     })
     return res
   }
