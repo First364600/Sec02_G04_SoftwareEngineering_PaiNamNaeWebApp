@@ -47,7 +47,7 @@
                             </div>
                         </div>
                         <div v-if="!token" class="flex items-center space-x-3 ">
-                            <a href="#"
+                            <a href="/register"
                                 class="text-gray-600 hover:text-blue-600 transition-colors duration-200">สมัครสมาชิก</a>
                             <span class="text-gray-600">|</span>
                             <a href="/login"
