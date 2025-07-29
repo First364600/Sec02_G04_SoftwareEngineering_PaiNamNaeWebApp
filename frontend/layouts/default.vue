@@ -6,20 +6,20 @@
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo -->
                     <div class="flex items-center">
-                        <h1 class="text-xl sm:text-2xl font-bold text-blue-600">Car Pool</h1>
+                        <h1 class="text-xl sm:text-2xl font-bold text-blue-600">ไปนำแหน่</h1>
                     </div>
 
                     <!-- Desktop Navigation -->
                     <nav class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                        <NuxtLink to="/"
-                            class="text-blue-600 font-medium hover:text-blue-700 transition-colors duration-200"
-                            :class="{ 'text-blue-600': $route.path === '/' }">
+                        <NuxtLink to="/findTrip"
+                            class="text-gray-600 font-medium hover:text-blue-700 transition-colors duration-200"
+                            :class="{ 'text-blue-600': $route.path === '/findTrip' }">
                             ค้นหาเส้นทาง
                         </NuxtLink>
 
                         <NuxtLink to="/" class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
                             :class="{ 'text-blue-600': $route.path === '/' }">
-                            เสนอเส้นทาง
+                            สร้างเส้นทาง
                         </NuxtLink>
 
                         <!-- การเดินทางของฉัน with dropdown -->
@@ -115,7 +115,7 @@
                         <NuxtLink to="/" class="block px-3 py-2 rounded-md transition-colors duration-200"
                             :class="$route.path === '/' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'"
                             @click="closeMobileMenu">
-                            เสนอเส้นทาง
+                            สร้างเส้นทาง
                         </NuxtLink>
 
                         <!-- Mobile dropdown for การเดินทางของฉัน -->

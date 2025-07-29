@@ -33,5 +33,11 @@ export default defineNuxtConfig({
     plugins: [tailwindcssVite()],
   },
 
-  css: ["~/assets/css/input.css"],
+  css: [
+    'leaflet/dist/leaflet.css',
+    '~/assets/css/input.css'
+  ],
+  build: {
+    transpile: ['leaflet']
+  },
 });

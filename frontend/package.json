@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "jwt-decode": "^4.0.0",
+    "leaflet": "^1.9.4",
     "nuxt": "^3.17.4",
     "swiper": "^11.2.8",
     "tailwindcss": "^4.1.8",
