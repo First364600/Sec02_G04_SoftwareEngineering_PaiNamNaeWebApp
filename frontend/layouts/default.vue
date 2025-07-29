@@ -27,9 +27,9 @@
 
                         <!-- การเดินทางของฉัน with dropdown -->
                         <div class="relative dropdown-trigger">
-                            <NuxtLink to="/"
+                            <NuxtLink to="/myTrip"
                                 class="text-gray-600 hover:text-blue-600 transition-colors duration-200 flex items-center"
-                                :class="{ 'text-blue-600': $route.path.startsWith('/') }">
+                                :class="{ 'text-blue-600': $route.path.startsWith('/myTrip') }">
                                 การเดินทางของฉัน
                                 <svg class="w-4 h-4 ml-1 transition-transform duration-200" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
