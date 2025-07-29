@@ -5,9 +5,11 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo -->
-                    <div class="flex items-center">
-                        <h1 class="text-xl sm:text-2xl font-bold text-blue-600">ไปนำแหน่</h1>
-                    </div>
+                    <NuxtLink to="/">
+                        <div class="flex items-center">
+                            <h1 class="text-xl sm:text-2xl font-bold text-blue-600">ไปนำแหน่</h1>
+                        </div>
+                    </NuxtLink>
 
                     <!-- Desktop Navigation -->
                     <nav class="hidden md:flex items-center space-x-6 lg:space-x-8">
@@ -17,7 +19,8 @@
                             ค้นหาเส้นทาง
                         </NuxtLink>
 
-                        <NuxtLink to="/createTrip" class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                        <NuxtLink to="/createTrip"
+                            class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
                             :class="{ 'text-blue-600': $route.path === '/createTrip' }">
                             สร้างเส้นทาง
                         </NuxtLink>
@@ -73,7 +76,7 @@
                                 class="dropdown-menu absolute top-full right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 user-dropdown-arrow">
                                 <NuxtLink to="/profile"
                                     class="w-full text-left block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 flex items-center">
-                                    
+
                                     บัญชีของฉัน
                                 </NuxtLink>
                                 <button @click="logout"
