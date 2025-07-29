@@ -132,7 +132,7 @@
         <transition name="modal-fade">
             <div v-if="showModal && bookingRoute" class="modal-overlay" @click.self="closeModal">
                 <div class="modal-content">
-                    <div class="flex justify-between items-center p-6 border-b">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200">
                         <h3 class="text-xl font-semibold text-gray-900">ยืนยันการจอง</h3>
                         <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +153,7 @@
                                     <div class="flex items-center">
                                         <div class="flex text-yellow-400 text-sm">
                                             <span v-for="star in 5" :key="star">{{ star <= bookingRoute.driver.rating
-                                                    ? '★' : '☆' }}</span>
+                                                ? '★' : '☆' }}</span>
                                         </div>
                                         <span class="ml-2 text-sm text-gray-600">{{ bookingRoute.driver.rating }} ({{
                                             bookingRoute.driver.reviews }} รีวิว)</span>
@@ -208,21 +208,17 @@
                                     </option>
                                 </select>
                             </div>
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">เลือกจุดขึ้นรถ</label>
-                                <select
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option>สถานีขนส่งหมอชิต</option>
-                                    <option>สถานีรถไฟฟ้าพญาไท</option>
-                                </select>
+                                <input type="text" v-model="pickupPoint" placeholder="กรอกเพื่อค้นหาจุดขึ้นรถ..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">เลือกจุดลงรถ</label>
-                                <select
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option>สถานีขนส่งเชียงใหม่</option>
-                                    <option>ประตูท่าแพ</option>
-                                </select>
+                                <input type="text" v-model="dropoffPoint" placeholder="กรอกเพื่อค้นหาจุดลงรถ..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
                         </div>
 
@@ -235,7 +231,7 @@
                                 <span class="text-gray-700">จำนวนที่นั่ง</span>
                                 <span class="text-gray-900 font-medium">{{ bookingSeats }} ที่นั่ง</span>
                             </div>
-                            <div class="border-t pt-2 mt-2">
+                            <div class="border-t pt-2 mt-2  border-gray-200">
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold text-gray-900">ยอดรวม</span>
                                     <span class="font-bold text-blue-600 text-lg">{{ bookingTotalPrice }} บาท</span>
@@ -313,11 +309,27 @@ const showModal = ref(false)
 const bookingRoute = ref(null) // To store the data of the route being booked
 const bookingSeats = ref(1)   // To store the number of seats selected in the modal
 
+const pickupPoint = ref('') 
+const dropoffPoint = ref('')
+
 const bookingTotalPrice = computed(() => {
     if (!bookingRoute.value) return 0
     return bookingSeats.value * bookingRoute.value.price
 })
 
+function openModal() {
+    const routeData = routes.value.find(r => r.id === selectedRoute.value)
+    if (routeData && routeData.availableSeats > 0) {
+        bookingRoute.value = routeData
+        bookingSeats.value = 1
+        
+        // ✨ เพิ่ม 2 บรรทัดนี้เพื่อเคลียร์ค่าเก่าทุกครั้งที่เปิด Modal
+        pickupPoint.value = ''
+        dropoffPoint.value = ''
+
+        showModal.value = true
+    }
+}
 
 // --- Methods ---
 const toggleDetails = (routeId) => {
@@ -361,14 +373,7 @@ const updateMapForRoute = (routeId) => {
     map.fitBounds(polyline.getBounds(), { padding: [30, 30] })
 }
 
-function openModal() {
-    const routeData = routes.value.find(r => r.id === selectedRoute.value)
-    if (routeData && routeData.availableSeats > 0) {
-        bookingRoute.value = routeData
-        bookingSeats.value = 1 // Reset to 1 seat every time modal opens
-        showModal.value = true
-    }
-}
+
 
 function closeModal() {
     showModal.value = false
@@ -378,10 +383,7 @@ function closeModal() {
     }, 300);
 }
 
-function confirmBooking() {
-    alert(`การจองสำเร็จ!\nเส้นทาง: ${bookingRoute.value.driver.name}\nจำนวน: ${bookingSeats.value} ที่นั่ง\nราคารวม: ${bookingTotalPrice.value} บาท`)
-    closeModal()
-}
+
 
 // Ensure map is initialized on mount if Leaflet is already loaded
 onMounted(() => {
@@ -443,7 +445,6 @@ body,
 .modal-content {
     background-color: white;
     border-radius: 0.75rem;
-    /* 12px */
     max-width: 600px;
     width: 95%;
     max-height: 90vh;
