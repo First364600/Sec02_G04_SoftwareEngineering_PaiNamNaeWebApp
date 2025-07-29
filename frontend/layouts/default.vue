@@ -197,8 +197,6 @@ const { token, user, logout } = useAuth()
 const isMobileMenuOpen = ref(false)
 const isMobileTripMenuOpen = ref(false)
 
-
-
 // Methods
 const toggleMobileMenu = () => {
     isMobileMenuOpen.value = !isMobileMenuOpen.value
