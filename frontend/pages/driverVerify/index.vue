@@ -20,8 +20,6 @@
                 <!-- Form Container -->
                 <div class="bg-white rounded-xl shadow-xl p-8">
                     <form @submit.prevent="handleSubmit" novalidate class="space-y-8">
-
-
                         <div class="relative mb-8">
                             <div class="flex items-center mb-4">
                                 <div class="step-indicator mr-4 bg-gray-400">0</div>
