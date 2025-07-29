@@ -17,8 +17,8 @@
                             ค้นหาเส้นทาง
                         </NuxtLink>
 
-                        <NuxtLink to="/" class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                            :class="{ 'text-blue-600': $route.path === '/' }">
+                        <NuxtLink to="/createTrip" class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                            :class="{ 'text-blue-600': $route.path === '/createTrip' }">
                             สร้างเส้นทาง
                         </NuxtLink>
 
