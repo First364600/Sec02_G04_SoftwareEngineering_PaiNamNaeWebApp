@@ -74,17 +74,10 @@
                         <form @submit.prevent="handleProfileUpdate" class="space-y-6" novalidate>
                             <!-- รูปโปรไฟล์ -->
                             <div class="text-center">
-                                <img src="" alt="Profile Preview"
-                                    class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-white shadow-md">
-                                <div
-                                    class="w-24 h-24 bg-blue-500 rounded-full mx-auto mb-3 flex items-center justify-center border-4 border-white shadow-md">
-                                    <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                    </svg>
-                                </div>
+                                <img :src="previewUrl" alt="Profile Preview"
+                                    class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-white shadow-md" />
                                 <p class="text-xs text-gray-600 mb-3">* ระบบจะใช้รูปภาพนี้เพื่อแสดงบนโปรไฟล์</p>
-                                <input type="file"
+                                <input type="file" accept="image/*" @change="handleFileChange"
                                     class="mx-auto block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
                             </div>
 
@@ -199,6 +192,8 @@ const phoneNumber = ref('')
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmNewPassword = ref('')
+const profilePictureFile = ref(null)
+const previewUrl = ref('')
 
 onMounted(() => {
     if (user.value) {
@@ -206,6 +201,13 @@ onMounted(() => {
         lastName.value = user.value.lastName || ''
         email.value = user.value.email || ''
         phoneNumber.value = user.value.phoneNumber || ''
+    }
+
+    if (user.value.profilePicture) {
+        const pic = user.value.profilePicture
+        previewUrl.value = pic.startsWith('http')
+            ? pic
+            : `${useNuxtApp().$config.public.apiBase}${pic}`
     }
 })
 
@@ -227,16 +229,33 @@ function formatDate(raw) {
     return raw ? dayjs(raw).format('YYYY-MM-DD HH:mm') : ''
 }
 
+function handleFileChange(e) {
+    const file = e.target.files?.[0]
+    if (file) {
+        profilePictureFile.value = file
+        previewUrl.value = URL.createObjectURL(file)
+    }
+}
+
 async function handleProfileUpdate() {
     try {
-        const payload = {
-            firstName: firstName.value,
-            lastName: lastName.value,
-            email: email.value
+        // const payload = {
+        //     firstName: firstName.value,
+        //     lastName: lastName.value,
+        //     email: email.value
+        // }
+
+        const form = new FormData()
+        form.append('firstName', firstName.value)
+        form.append('lastName', lastName.value)
+        form.append('email', email.value)
+
+        if (profilePictureFile.value) {
+            form.append('profilePicture', profilePictureFile.value)
         }
         const updatedUser = await $api('/users/me', {
             method: 'PUT',
-            body: payload
+            body: form
         })
         user.value = updatedUser
 
