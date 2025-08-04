@@ -90,14 +90,16 @@
 
                             <!-- ชื่อจริง -->
                             <div>
-                                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">ชื่อจริง</label>
+                                <label for="firstName"
+                                    class="block text-sm font-medium text-gray-700 mb-2">ชื่อจริง</label>
                                 <input id="firstName" v-model="firstName" type="text" placeholder="กรอกชื่อจริง"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
 
                             <!-- นามสกุล -->
                             <div>
-                                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">นามสกุล</label>
+                                <label for="lastName"
+                                    class="block text-sm font-medium text-gray-700 mb-2">นามสกุล</label>
                                 <input id="lastName" v-model="lastName" type="text" placeholder="กรอกนามสกุล" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
@@ -139,12 +141,13 @@
                                         <label for="currentPassword"
                                             class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่านเดิม</label>
                                         <input type="password" id="currentPassword" placeholder="กรอกรหัสผ่านเดิม"
+                                            v-model="currentPassword"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     </div>
                                     <div>
                                         <label for="newPassword"
                                             class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่านใหม่</label>
-                                        <input type="password" id="newPassword" minlength="6"
+                                        <input type="password" id="newPassword" minlength="6" v-model="newPassword"
                                             placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     </div>
@@ -152,7 +155,7 @@
                                         <label for="confirmPassword"
                                             class="block text-sm font-medium text-gray-700 mb-2">ยืนยันรหัสผ่านใหม่</label>
                                         <input type="password" id="confirmPassword" minlength="6"
-                                            placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
+                                            v-model="confirmNewPassword" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     </div>
                                 </div>
@@ -193,6 +196,9 @@ const firstName = ref('')
 const lastName = ref('')
 const email = ref('')
 const phoneNumber = ref('')
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmNewPassword = ref('')
 
 onMounted(() => {
     if (user.value) {
@@ -209,6 +215,10 @@ function resetForm() {
         lastName.value = user.value.lastName || ''
         email.value = user.value.email || ''
         phoneNumber.value = user.value.phoneNumber || ''
+
+        currentPassword.value = user.value.currentPassword || ''
+        newPassword.value = user.value.newPassword || ''
+        confirmNewPassword.value = user.value.confirmNewPassword || ''
     }
 }
 
@@ -224,21 +234,43 @@ async function handleProfileUpdate() {
             lastName: lastName.value,
             email: email.value
         }
-        const updated = await $api('/users/me', {
+        const updatedUser = await $api('/users/me', {
             method: 'PUT',
             body: payload
         })
-        user.value = updated
+        user.value = updatedUser
 
-        // แจ้งผล
+        if (currentPassword.value || newPassword.value || confirmNewPassword.value) {
+            if (!currentPassword.value || !newPassword.value || !confirmNewPassword.value) {
+                alert('กรุณากรอกรหัสผ่านให้ครบถ้วน')
+                return
+            }
+            if (newPassword.value !== confirmNewPassword.value) {
+                alert('รหัสผ่านใหม่ไม่ตรงกัน')
+                return
+            }
+
+            await $api('/auth/change-password', {
+                method: 'PUT',
+                body: {
+                    currentPassword: currentPassword.value,
+                    newPassword: newPassword.value,
+                    confirmNewPassword: confirmNewPassword.value
+                }
+            })
+            alert('เปลี่ยนรหัสผ่านสำเร็จ')
+
+            currentPassword.value = ''
+            newPassword.value = ''
+            confirmNewPassword.value = ''
+        }
+
         alert('อัพเดตโปรไฟล์สำเร็จ')
     } catch (err) {
-        console.error('handleProfileUpdate error', err)
-        alert('อัพเดตโปรไฟล์ไม่สำเร็จ')
+        console.error(err)
+        alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
