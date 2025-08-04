@@ -19,10 +19,10 @@
                             <h3 class="text-sm font-semibold text-gray-900 mb-2 px-4">การจัดการบัญชี</h3>
                             <ul class="space-y-1">
                                 <li>
-                                    <a href="#"
-                                        :class="['block px-4 py-2 text-sm rounded-md font-medium', activeTab === 'profile' ? 'text-blue-600 bg-blue-100' : 'text-gray-700 hover:bg-gray-100']">
+                                    <NuxtLink to="/profile"
+                                        class="block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100">
                                         โปรไฟล์ของฉัน
-                                    </a>
+                                    </NuxtLink>
                                 </li>
                             </ul>
                         </div>
@@ -32,10 +32,10 @@
                             <h3 class="text-sm font-semibold text-gray-900 mb-2 px-4">การยืนยันตัวตน</h3>
                             <ul class="space-y-1">
                                 <li>
-                                    <a href="#" @click.prevent="activeTab = 'verification'"
-                                        :class="['block px-4 py-2 text-sm rounded-md', activeTab === 'verification' ? 'text-blue-600 bg-blue-100' : 'text-gray-700 hover:bg-gray-100']">
+                                    <NuxtLink to="/profile"
+                                        class="block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100">
                                         การยืนยันตัวตนขั้นพื้นฐาน
-                                    </a>
+                                    </NuxtLink>
                                 </li>
                                 <li>
                                     <NuxtLink to="/"
@@ -51,10 +51,10 @@
                             <h3 class="text-sm font-semibold text-gray-900 mb-2 px-4">โหมดผู้ขับขี่</h3>
                             <ul class="space-y-1">
                                 <li>
-                                    <a href="#"
-                                        :class="['block px-4 py-2 text-sm rounded-md', activeTab === 'myCar' ? 'text-blue-600 bg-blue-100' : 'text-gray-700 hover:bg-gray-100']">
+                                    <NuxtLink to="/"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
                                         ข้อมูลรถยนต์ของฉัน
-                                    </a>
+                                    </NuxtLink>
                                 </li>
                             </ul>
                         </div>
