@@ -90,17 +90,15 @@
 
                             <!-- ชื่อจริง -->
                             <div>
-                                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">ชื่อจริง
-                                    *</label>
-                                <input id="firstName" type="text" placeholder="กรอกชื่อจริง" required
+                                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">ชื่อจริง</label>
+                                <input id="firstName" v-model="firstName" type="text" placeholder="กรอกชื่อจริง"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
 
                             <!-- นามสกุล -->
                             <div>
-                                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">นามสกุล
-                                    *</label>
-                                <input id="lastName" type="text" placeholder="กรอกนามสกุล" required
+                                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">นามสกุล</label>
+                                <input id="lastName" v-model="lastName" type="text" placeholder="กรอกนามสกุล" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
 
@@ -108,28 +106,28 @@
                             <div>
                                 <label for="phone"
                                     class="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์</label>
-                                <input type="text" id="phone" value="0803852628" disabled
+                                <input type="text" id="phone" v-model="phoneNumber" disabled
                                     class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
                             </div>
 
                             <!-- อีเมล -->
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
-                                <input id="email" type="email" placeholder="example@example.com"
+                                <input id="email" v-model="email" type="email" placeholder="example@example.com"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
 
                             <!-- วันที่สร้างบัญชี -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">วันที่สร้างบัญชี</label>
-                                <input type="text" value="2025-01-01 12:00" disabled
+                                <input type="text" :value="formatDate(user?.createdAt)" disabled
                                     class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
                             </div>
 
                             <!-- วันที่แก้ไขล่าสุด -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">วันที่แก้ไขล่าสุด</label>
-                                <input type="text" value="2025-07-01 14:30" disabled
+                                <input type="text" :value="formatDate(user?.updatedAt)" disabled
                                     class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
                             </div>
 
@@ -162,7 +160,7 @@
 
                             <!-- ปุ่มดำเนินการ -->
                             <div class="pt-6 flex justify-end gap-4">
-                                <button type="button"
+                                <button type="button" @click="resetForm"
                                     class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400">
                                     ยกเลิก
                                 </button>
@@ -183,15 +181,64 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue'
+import { useNuxtApp } from '#app'
 import { useAuth } from '~/composables/useAuth';
+import dayjs from 'dayjs'
 
+const { $api } = useNuxtApp()
+const { user } = useAuth()
 
-const { user } = useAuth();
+const firstName = ref('')
+const lastName = ref('')
+const email = ref('')
+const phoneNumber = ref('')
 
+onMounted(() => {
+    if (user.value) {
+        firstName.value = user.value.firstName || ''
+        lastName.value = user.value.lastName || ''
+        email.value = user.value.email || ''
+        phoneNumber.value = user.value.phoneNumber || ''
+    }
+})
 
+function resetForm() {
+    if (user.value) {
+        firstName.value = user.value.firstName || ''
+        lastName.value = user.value.lastName || ''
+        email.value = user.value.email || ''
+        phoneNumber.value = user.value.phoneNumber || ''
+    }
+}
+
+// ฟอร์แมตรูปวันที่
+function formatDate(raw) {
+    return raw ? dayjs(raw).format('YYYY-MM-DD HH:mm') : ''
+}
+
+async function handleProfileUpdate() {
+    try {
+        const payload = {
+            firstName: firstName.value,
+            lastName: lastName.value,
+            email: email.value
+        }
+        const updated = await $api('/users/me', {
+            method: 'PUT',
+            body: payload
+        })
+        user.value = updated
+
+        // แจ้งผล
+        alert('อัพเดตโปรไฟล์สำเร็จ')
+    } catch (err) {
+        console.error('handleProfileUpdate error', err)
+        alert('อัพเดตโปรไฟล์ไม่สำเร็จ')
+    }
+}
 </script>
 
 <style scoped>
-/* Scoped styles can be added here if needed */
+
 </style>
