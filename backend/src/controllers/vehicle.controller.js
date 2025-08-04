@@ -14,8 +14,9 @@ const getVehicles = asyncHandler(async (req, res) => {
 });
 
 const getVehicleById = asyncHandler(async (req, res) => {
+  const ownerId = req.user.sub;
   const { id } = req.params;
-  const vehicle = await vehicleService.getVehicleById(id);
+  const vehicle = await vehicleService.getVehicleById(id , ownerId);
 
   if (!vehicle) {
     throw new ApiError(404, "Vehicle not found");
@@ -40,27 +41,6 @@ const createVehicle = asyncHandler(async (req, res) => {
   });
 });
 
-// const updateVehicle = asyncHandler(async (req, res) => {
-//   const { id } = req.params;
-//   const payload = req.body;
-
-//   let updated;
-//   try {
-//     updated = await vehicleService.updateVehicle(id, payload);
-//   } catch (err) {
-//     if (err.code === "P2025") {
-//       throw new ApiError(404, "Vehicle not found");
-//     }
-//     throw err;
-//   }
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Vehicle updated successfully.",
-//     data: updated,
-//   });
-// });
-
 const updateVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const { id } = req.params
@@ -74,17 +54,6 @@ const updateVehicle = asyncHandler(async (req, res) => {
     data: updated,
   });
 });
-
-// const deleteVehicle = asyncHandler(async (req, res) => {
-//   const { id } = req.params;
-//   const result = await vehicleService.deleteVehicle(id);
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Vehicle deleted successfully.",
-//     data: result,
-//   });
-// });
 
 const deleteVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;

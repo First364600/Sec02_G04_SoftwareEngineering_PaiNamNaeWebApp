@@ -8,8 +8,8 @@ const getAllVehicles = async (userId) => {
   });
 };
 
-const getVehicleById = async (id) => {
-  const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+const getVehicleById = async (vehicleId, userId) => {
+  const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId, userId } });
   if (!vehicle) {
     throw new ApiError(404, 'Vehicle not found');
   }
