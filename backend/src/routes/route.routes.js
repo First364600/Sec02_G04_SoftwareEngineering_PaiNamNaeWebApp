@@ -1,6 +1,7 @@
 const express = require("express");
 const validate = require("../middlewares/validate");
 const { protect } = require("../middlewares/auth");
+const requireDriverVerified = require('../middlewares/driverVerified');
 const routeController = require("../controllers/route.controller");
 const {
   idParamSchema,
@@ -24,6 +25,7 @@ router.get(
 router.post(
   "/",
   protect,
+  requireDriverVerified,
   validate({ body: createRouteSchema }),
   routeController.createRoute
 );
@@ -32,6 +34,7 @@ router.post(
 router.put(
   "/:id",
   protect,
+  requireDriverVerified,
   validate({ params: idParamSchema, body: updateRouteSchema }),
   routeController.updateRoute
 );
@@ -40,6 +43,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
+  requireDriverVerified,
   validate({ params: idParamSchema }),
   routeController.deleteRoute
 );
