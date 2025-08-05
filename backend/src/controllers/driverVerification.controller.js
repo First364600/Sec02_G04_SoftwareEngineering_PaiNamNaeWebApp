@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const verifService = require('../services/driverVerification.service');
-const ApiError     = require('../utils/ApiError');
+const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 
 

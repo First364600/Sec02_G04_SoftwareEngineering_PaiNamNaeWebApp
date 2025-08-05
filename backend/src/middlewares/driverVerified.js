@@ -8,7 +8,7 @@ const requireDriverVerified = asyncHandler(async (req, res, next) => {
     const dv = await prisma.driverVerification.findUnique({
         where: { userId: driverId }
     });
-    if (!dv || dv.status !== 'APPROVED') {
+    if (!dv || dv.status === 'REJECTED') {
         throw new ApiError(403, 'คุณต้องยืนยันตัวตนผู้ขับก่อนจึงจะดำเนินการนี้ได้');
     }
     next();

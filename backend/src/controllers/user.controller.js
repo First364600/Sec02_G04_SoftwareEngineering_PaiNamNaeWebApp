@@ -49,15 +49,6 @@ const createUser = asyncHandler(async (req, res) => {
     });
 });
 
-// const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-//     const updatedUser = await userService.updateUserProfile(req.user.sub, req.body);
-//     res.status(200).json({
-//         success: true,
-//         message: "Profile updated",
-//         data: updatedUser
-//     });
-// });
-
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     // เอาข้อมูล text fields ที่มากับ req.body
     const updateData = { ...req.body };
@@ -106,24 +97,6 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
         data: { deletedUserId: deletedUser.id }
     });
 });
-
-// const uploadImage = asyncHandler(async (req, res) => {
-
-//     const imageFile = req.body.image
-//     if (imageFile && imageFile.hapi && imageFile.hapi.filename) {
-
-//         console.log("Uploading image to Cloudinary...");
-//         const result = await uploadToCloudinary(
-//             imageFile,
-//             "my_app/upload"
-//         );
-//         Data.imageUrl = result.url;
-//         Data.imagePublicId = result.public_id;
-//         console.log("Upload successful:", result.url);
-//     }
-//     const createDate = await userService.uploadImage(Data)
-//     return res.status(201).json({ success: true, message: "Upload successful", data: createDate });
-// })
 
 const setUserStatus = asyncHandler(async (req, res) => {
     const updatedUser = await userService.setUserStatus(req.params.id, req.body.isActive);
