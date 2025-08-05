@@ -150,6 +150,23 @@ Visit [**http://localhost:3000/documentation**](http://localhost:3000/documentat
 - `DELETE /api/vehicles/{id}` – Delete a vehicle
 - `PUT /api/vehicles/{id}/default` – Set a vehicle as the default
 
+### Driver Verifications
+
+- `GET /api/driver-verifications/me` – View your own verification record  
+- `POST /api/driver-verifications` – Submit a new driver verification (upload license)  
+- `PUT /api/driver-verifications/{id}` – Update your verification details
+- `GET /api/driver-verifications` – List all verifications (Admin only)  
+- `GET /api/driver-verifications/{id}` – Get a specific verification record (Admin only)  
+- `PATCH /api/driver-verifications/{id}/status` – Approve or reject a driver verification (Admin only)
+
+### Routes
+
+- `GET /api/routes` – List all routes (public)  
+- `GET /api/routes/{id}` – Get route by ID (public)  
+- `POST /api/routes` – Create a new route (Driver only, must be pending/approved)  
+- `PUT /api/routes/{id}` – Update your route (Driver only)  
+- `DELETE /api/routes/{id}` – Delete your route (Driver only)
+
 ### Health-check & Metrics
 
 - `GET /health` – Check application & database health (200 OK or 503)
