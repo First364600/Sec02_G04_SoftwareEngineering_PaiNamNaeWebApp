@@ -7,7 +7,11 @@ const { uploadToCloudinary } = require('../utils/cloudinary');
 const getMyVerification = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   const record = await verifService.getVerificationByUser(userId);
-  res.status(200).json({ success: true, data: record });
+  res.status(200).json({
+    success: true,
+    message: 'Driver verification record retrieved successfully',
+    data: record
+  });
 });
 
 const createVerification = asyncHandler(async (req, res) => {
@@ -34,7 +38,11 @@ const createVerification = asyncHandler(async (req, res) => {
   };
 
   const newRec = await verifService.createVerification(payload);
-  res.status(201).json({ success: true, data: newRec });
+  res.status(201).json({
+    success: true,
+    message: 'Driver verification submitted and pending approval',
+    data: newRec
+  });
 });
 
 const updateVerification = asyncHandler(async (req, res) => {
@@ -67,26 +75,42 @@ const updateVerification = asyncHandler(async (req, res) => {
   };
 
   const updated = await verifService.updateVerification(id, payload);
-  res.status(200).json({ success: true, data: updated });
+  res.status(200).json({
+    success: true,
+    message: 'Driver verification updated successfully',
+    data: updated
+  });
 });
 
 const getAllVerifications = asyncHandler(async (req, res) => {
   const list = await verifService.getAllVerifications();
-  res.status(200).json({ success: true, data: list });
+  res.status(200).json({
+    success: true,
+    message: 'All driver verifications retrieved successfully',
+    data: list
+  });
 });
 
 const getVerificationById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const rec = await verifService.getVerificationById(id);
   if (!rec) throw new ApiError(404, 'Verification not found');
-  res.status(200).json({ success: true, data: rec });
+  res.status(200).json({
+    success: true,
+    message: 'Driver verification record retrieved successfully',
+    data: rec
+  });
 });
 
 const updateVerificationStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const updated = await verifService.updateVerificationStatus(id, status);
-  res.status(200).json({ success: true, data: updated });
+  res.status(200).json({
+    success: true,
+    message: `Driver verification status updated to ${status}`,
+    data: updated
+  });
 });
 
 module.exports = {

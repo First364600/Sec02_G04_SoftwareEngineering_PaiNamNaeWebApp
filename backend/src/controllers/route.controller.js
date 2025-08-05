@@ -7,6 +7,7 @@ const getAllRoutes = asyncHandler(async (req, res) => {
   const routes = await routeService.getAllRoutes();
   res.status(200).json({
     success: true,
+    message: "Routes retrieved successfully",
     data: routes,
   });
 });
@@ -18,6 +19,7 @@ const getRouteById = asyncHandler(async (req, res) => {
   }
   res.status(200).json({
     success: true,
+    message: "Route retrieved successfully",
     data: route,
   });
 });
@@ -36,7 +38,11 @@ const createRoute = asyncHandler(async (req, res) => {
   };
 
   const newRoute = await routeService.createRoute(payload);
-  res.status(201).json({ success: true, data: newRoute });
+  res.status(201).json({
+    success: true,
+    message: "Route created successfully",
+    data: newRoute
+  });
 });
 
 const updateRoute = asyncHandler(async (req, res) => {
@@ -67,7 +73,11 @@ const updateRoute = asyncHandler(async (req, res) => {
   };
 
   const updated = await routeService.updateRoute(id, payload);
-  res.status(200).json({ success: true, data: updated });
+  res.status(200).json({
+    success: true,
+    message: "Route updated successfully",
+    data: updated
+  });
 });
 
 const deleteRoute = asyncHandler(async (req, res) => {
@@ -84,7 +94,7 @@ const deleteRoute = asyncHandler(async (req, res) => {
   const result = await routeService.deleteRoute(id);
   res.status(200).json({
     success: true,
-    message: "Route deleted",
+    message: "Route deleted successfully",
     data: result
   });
 });
