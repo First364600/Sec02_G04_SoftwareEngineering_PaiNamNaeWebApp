@@ -2,7 +2,7 @@ const { z } = require("zod");
 const { RouteStatus } = require("@prisma/client");
 
 const createRouteSchema = z.object({
-  driverId: z.string().cuid({ message: "driverId must be a CUID" }),
+  // driverId: z.string().cuid({ message: "driverId must be a CUID" }),
   vehicleId: z.string().cuid({ message: "vehicleId must be a CUID" }),
   startLocation: z.any(),
   endLocation: z.any(),

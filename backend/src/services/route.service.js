@@ -25,9 +25,10 @@ const updateRoute = async (id, data) => {
 };
 
 const deleteRoute = async (id) => {
-  return prisma.route.delete({
+  await prisma.route.delete({
     where: { id }
   });
+  return {id}
 };
 
 module.exports = {

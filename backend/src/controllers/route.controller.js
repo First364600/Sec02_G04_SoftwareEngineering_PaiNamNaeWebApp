@@ -48,11 +48,15 @@ const updateRoute = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Route not found");
   if (existing.driverId !== driverId) throw new ApiError(403, "Forbidden");
 
-  await vehicleService.getVehicleById(vehicleId, driverId);
-
+  // await vehicleService.getVehicleById(vehicleId, driverId);
+  let newVehicleId = existing.vehicleId;
+  if (vehicleId) {
+    await vehicleService.getVehicleById(vehicleId, driverId);
+    newVehicleId = vehicleId;
+  }
   const payload = {
     ...routeFields,
-    vehicleId,
+    vehicleId: newVehicleId,
     ...(routeFields.departureTime && {
       departureTime: new Date(routeFields.departureTime),
     }),
@@ -70,8 +74,12 @@ const deleteRoute = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Route not found");
   if (existing.driverId !== driverId) throw new ApiError(403, "Forbidden");
 
-  await routeService.deleteRoute(id);
-  res.status(200).json({ success: true, message: "Route deleted" });
+  const result = await routeService.deleteRoute(id);
+  res.status(200).json({
+    success: true,
+    message: "Route deleted",
+    data: result
+  });
 });
 
 module.exports = {

@@ -108,10 +108,11 @@ model Route {
   routeSummary    String?
   distance        String?
   duration        String?
-  waypoints       Json        @db.Json
-  landmarks       Json        @db.Json
-  steps           Json        @db.Json
+  waypoints       Json?        @db.Json
+  landmarks       Json?       @db.Json
+  steps           Json?       @db.Json
   createdAt       DateTime    @default(now())
+  updatedAt     DateTime @updatedAt
 
   bookings        Booking[]
 }
