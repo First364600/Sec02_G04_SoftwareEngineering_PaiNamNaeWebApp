@@ -2,7 +2,7 @@ const prisma = require('../utils/prisma');
 
 const getAllRoutes = async () => {
   return prisma.route.findMany({
-    include: { bookings: true }
+    include: { bookings: true },
   });
 };
 

@@ -48,7 +48,7 @@ const updateVerificationStatus = async (id, status) => {
     if (status === 'APPROVED') {
       await tx.user.update({
         where: { id: verification.userId },
-        data: { isVerified: true },
+        data: { isVerified: true , role: 'DRIVER' },
       });
     }
     else if (status === 'REJECTED') {
@@ -62,7 +62,7 @@ const updateVerificationStatus = async (id, status) => {
 
       await tx.route.updateMany({
         where: {
-          driverId: userId,
+          driverId: verification.userId,
           status: 'AVAILABLE',
         },
         data: {

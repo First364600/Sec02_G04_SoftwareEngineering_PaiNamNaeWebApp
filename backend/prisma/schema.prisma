@@ -23,6 +23,7 @@ enum RouteStatus {
   AVAILABLE
   FULL
   COMPLETED
+  CANCELLED
 }
 
 enum BookingStatus {
