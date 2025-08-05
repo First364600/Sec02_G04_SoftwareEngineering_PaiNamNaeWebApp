@@ -3,18 +3,13 @@ const verifService = require('../services/driverVerification.service');
 const ApiError     = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 
-/**
- * GET /driver-verifications/me
- */
+
 const getMyVerification = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   const record = await verifService.getVerificationByUser(userId);
   res.status(200).json({ success: true, data: record });
 });
 
-/**
- * POST /driver-verifications
- */
 const createVerification = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   // ไฟล์ต้องมีอยู่
@@ -42,14 +37,10 @@ const createVerification = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, data: newRec });
 });
 
-/**
- * PUT /driver-verifications/:id
- */
 const updateVerification = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   const { id } = req.params;
 
-  // ตรวจ ownership
   const existing = await verifService.getVerificationById(id);
   if (!existing) throw new ApiError(404, 'Verification not found');
   if (existing.userId !== userId) throw new ApiError(403, 'Forbidden');
@@ -79,17 +70,11 @@ const updateVerification = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: updated });
 });
 
-/**
- * GET /driver-verifications
- */
 const getAllVerifications = asyncHandler(async (req, res) => {
   const list = await verifService.getAllVerifications();
   res.status(200).json({ success: true, data: list });
 });
 
-/**
- * GET /driver-verifications/:id
- */
 const getVerificationById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const rec = await verifService.getVerificationById(id);
@@ -97,9 +82,6 @@ const getVerificationById = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: rec });
 });
 
-/**
- * PATCH /driver-verifications/:id/status
- */
 const updateVerificationStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;

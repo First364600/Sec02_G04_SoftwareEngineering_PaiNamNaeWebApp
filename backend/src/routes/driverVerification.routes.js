@@ -13,12 +13,14 @@ const {
 const router = express.Router();
 
 // --- Driver routes ---
+// GET /driver-verifications/me
 router.get(
   '/me',
   protect,
   driverVerifController.getMyVerification
 );
 
+// POST /driver-verifications
 router.post(
   '/',
   protect,
@@ -27,6 +29,7 @@ router.post(
   driverVerifController.createVerification
 );
 
+// PUT /driver-verifications/:id
 router.put(
   '/:id',
   protect,
@@ -36,6 +39,7 @@ router.put(
 );
 
 // --- Admin routes ---
+// GET /driver-verifications
 router.get(
   '/',
   protect,
@@ -43,6 +47,7 @@ router.get(
   driverVerifController.getAllVerifications
 );
 
+// GET /driver-verifications/:id
 router.get(
   '/:id',
   protect,
@@ -51,6 +56,7 @@ router.get(
   driverVerifController.getVerificationById
 );
 
+// PATCH /driver-verifications/:id/status
 router.patch(
   '/:id/status',
   protect,
