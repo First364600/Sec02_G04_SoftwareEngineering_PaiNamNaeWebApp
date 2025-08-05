@@ -4,6 +4,7 @@ const userRoutes = require('./user.routes');
 const vehicleRoutes = require('./vehicle.routes');
 const routeRoutes   = require('./route.routes');
 const driverVerifRoutes = require('./driverVerification.routes');
+const bookingRoutes = require('./booking.routes');
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use('/users', userRoutes);
 router.use('/vehicles', vehicleRoutes);
 router.use('/routes', routeRoutes);
 router.use('/driver-verifications', driverVerifRoutes);
+router.use('/bookings', bookingRoutes);
 
 module.exports = router;
