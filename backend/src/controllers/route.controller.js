@@ -48,6 +48,10 @@ const updateRoute = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Route not found");
   if (existing.driverId !== driverId) throw new ApiError(403, "Forbidden");
 
+  if (existing.status === 'CANCELLED') {
+    throw new ApiError(400, "ไม่สามารถแก้ไขเส้นทางที่ถูกยกเลิกได้");
+  }
+
   // await vehicleService.getVehicleById(vehicleId, driverId);
   let newVehicleId = existing.vehicleId;
   if (vehicleId) {
@@ -74,6 +78,9 @@ const deleteRoute = asyncHandler(async (req, res) => {
   if (!existing) throw new ApiError(404, "Route not found");
   if (existing.driverId !== driverId) throw new ApiError(403, "Forbidden");
 
+  if (existing.status === 'CANCELLED') {
+    throw new ApiError(400, "ไม่สามารถลบเส้นทางที่ถูกยกเลิกได้");
+  }
   const result = await routeService.deleteRoute(id);
   res.status(200).json({
     success: true,
