@@ -3,6 +3,8 @@ const validate = require('../middlewares/validate');
 const vehicleController = require('../controllers/vehicle.controller');
 const { idParamSchema, createVehicleSchema, updateVehicleSchema } = require('../validations/vehicle.validation');
 const { protect } = require('../middlewares/auth');
+const upload = require('../middlewares/upload.middleware');
+const parseVehicleBody = require('../middlewares/parseVehicleBody');
 
 const router = express.Router();
 
@@ -16,7 +18,7 @@ router.get(
 // GET /api/vehicles/:id
 router.get(
   '/:id',
-   protect,
+  protect,
   validate({ params: idParamSchema }),
   vehicleController.getVehicleById
 );
@@ -24,7 +26,9 @@ router.get(
 // POST /api/vehicles
 router.post(
   '/',
-   protect,
+  protect,
+  upload.fields([{ name: 'photos', maxCount: 5 }]), // รับ photos สูงสุด 5 ไฟล์
+  parseVehicleBody,
   validate({ body: createVehicleSchema }),
   vehicleController.createVehicle
 );
@@ -32,7 +36,9 @@ router.post(
 // PUT /api/vehicles/:id
 router.put(
   '/:id',
-    protect,
+  protect,
+  upload.fields([{ name: 'photos', maxCount: 5 }]),
+  parseVehicleBody,
   validate({ params: idParamSchema, body: updateVehicleSchema }),
   vehicleController.updateVehicle
 );
@@ -40,7 +46,7 @@ router.put(
 // DELETE /api/vehicles/:id
 router.delete(
   '/:id',
-   protect,
+  protect,
   validate({ params: idParamSchema }),
   vehicleController.deleteVehicle
 );
@@ -48,7 +54,7 @@ router.delete(
 // PUT /api/vehicles/:id/default
 router.put(
   '/:id/default',
-    protect,
+  protect,
   validate({ params: idParamSchema }),
   vehicleController.setDefaultVehicle
 );

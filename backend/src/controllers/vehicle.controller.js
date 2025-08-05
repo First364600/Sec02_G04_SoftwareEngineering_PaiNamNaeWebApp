@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 const getVehicles = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
@@ -16,7 +17,7 @@ const getVehicles = asyncHandler(async (req, res) => {
 const getVehicleById = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const { id } = req.params;
-  const vehicle = await vehicleService.getVehicleById(id , ownerId);
+  const vehicle = await vehicleService.getVehicleById(id, ownerId);
 
   if (!vehicle) {
     throw new ApiError(404, "Vehicle not found");
@@ -31,7 +32,17 @@ const getVehicleById = asyncHandler(async (req, res) => {
 
 const createVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
-  const payload = req.body;
+  const payload = {...req.body};
+
+  if (req.files?.photos) {
+    const uploads = await Promise.all(
+      req.files.photos.map(file =>
+        uploadToCloudinary(file.buffer, 'painamnae/vehicles')
+      )
+    );
+
+    payload.photos = uploads.map(u => u.url); // เก็บเป็น array ของ URL
+  }
 
   const newVehicle = await vehicleService.createVehicle(payload, ownerId);
   res.status(201).json({
@@ -44,7 +55,16 @@ const createVehicle = asyncHandler(async (req, res) => {
 const updateVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const { id } = req.params
-  const payload = req.body;
+  const payload = {...req.body};
+
+  if (req.files?.photos) {
+    const uploads = await Promise.all(
+      req.files.photos.map(file =>
+        uploadToCloudinary(file.buffer, 'painamnae/vehicles')
+      )
+    );
+    payload.photos = uploads.map(u => u.url);
+  }
 
   const updated = await vehicleService.updateVehicle(id, ownerId, payload)
 
