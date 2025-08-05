@@ -49,8 +49,39 @@ const createUser = asyncHandler(async (req, res) => {
     });
 });
 
+// const updateCurrentUserProfile = asyncHandler(async (req, res) => {
+//     const updatedUser = await userService.updateUserProfile(req.user.sub, req.body);
+//     res.status(200).json({
+//         success: true,
+//         message: "Profile updated",
+//         data: updatedUser
+//     });
+// });
+
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-    const updatedUser = await userService.updateUserProfile(req.user.sub, req.body);
+    // เอาข้อมูล text fields ที่มากับ req.body
+    const updateData = { ...req.body };
+
+    
+    if (req.files?.nationalIdPhotoUrl) {
+        const buf = req.files.nationalIdPhotoUrl[0].buffer;
+        const result = await uploadToCloudinary(buf, 'painamnae/national_ids');
+        updateData.nationalIdPhotoUrl = result.url;
+    }
+
+    if (req.files?.selfiePhotoUrl) {
+        const buf = req.files.selfiePhotoUrl[0].buffer;
+        const result = await uploadToCloudinary(buf, 'painamnae/selfies');
+        updateData.selfiePhotoUrl = result.url;
+    }
+
+    if (req.files?.profilePicture) {
+        const buf = req.files.profilePicture[0].buffer;
+        const result = await uploadToCloudinary(buf, 'painamnae/profiles');
+        updateData.profilePicture = result.url;
+    }
+
+    const updatedUser = await userService.updateUserProfile(req.user.sub, updateData);
     res.status(200).json({
         success: true,
         message: "Profile updated",

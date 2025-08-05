@@ -53,19 +53,24 @@ router.get(
 
 // POST /api/users
 router.post(
-        '/',
-        upload.fields([
-            { name: 'nationalIdPhotoUrl', maxCount: 1 },
-            { name: 'selfiePhotoUrl', maxCount: 1 }
-        ]),
-        validate({ body: createUserSchema }),
-        userController.createUser
-    );
-    
+    '/',
+    upload.fields([
+        { name: 'nationalIdPhotoUrl', maxCount: 1 },
+        { name: 'selfiePhotoUrl', maxCount: 1 }
+    ]),
+    validate({ body: createUserSchema }),
+    userController.createUser
+);
+
 // PUT /api/users/me
 router.put(
     '/me',
     protect,
+    upload.fields([
+        { name: 'nationalIdPhotoUrl', maxCount: 1 },
+        { name: 'selfiePhotoUrl', maxCount: 1 },
+        { name: 'profilePicture', maxCount: 1 },
+    ]),
     validate({ body: updateUserSchema }),
     userController.updateCurrentUserProfile
 );
