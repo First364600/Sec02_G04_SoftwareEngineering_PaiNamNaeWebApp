@@ -23,7 +23,24 @@ const login = asyncHandler(async (req, res) => {
     }
 
     const token = signToken({ sub: user.id, role: user.role });
-    const { password: _, ...safeUser } = user; // Exclude password from response
+    const {
+        password:_,
+        gender,
+        phoneNumber,
+        otpCode,
+        nationalIdNumber,
+        nationalIdPhotoUrl,
+        nationalIdExpiryDate,
+        selfiePhotoUrl,
+        isVerified,
+        isActive,
+        lastLogin,
+        createdAt,
+        updatedAt,
+        username:__,
+        email:___,
+        ...safeUser
+    } = user;
 
     res.status(200).json({
         success: true,
