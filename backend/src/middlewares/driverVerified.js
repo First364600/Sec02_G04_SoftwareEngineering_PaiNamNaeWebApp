@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler');
-const { PrismaClient } = require('@prisma/client');
 const ApiError = require('../utils/ApiError');
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 const requireDriverVerified = asyncHandler(async (req, res, next) => {
     const driverId = req.user.sub;
