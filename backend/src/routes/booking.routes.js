@@ -1,6 +1,7 @@
 const express = require('express');
 const validate = require('../middlewares/validate');
-const { protect, requireDriverVerified } = require('../middlewares/auth');
+const { protect } = require('../middlewares/auth');
+const requireDriverVerified = require('../middlewares/driverVerified');
 const bookingController = require('../controllers/booking.controller');
 const {
   createBookingSchema,
