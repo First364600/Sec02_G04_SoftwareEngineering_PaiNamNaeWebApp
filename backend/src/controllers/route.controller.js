@@ -24,6 +24,16 @@ const getRouteById = asyncHandler(async (req, res) => {
   });
 });
 
+const getMyRoutes = asyncHandler(async (req,res) =>{
+  const driverId = req.user.sub
+  const list = await routeService.getMyRoutes(driverId)
+  res.status(200).json({
+    success: true,
+    message: "Route retrieved successfully",
+    data: list
+  })
+})
+
 const createRoute = asyncHandler(async (req, res) => {
   const driverId = req.user.sub;
   const { vehicleId, ...routeFields } = req.body;
@@ -102,6 +112,7 @@ const deleteRoute = asyncHandler(async (req, res) => {
 module.exports = {
   getAllRoutes,
   getRouteById,
+  getMyRoutes,
   createRoute,
   updateRoute,
   deleteRoute,

@@ -2,16 +2,66 @@ const prisma = require('../utils/prisma');
 
 const getAllRoutes = async () => {
   return prisma.route.findMany({
-    include: { bookings: true },
+    include: {
+      bookings: {
+        include: {
+          passenger: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
   });
 };
 
 const getRouteById = async (id) => {
   return prisma.route.findUnique({
     where: { id },
-    include: { bookings: true }
+    include: {
+      bookings: {
+        include: {
+          passenger: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true
+            }
+          }
+        }
+      }
+    },
   });
 };
+
+const getMyRoutes = async (driverId) => {
+  return prisma.route.findMany({
+    where: {
+      driverId
+    },
+    include: {
+      bookings: {
+        include: {
+          passenger: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+}
 
 const createRoute = async (data) => {
   return prisma.route.create({ data });
@@ -28,12 +78,13 @@ const deleteRoute = async (id) => {
   await prisma.route.delete({
     where: { id }
   });
-  return {id}
+  return { id }
 };
 
 module.exports = {
   getAllRoutes,
   getRouteById,
+  getMyRoutes,
   createRoute,
   updateRoute,
   deleteRoute

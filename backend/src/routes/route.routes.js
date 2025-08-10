@@ -14,6 +14,13 @@ const router = express.Router();
 // GET /routes
 router.get("/", routeController.getAllRoutes);
 
+// GET /routes/me
+router.get(
+  "/me",
+  protect,
+  routeController.getMyRoutes
+);
+
 // GET /routes/:id
 router.get(
   "/:id",
