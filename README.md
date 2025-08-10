@@ -162,15 +162,26 @@ Visit [**http://localhost:3000/documentation**](http://localhost:3000/documentat
 ### Routes
 
 - `GET /api/routes` – List all routes (public)  
-- `GET /api/routes/{id}` – Get route by ID (public)  
+- `GET /api/routes/{id}` – Get route by ID (public)
+- `GET /api/routes/me` - List all routes created by the current logged-in driver (Driver only)
 - `POST /api/routes` – Create a new route (Driver only, must be pending/approved)  
 - `PUT /api/routes/{id}` – Update your route (Driver only)  
 - `DELETE /api/routes/{id}` – Delete your route (Driver only)
+
+### Bookings
+
+- `GET /api/bookings/me` - List all bookings made by the current user (Passenger only)
+- `GET /api/bookings/{id}` - Get a booking by its ID (Related Passenger or Driver only)
+- `POST /api/bookings` - Create a new booking for a route (Passenger only)
+- `PATCH /api/bookings/{id}/status` - Update a booking's status, e.g., confirm/reject (Driver only)
+- `PATCH /api/bookings/{id}/cancel` - Cancel a booking (Passenger only)
+- `DELETE /api/bookings/{id}` - Delete a cancelled/rejected booking (Related Passenger or Driver only)
 
 ### Health-check & Metrics
 
 - `GET /health` – Check application & database health (200 OK or 503)
 - `GET /metrics` – Expose Prometheus-compatible metrics (CPU, memory, HTTP latency, request counts, etc.)
+- `GET /documentation` - Access the Swagger UI API documentation page
 
 ## Contact
 
