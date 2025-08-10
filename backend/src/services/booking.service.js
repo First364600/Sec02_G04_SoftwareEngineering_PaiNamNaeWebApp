@@ -3,13 +3,27 @@ const ApiError = require('../utils/ApiError');
 const { RouteStatus, BookingStatus } = require('@prisma/client');
 
 const createBooking = async (data, passengerId) => {
-  const route = await prisma.route.findUnique({ where: { id: data.routeId } });
-  if (!route) throw new ApiError(404, 'Route not found');
-  if (route.status !== RouteStatus.AVAILABLE || route.availableSeats < data.numberOfSeats) {
-    throw new ApiError(400, 'Not enough seats available');
-  }
-
   return prisma.$transaction(async (tx) => {
+
+    const route = await tx.route.findUnique({
+      where: { id: data.routeId },
+    });
+
+    if (!route) {
+      throw new ApiError(404, 'Route not found');
+    }
+
+    if (route.driverId === passengerId) {
+      throw new ApiError(400, 'Driver cannot book their own route.');
+    }
+
+    if (route.status !== RouteStatus.AVAILABLE) {
+      throw new ApiError(400, 'This route is no longer available.');
+    }
+    if (route.availableSeats < data.numberOfSeats) {
+      throw new ApiError(400, 'Not enough seats available on this route.');
+    }
+
     const booking = await tx.booking.create({
       data: {
         routeId: data.routeId,
@@ -20,14 +34,21 @@ const createBooking = async (data, passengerId) => {
       },
     });
 
-    const remaining = route.availableSeats - data.numberOfSeats;
-    const routeUpdates = { availableSeats: remaining };
-    if (remaining === 0) routeUpdates.status = RouteStatus.FULL;
-
-    await tx.route.update({
+    const updatedRoute = await tx.route.update({
       where: { id: data.routeId },
-      data: routeUpdates,
+      data: {
+        availableSeats: {
+          decrement: data.numberOfSeats,
+        },
+      },
     });
+
+    if (updatedRoute.availableSeats === 0) {
+      await tx.route.update({
+        where: { id: data.routeId },
+        data: { status: RouteStatus.FULL },
+      });
+    }
 
     return booking;
   });
