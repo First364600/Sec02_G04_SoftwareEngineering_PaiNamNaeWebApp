@@ -14,6 +14,24 @@ const getAllRoutes = async () => {
             }
           }
         }
+      },
+      driver:{
+        select: {
+          id:true,
+          firstName:true,
+          lastName:true,
+          gender:true,
+          profilePicture:true,
+          isVerified:true
+        }
+      },
+      vehicle:{
+        select:{
+          vehicleModel:true,
+          vehicleType:true,
+          photos:true,
+          amenities:true
+        }
       }
     },
     orderBy: { createdAt: 'desc' }
