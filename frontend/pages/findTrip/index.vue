@@ -1,7 +1,7 @@
 <template>
     <div class="bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="bg-white  border border-gray-200 rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">ค้นหาการเดินทาง</h2>
                 <form @submit.prevent="handleSearch" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div>
@@ -38,9 +38,9 @@
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow-md">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
+                <div class="lg:col-span-2 ">
+                    <div class="bg-white rounded-lg shadow-md border border-gray-200">
                         <div class="p-6 border-b border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-900">ผลการค้นหา ({{ routes.length }} รายการ)</h3>
                         </div>
@@ -146,7 +146,7 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden sticky top-8">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden sticky top-8 border border-gray-200">
                         <div class="p-6 border-b border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
                         </div>
