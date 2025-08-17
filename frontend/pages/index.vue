@@ -11,6 +11,9 @@
             <h1 v-else-if="user?.role === 'PASSENGER'">
                 welcome Role passenger, {{ user.firstName }}
             </h1>
+            <h1 v-else-if="user?.role === 'DRIVER'">
+                welcome Role DRIVER, {{ user.firstName }}
+            </h1>
         </template>
     </div>
     

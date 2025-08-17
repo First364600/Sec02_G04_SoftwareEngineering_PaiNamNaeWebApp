@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">ค้นหาการเดินทาง</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <form @submit.prevent="handleSearch" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">จุดเริ่มต้น</label>
                         <input v-model="searchForm.origin" type="text" placeholder="เช่น กรุงเทพฯ"
@@ -30,12 +30,12 @@
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button
+                        <button type="submit"
                             class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
                             ค้นหา
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -44,10 +44,16 @@
                         <div class="p-6 border-b border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-900">ผลการค้นหา ({{ routes.length }} รายการ)</h3>
                         </div>
-                        <div class="divide-y divide-gray-200">
-                            <div v-for="route in routes" :key="route.id" :class="['route-card p-6 cursor-pointer transition-all duration-300 hover:shadow-lg',
-                                { 'border-2 border-blue-500 bg-blue-50': selectedRoute === route.id }]"
-                                @click="toggleDetails(route.id)">
+                        <div v-if="isLoading" class="p-6 text-center text-gray-500">
+                            กำลังค้นหาเส้นทาง...
+                        </div>
+                        <div v-else class="divide-y divide-gray-200">
+                            <div v-if="routes.length === 0" class="p-6 text-center text-gray-500">
+                                ไม่พบเส้นทางที่ค้นหา
+                            </div>
+                            <div v-for="route in routes" :key="route.id"
+                                class="route-card p-6 cursor-pointer transition-all duration-300 hover:shadow-lg"
+                                @click="toggleDetails(route)">
                                 <div class="flex items-start space-x-4">
                                     <img :src="route.driver.image" :alt="route.driver.name"
                                         class="w-12 h-12 rounded-full object-cover">
@@ -57,8 +63,8 @@
                                                 <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4>
                                                 <div class="flex items-center mt-1">
                                                     <div class="flex text-yellow-400">
-                                                        <span v-for="star in 5" :key="star">
-                                                            {{ star <= route.driver.rating ? '★' : '☆' }} </span>
+                                                        <span v-for="star in 5" :key="star">{{ star <=
+                                                            route.driver.rating ? '★' : '☆' }}</span>
                                                     </div>
                                                     <span class="ml-2 text-sm text-gray-600">
                                                         {{ route.driver.rating }} ({{ route.driver.reviews }} รีวิว)
@@ -71,11 +77,14 @@
                                             </div>
                                         </div>
                                         <div class="mt-3">
-                                            <div class="flex items-center text-sm text-gray-600">
+                                            <div class="flex flex-wrap items-center text-sm text-gray-600">
+                                                <span class="font-medium">{{ route.date }}</span>
+                                                <span class="text-gray-300 mx-2">|</span>
                                                 <span class="font-medium">เวลาออก:</span>
-                                                <span class="ml-2">{{ route.departureTime }}</span>
-                                                <span class="ml-4 font-medium">ระยะเวลา:</span>
-                                                <span class="ml-2">{{ route.duration }}</span>
+                                                <span class="ml-1">{{ route.departureTime }}</span>
+                                                <span class="text-gray-300 mx-2">|</span>
+                                                <span class="font-medium">ระยะเวลา:</span>
+                                                <span class="ml-1">{{ route.duration }}</span>
                                             </div>
                                             <div class="flex items-center mt-2 text-sm text-gray-600">
                                                 <span :class="[
@@ -90,7 +99,7 @@
                                     </div>
                                 </div>
 
-                                <div v-if="selectedRoute === route.id"
+                                <div v-if="selectedRoute && selectedRoute.id === route.id"
                                     class="mt-4 pt-4 border-t border-gray-200 animate-in slide-in-from-top duration-300">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
@@ -106,8 +115,26 @@
                                             </ul>
                                         </div>
                                     </div>
+                                    <div class="mt-4 space-y-4">
+                                        <div v-if="route.conditions">
+                                            <h5 class="font-medium text-gray-900 mb-2">เงื่อนไขการเดินทาง</h5>
+                                            <p
+                                                class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-200">
+                                                {{ route.conditions }}
+                                            </p>
+                                        </div>
+                                        <div v-if="route.photos && route.photos.length > 0">
+                                            <h5 class="font-medium text-gray-900 mb-2">รูปภาพรถยนต์</h5>
+                                            <div class="grid grid-cols-3 gap-2 mt-2">
+                                                <div v-for="(photo, index) in route.photos.slice(0, 3)" :key="index">
+                                                    <img :src="photo" alt="Vehicle photo"
+                                                        class="w-full aspect-video object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="mt-4 flex justify-end">
-                                        <button @click="openModal" :disabled="route.availableSeats === 0"
+                                        <button @click.stop="openModal(route)" :disabled="route.availableSeats === 0"
                                             class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                             จองที่นั่ง
                                         </button>
@@ -141,7 +168,6 @@
                             </svg>
                         </button>
                     </div>
-
                     <div class="p-6">
                         <div class="mb-6">
                             <h4 class="font-semibold text-gray-900 mb-3">เดินทางกับ</h4>
@@ -161,12 +187,11 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">วันที่เดินทาง</label>
                                 <div class="p-3 bg-gray-50 rounded-lg text-gray-900">
-                                    อังคารที่ 29 กรกฎาคม 2568
+                                    {{ bookingRoute.date }}
                                 </div>
                             </div>
                             <div>
@@ -176,12 +201,11 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="mb-6">
                             <h4 class="font-semibold text-gray-900 mb-3">เส้นทางการเดินทาง</h4>
                             <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
                                 <div class="flex-1">
-                                    <div class="font-medium text-gray-900">กรุงเทพมหานคร</div>
+                                    <div class="font-medium text-gray-900">{{ bookingRoute.origin }}</div>
                                     <div class="text-sm text-gray-600">จุดเริ่มต้น</div>
                                 </div>
                                 <div class="text-blue-600">
@@ -191,12 +215,11 @@
                                     </svg>
                                 </div>
                                 <div class="flex-1 text-right">
-                                    <div class="font-medium text-gray-900">เชียงใหม่</div>
+                                    <div class="font-medium text-gray-900">{{ bookingRoute.destination }}</div>
                                     <div class="text-sm text-gray-600">จุดปลายทาง</div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="space-y-4 mb-6">
                             <div>
                                 <label
@@ -208,20 +231,17 @@
                                     </option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">เลือกจุดขึ้นรถ</label>
                                 <input type="text" v-model="pickupPoint" placeholder="กรอกเพื่อค้นหาจุดขึ้นรถ..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
-
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">เลือกจุดลงรถ</label>
                                 <input type="text" v-model="dropoffPoint" placeholder="กรอกเพื่อค้นหาจุดลงรถ..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
                         </div>
-
                         <div class="bg-blue-50 p-4 rounded-lg mb-6">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-gray-700">ราคาต่อที่นั่ง</span>
@@ -231,14 +251,13 @@
                                 <span class="text-gray-700">จำนวนที่นั่ง</span>
                                 <span class="text-gray-900 font-medium">{{ bookingSeats }} ที่นั่ง</span>
                             </div>
-                            <div class="border-t pt-2 mt-2  border-gray-200">
+                            <div class="border-t pt-2 mt-2 border-gray-200">
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold text-gray-900">ยอดรวม</span>
                                     <span class="font-bold text-blue-600 text-lg">{{ bookingTotalPrice }} บาท</span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="flex space-x-4">
                             <button @click="closeModal"
                                 class="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-md hover:bg-gray-300 transition duration-200 font-semibold">
@@ -258,8 +277,15 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
+import dayjs from 'dayjs'
+import 'dayjs/locale/th'
+import buddhistEra from 'dayjs/plugin/buddhistEra'
 
-// Head configuration for Nuxt
+dayjs.locale('th')
+dayjs.extend(buddhistEra)
+
+const { $api } = useNuxtApp()
+
 useHead({
     title: 'ค้นหาเส้นทาง - Car Pool',
     link: [
@@ -269,9 +295,8 @@ useHead({
     script: [
         {
             src: 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
-            defer: true, // Use defer for better loading performance
+            defer: true,
             onload: () => {
-                // Ensure map initializes after DOM is ready
                 nextTick(() => {
                     initializeMap()
                 })
@@ -280,7 +305,6 @@ useHead({
     ]
 })
 
-// --- Reactive Data ---
 const searchForm = ref({
     origin: '',
     destination: '',
@@ -288,28 +312,17 @@ const searchForm = ref({
     seats: '1'
 })
 
+const routes = ref([])
 const selectedRoute = ref(null)
+const isLoading = ref(false)
+
 const mapContainer = ref(null)
 let map = null
 
-const routes = ref([
-    {
-        id: 1, driver: { name: 'สมชาย ใจดี', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face', rating: 4.8, reviews: 25 }, price: 250, departureTime: '08:00 น.', duration: '6 ชั่วโมง 30 นาที', availableSeats: 2, stops: ['จุดแวะ: ปั้มบางปะอิน', 'จุดแวะ: ร้านอาหารสระบุรี', 'จุดแวะ: ปั้มโคราช'], carDetails: ['Toyota Camry สีดำ', 'ทะเบียน: กก 1234', 'เครื่องปรับอากาศ', 'ไม่สูบบุหรี่']
-    },
-    {
-        id: 2, driver: { name: 'วรรณา สุขใจ', image: 'https://images.unsplash.com/photo-1494790108755-2616b2dc0a48?w=60&h=60&fit=crop&crop=face', rating: 4.5, reviews: 18 }, price: 280, departureTime: '10:30 น.', duration: '6 ชั่วโมง', availableSeats: 3, stops: ['จุดแวะ: ปั้มบางปะอิน', 'จุดแวะ: ห้างสระบุรี'], carDetails: ['Honda Civic สีขาว', 'ทะเบียน: ขข 5678', 'เครื่องปรับอากาศ', 'อนุญาตสูบบุหรี่']
-    },
-    {
-        id: 3, driver: { name: 'อนุชา รักเดินทาง', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face', rating: 4.9, reviews: 42 }, price: 300, departureTime: '14:00 น.', duration: '5 ชั่วโมง 45 นาที', availableSeats: 0, stops: ['จุดแวะ: ร้านกาแฟอยุธยา', 'จุดแวะ: ตลาดโบราณลพบุรี', 'จุดแวะ: วิวจุดพักร้อย'], carDetails: ['BMW 320i สีเทา', 'ทะเบียน: คค 9999', 'เครื่องปรับอากาศ', 'ไม่สูบบุหรี่', 'มี Wi-Fi']
-    }
-])
-
-// --- Modal State ---
 const showModal = ref(false)
-const bookingRoute = ref(null) // To store the data of the route being booked
-const bookingSeats = ref(1)   // To store the number of seats selected in the modal
-
-const pickupPoint = ref('') 
+const bookingRoute = ref(null)
+const bookingSeats = ref(1)
+const pickupPoint = ref('')
 const dropoffPoint = ref('')
 
 const bookingTotalPrice = computed(() => {
@@ -317,50 +330,114 @@ const bookingTotalPrice = computed(() => {
     return bookingSeats.value * bookingRoute.value.price
 })
 
-function openModal() {
-    const routeData = routes.value.find(r => r.id === selectedRoute.value)
-    if (routeData && routeData.availableSeats > 0) {
-        bookingRoute.value = routeData
+async function handleSearch() {
+    isLoading.value = true
+    selectedRoute.value = null
+
+    try {
+        const apiResponse = await $api('/routes', {
+            // params: searchForm.value 
+        })
+
+        const formattedRoutes = apiResponse
+            .filter(route => route.status === 'AVAILABLE')
+            .map(route => {
+
+                const driverData = {
+                    name: `${route.driver.firstName} ${route.driver.lastName}`,
+                    image: route.driver.profilePicture || `https://ui-avatars.com/api/?name=${route.driver.firstName}&background=random&size=64`,
+                    rating: 4.5,
+                    reviews: Math.floor(Math.random() * 50) + 5,
+                };
+
+                const carDetailsList = [];
+                if (route.vehicle) {
+                    carDetailsList.push(`${route.vehicle.vehicleModel} (${route.vehicle.vehicleType})`);
+                    if (route.vehicle.amenities && route.vehicle.amenities.length > 0) {
+                        carDetailsList.push(...route.vehicle.amenities);
+                    }
+                } else {
+                    carDetailsList.push('ไม่มีข้อมูลรถ');
+                }
+
+                return {
+                    id: route.id,
+                    availableSeats: route.availableSeats,
+                    price: route.pricePerSeat,
+                    departureTime: dayjs(route.departureTime).format('HH:mm น.'),
+                    date: dayjs(route.departureTime).format('D MMMM BBBB'),
+                    origin: `จาก Lat: ${route.startLocation.lat.toFixed(2)}, Lng: ${route.startLocation.lng.toFixed(2)}`,
+                    destination: `ถึง Lat: ${route.endLocation.lat.toFixed(2)}, Lng: ${route.endLocation.lng.toFixed(2)}`,
+                    driver: driverData,
+                    carDetails: carDetailsList,
+                    conditions: route.conditions,
+                    photos: route.vehicle?.photos,
+                    stops: ['จุดแวะพัก (รอข้อมูล)'],
+                    duration: route.duration || 'ประมาณ 8 ชั่วโมง',
+                    coordinates: [
+                        [route.startLocation.lat, route.startLocation.lng],
+                        [route.endLocation.lat, route.endLocation.lng]
+                    ]
+                }
+            })
+
+        routes.value = formattedRoutes
+
+    } catch (error) {
+        console.error("Failed to fetch routes:", error)
+        routes.value = []
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const toggleDetails = (route) => {
+    if (selectedRoute.value && selectedRoute.value.id === route.id) {
+        selectedRoute.value = null
+    } else {
+        selectedRoute.value = route
+        updateMapForRoute(route)
+    }
+}
+
+function openModal(route) {
+    if (route && route.availableSeats > 0) {
+        bookingRoute.value = route
         bookingSeats.value = 1
-        
-        // ✨ เพิ่ม 2 บรรทัดนี้เพื่อเคลียร์ค่าเก่าทุกครั้งที่เปิด Modal
         pickupPoint.value = ''
         dropoffPoint.value = ''
-
         showModal.value = true
     }
 }
 
-// --- Methods ---
-const toggleDetails = (routeId) => {
-    if (selectedRoute.value === routeId) {
-        selectedRoute.value = null
-    } else {
-        selectedRoute.value = routeId
-        updateMapForRoute(routeId)
-    }
+function closeModal() {
+    showModal.value = false
+    setTimeout(() => {
+        bookingRoute.value = null
+    }, 300);
+}
+
+async function confirmBooking() {
+    console.log('Booking confirmed for route:', bookingRoute.value.id)
+    // TODO: Implement booking API call here
+    closeModal()
 }
 
 const initializeMap = () => {
     if (typeof L === 'undefined' || !mapContainer.value || map) return
 
     try {
-        map = L.map(mapContainer.value).setView([16.0, 101.0], 6) // Centered on Thailand
-
+        map = L.map(mapContainer.value).setView([16.0, 101.0], 6)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map)
-
-        // Initial markers (optional)
-        L.marker([13.7563, 100.5018]).addTo(map).bindPopup('กรุงเทพมหานคร')
-        L.marker([18.7883, 98.9853]).addTo(map).bindPopup('เชียงใหม่')
     } catch (error) {
         console.error('Error initializing map:', error)
     }
 }
 
-const updateMapForRoute = (routeId) => {
-    if (!map) return
+const updateMapForRoute = (route) => {
+    if (!map || !route.coordinates) return
 
     map.eachLayer(layer => {
         if (layer instanceof L.Polyline) {
@@ -368,28 +445,19 @@ const updateMapForRoute = (routeId) => {
         }
     })
 
-    const routeCoords = [[13.7563, 100.5018], [14.3532, 100.5691], [18.7883, 98.9853]]
-    const polyline = L.polyline(routeCoords, { color: '#3b82f6', weight: 5 }).addTo(map)
-    map.fitBounds(polyline.getBounds(), { padding: [30, 30] })
+    const routeCoords = route.coordinates
+
+    if (routeCoords && routeCoords.length > 0) {
+        const polyline = L.polyline(routeCoords, { color: '#3b82f6', weight: 5 }).addTo(map)
+        map.fitBounds(polyline.getBounds(), { padding: [30, 30] })
+    }
 }
 
-
-
-function closeModal() {
-    showModal.value = false
-    // Optional: delay resetting data for smoother closing animation
-    setTimeout(() => {
-        bookingRoute.value = null
-    }, 300);
-}
-
-
-
-// Ensure map is initialized on mount if Leaflet is already loaded
 onMounted(() => {
     if (window.L) {
         initializeMap();
     }
+    handleSearch();
 });
 </script>
 
@@ -428,7 +496,6 @@ body,
     animation-duration: 300ms;
 }
 
-/* New Modal Styles */
 .modal-overlay {
     position: fixed;
     z-index: 1000;
@@ -452,7 +519,6 @@ body,
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-/* Transition classes */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
     transition: opacity 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02);
