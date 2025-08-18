@@ -110,7 +110,8 @@
                                     </div>
                                 </div>
 
-                                <div class="flex justify-end space-x-3 " :class="{ 'mt-4': selectedTripId !== trip.id }">
+                                <div class="flex justify-end space-x-3 "
+                                    :class="{ 'mt-4': selectedTripId !== trip.id }">
                                     <button v-if="trip.status === 'pending'"
                                         @click.stop="openConfirmModal(trip, 'cancel')"
                                         class="px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition duration-200 text-sm">
@@ -156,12 +157,14 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/th';
 import buddhistEra from 'dayjs/plugin/buddhistEra';
 import ConfirmModal from '~/components/ConfirmModal.vue';
+import { useToast } from '~/composables/useToast';
 
 // Setup dayjs for Thai locale
 dayjs.locale('th');
 dayjs.extend(buddhistEra);
 
 const { $api } = useNuxtApp();
+const { toast } = useToast();
 
 // --- State Management ---
 const activeTab = ref('pending');
@@ -319,14 +322,18 @@ const handleConfirmAction = async () => {
                 method: 'PATCH',
                 body: { status: 'CANCELLED' }
             });
+            toast.success('ยกเลิกการจองสำเร็จ', 'การจองของคุณถูกยกเลิกแล้ว');
         } else if (action === 'delete') {
             // TODO: Call API to delete booking record
             console.log(`Deleting booking ID: ${tripId}`);
+            // Example toast for when you implement this:
+            // toast.success('ลบรายการสำเร็จ', 'รายการได้ถูกลบออกจากประวัติแล้ว');
         }
         closeConfirmModal();
         await fetchMyTrips();
     } catch (error) {
         console.error(`Failed to ${action} booking:`, error);
+        toast.error('เกิดข้อผิดพลาด', error.data?.message || 'ไม่สามารถดำเนินการได้');
         closeConfirmModal();
     }
 };

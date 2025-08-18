@@ -125,10 +125,11 @@
                                         </div>
                                         <div v-if="route.photos && route.photos.length > 0">
                                             <h5 class="font-medium text-gray-900 mb-2">รูปภาพรถยนต์</h5>
-                                            <div class="grid grid-cols-3 gap-2 mt-2">
-                                                <div v-for="(photo, index) in route.photos.slice(0, 3)" :key="index">
+                                            <div class="grid grid-cols-3 gap-2 mt-2 ">
+                                                <div v-for="(photo, index) in route.photos.slice(0, 3)" :key="index"
+                                                    class="">
                                                     <img :src="photo" alt="Vehicle photo"
-                                                        class="w-full aspect-video object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+                                                        class="w-full aspect-video object-cover border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
                                                 </div>
                                             </div>
                                         </div>
@@ -280,11 +281,13 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
+import { useToast } from '~/composables/useToast';
 
 dayjs.locale('th')
 dayjs.extend(buddhistEra)
 
 const { $api } = useNuxtApp()
+const { toast } = useToast();
 
 useHead({
     title: 'ค้นหาเส้นทาง - Car Pool',
@@ -391,12 +394,13 @@ async function handleSearch() {
     }
 }
 
+// [UPDATED] Removed the call to updateMapForRoute
 const toggleDetails = (route) => {
     if (selectedRoute.value && selectedRoute.value.id === route.id) {
         selectedRoute.value = null
     } else {
         selectedRoute.value = route
-        updateMapForRoute(route)
+        // updateMapForRoute(route) // <-- We don't call this anymore
     }
 }
 
@@ -418,38 +422,65 @@ function closeModal() {
 }
 
 async function confirmBooking() {
-    console.log('Booking confirmed for route:', bookingRoute.value.id)
-    // TODO: Implement booking API call here
-    closeModal()
+    if (!bookingRoute.value) return;
+
+    if (!pickupPoint.value.trim() || !dropoffPoint.value.trim()) {
+        toast.warning('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลจุดรับและจุดส่งให้ครบถ้วน');
+        return;
+    }
+
+    const payload = {
+        routeId: bookingRoute.value.id,
+        numberOfSeats: bookingSeats.value,
+        pickupLocation: {
+            name: pickupPoint.value,
+            lat: 16.432, // TODO: Replace with actual Lat
+            lng: 102.833  // TODO: Replace with actual Lng
+        },
+        dropoffLocation: {
+            name: dropoffPoint.value,
+            lat: 16.456, // TODO: Replace with actual Lat
+            lng: 102.876  // TODO: Replace with actual Lng
+        }
+    };
+
+    try {
+        await $api('/bookings', {
+            method: 'POST',
+            body: payload
+        });
+
+        closeModal();
+
+        toast.success(
+            'ส่งคำขอจองสำเร็จ!',
+            'คำขอของคุณถูกส่งไปให้ผู้ขับแล้ว โปรดรอการยืนยัน'
+        );
+
+        // Redirect to My Trips page after a short delay
+        setTimeout(() => {
+            navigateTo('/myTrip');
+        }, 1500);
+
+    } catch (error) {
+        console.error("Failed to create booking:", error);
+        toast.error(
+            'เกิดข้อผิดพลาดในการจอง',
+            error.data?.message || 'โปรดลองใหม่อีกครั้งในภายหลัง'
+        );
+    }
 }
 
 const initializeMap = () => {
     if (typeof L === 'undefined' || !mapContainer.value || map) return
 
     try {
-        map = L.map(mapContainer.value).setView([16.0, 101.0], 6)
+        map = L.map(mapContainer.value).setView([13.7563, 100.5018], 6) // Centered on Bangkok, zoomed out
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map)
     } catch (error) {
         console.error('Error initializing map:', error)
-    }
-}
-
-const updateMapForRoute = (route) => {
-    if (!map || !route.coordinates) return
-
-    map.eachLayer(layer => {
-        if (layer instanceof L.Polyline) {
-            map.removeLayer(layer)
-        }
-    })
-
-    const routeCoords = route.coordinates
-
-    if (routeCoords && routeCoords.length > 0) {
-        const polyline = L.polyline(routeCoords, { color: '#3b82f6', weight: 5 }).addTo(map)
-        map.fitBounds(polyline.getBounds(), { padding: [30, 30] })
     }
 }
 

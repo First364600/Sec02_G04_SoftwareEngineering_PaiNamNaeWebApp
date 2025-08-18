@@ -1,70 +1,11 @@
 <template>
     <div class="bg-gray-50">
-        <!-- Main Container - Centered -->
         <div class="min-h-screen flex items-center justify-center py-8">
             <div class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4">
 
-                <!-- Sidebar Menu -->
-                <aside class="w-80 bg-gray-50 p-6 border-r border-gray-200 hidden md:block">
-                    <!-- Header -->
-                    <div class="mb-8">
-                        <h1 class="text-xl font-bold text-gray-900 text-center mb-2">โปรไฟล์และการตั้งค่า</h1>
-                        <p class="text-sm text-gray-600 text-center">จัดการข้อมูลส่วนตัวและความปลอดภัยของบัญชี</p>
-                    </div>
+                <ProfileSidebar />
 
-                    <!-- Menu Items -->
-                    <nav class="space-y-4">
-                        <!-- การจัดการบัญชี -->
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 px-4">การจัดการบัญชี</h3>
-                            <ul class="space-y-1">
-                                <li>
-                                    <NuxtLink to="/profile"
-                                        class="block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100">
-                                        โปรไฟล์ของฉัน
-                                    </NuxtLink>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- การยืนยันตัวตน -->
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 px-4">การยืนยันตัวตน</h3>
-                            <ul class="space-y-1">
-                                <li>
-                                    <NuxtLink to="/profile"
-                                        class="block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100">
-                                        การยืนยันตัวตนขั้นพื้นฐาน
-                                    </NuxtLink>
-                                </li>
-                                <li>
-                                    <NuxtLink to="/"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-                                        การยืนยันตัวตนสำหรับผู้ขับขี่
-                                    </NuxtLink>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- โหมดผู้ขับขี่ -->
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 px-4">โหมดผู้ขับขี่</h3>
-                            <ul class="space-y-1">
-                                <li>
-                                    <NuxtLink to="/"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-                                        ข้อมูลรถยนต์ของฉัน
-                                    </NuxtLink>
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-                </aside>
-
-                <!-- Main Content -->
-                <main class="flex-1 p-8 overflow-y-auto" style="max-height: 90vh;">
-
-                    <!-- My Profile Section -->
+                <main class="flex-1 p-8 ">
                     <div>
                         <div class="text-center mb-8">
                             <h2 class="text-2xl font-bold text-gray-900 mb-2">โปรไฟล์ของฉัน</h2>
@@ -72,104 +13,126 @@
                         </div>
 
                         <form @submit.prevent="handleProfileUpdate" class="space-y-6" novalidate>
-                            <!-- รูปโปรไฟล์ -->
                             <div class="text-center">
                                 <img :src="previewUrl" alt="Profile Preview"
                                     class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-white shadow-md" />
-                                <p class="text-xs text-gray-600 mb-3">* ระบบจะใช้รูปภาพนี้เพื่อแสดงบนโปรไฟล์</p>
-                                <input type="file" accept="image/*" @change="handleFileChange"
-                                    class="mx-auto block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                                <input type="file" accept="image/*" @change="handleFileChange" ref="fileInput"
+                                    class="hidden" />
+                                <button type="button" @click="fileInput.click()"
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">เปลี่ยนรูปภาพ</button>
                             </div>
 
-                            <!-- ชื่อจริง -->
                             <div>
-                                <label for="firstName"
-                                    class="block text-sm font-medium text-gray-700 mb-2">ชื่อจริง</label>
-                                <input id="firstName" v-model="firstName" type="text" placeholder="กรอกชื่อจริง"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            </div>
-
-                            <!-- นามสกุล -->
-                            <div>
-                                <label for="lastName"
-                                    class="block text-sm font-medium text-gray-700 mb-2">นามสกุล</label>
-                                <input id="lastName" v-model="lastName" type="text" placeholder="กรอกนามสกุล" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            </div>
-
-                            <!-- เบอร์โทรศัพท์ -->
-                            <div>
-                                <label for="phone"
-                                    class="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์</label>
-                                <input type="text" id="phone" v-model="phoneNumber" disabled
+                                <label for="username"
+                                    class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้</label>
+                                <input id="username" :value="originalUserData?.username" type="text" disabled
                                     class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
                             </div>
 
-                            <!-- อีเมล -->
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
-                                <input id="email" v-model="email" type="email" placeholder="example@example.com"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="firstName"
+                                        class="block text-sm font-medium text-gray-700 mb-2">ชื่อจริง</label>
+                                    <input id="firstName" v-model="form.firstName" type="text"
+                                        placeholder="กรอกชื่อจริง" @focus="showNameWarning = true"
+                                        @blur="showNameWarning = false"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <div>
+                                    <label for="lastName"
+                                        class="block text-sm font-medium text-gray-700 mb-2">นามสกุล</label>
+                                    <input id="lastName" v-model="form.lastName" type="text" placeholder="กรอกนามสกุล"
+                                        @focus="showNameWarning = true" @blur="showNameWarning = false"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
                             </div>
 
-                            <!-- วันที่สร้างบัญชี -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">วันที่สร้างบัญชี</label>
-                                <input type="text" :value="formatDate(user?.createdAt)" disabled
-                                    class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
+                            <div v-if="showNameWarning" class="text-center -mt-2">
+                                <p class="text-sm text-red-600">
+                                    หากมีการเปลี่ยนแปลงชื่อ-นามสกุล กรุณาตรวจสอบให้แน่ใจว่าตรงกับบัตรประชาชน
+                                    <br>และอาจจำเป็นต้องยืนยันตัวตนสำหรับผู้ขับขี่ใหม่อีกครั้ง
+                                </p>
                             </div>
 
-                            <!-- วันที่แก้ไขล่าสุด -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">วันที่แก้ไขล่าสุด</label>
-                                <input type="text" :value="formatDate(user?.updatedAt)" disabled
-                                    class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="email"
+                                        class="block text-sm font-medium text-gray-700 mb-2">อีเมล</label>
+                                    <input id="email" v-model="form.email" type="email"
+                                        placeholder="example@example.com"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <div>
+                                    <label for="phoneNumber"
+                                        class="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์</label>
+                                    <input id="phoneNumber" v-model="form.phoneNumber" type="text"
+                                        placeholder="กรอกเบอร์โทรศัพท์"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
                             </div>
 
-                            <!-- เปลี่ยนรหัสผ่าน -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">วันที่สร้างบัญชี</label>
+                                    <input type="text" :value="formatDate(originalUserData?.createdAt)" disabled
+                                        class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700 mb-2">วันที่แก้ไขล่าสุด</label>
+                                    <input type="text" :value="formatDate(originalUserData?.updatedAt)" disabled
+                                        class="w-full px-4 py-3 border border-gray-200 bg-gray-100 rounded-md text-gray-600" />
+                                </div>
+                            </div>
+
                             <div class="border-t border-gray-200 pt-6">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4">เปลี่ยนรหัสผ่าน</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="currentPassword"
-                                            class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่านเดิม</label>
-                                        <input type="password" id="currentPassword" placeholder="กรอกรหัสผ่านเดิม"
-                                            v-model="currentPassword"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                    </div>
+                                <div>
+                                    <label for="currentPassword"
+                                        class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่านเดิม</label>
+                                    <input type="password" id="currentPassword" placeholder="กรอกรหัสผ่านเดิม"
+                                        v-model="form.currentPassword"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                     <div>
                                         <label for="newPassword"
                                             class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่านใหม่</label>
-                                        <input type="password" id="newPassword" minlength="6" v-model="newPassword"
+                                        <input type="password" id="newPassword" minlength="6" v-model="form.newPassword"
                                             placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     </div>
                                     <div>
-                                        <label for="confirmPassword"
+                                        <label for="confirmNewPassword"
                                             class="block text-sm font-medium text-gray-700 mb-2">ยืนยันรหัสผ่านใหม่</label>
-                                        <input type="password" id="confirmPassword" minlength="6"
-                                            v-model="confirmNewPassword" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
+                                        <input type="password" id="confirmNewPassword" minlength="6"
+                                            v-model="form.confirmNewPassword" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- ปุ่มดำเนินการ -->
                             <div class="pt-6 flex justify-end gap-4">
-                                <button type="button" @click="resetForm"
-                                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                <button type="button" @click="resetForm" :disabled="isLoading"
+                                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50">
                                     ยกเลิก
                                 </button>
-                                <button type="submit"
-                                    class="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    บันทึกการเปลี่ยนแปลง
+                                <button type="submit" :disabled="isLoading"
+                                    class="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center">
+                                    <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                    {{ isLoading ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง' }}
                                 </button>
                             </div>
                         </form>
                     </div>
-
-
-
                 </main>
             </div>
         </div>
@@ -177,119 +140,151 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useNuxtApp } from '#app'
+import { ref, onMounted, reactive } from 'vue'
 import { useAuth } from '~/composables/useAuth';
+import { useToast } from '~/composables/useToast';
+import ProfileSidebar from '~/components/ProfileSidebar.vue';
 import dayjs from 'dayjs'
+import 'dayjs/locale/th'
+
+dayjs.locale('th')
+
+definePageMeta({
+    middleware: 'auth'
+});
 
 const { $api } = useNuxtApp()
-const { user } = useAuth()
+const { user: userCookie } = useAuth()
+const { toast } = useToast(); // [FIXED] Initialize the toast object
 
-const firstName = ref('')
-const lastName = ref('')
-const email = ref('')
-const phoneNumber = ref('')
-const currentPassword = ref('')
-const newPassword = ref('')
-const confirmNewPassword = ref('')
-const profilePictureFile = ref(null)
+const fileInput = ref(null)
 const previewUrl = ref('')
+const isLoading = ref(false)
+const showNameWarning = ref(false);
+
+const form = reactive({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    profilePictureFile: null,
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+});
+
+let originalUserData = null;
+
+const fetchUserData = async () => {
+    try {
+        const data = await $api('/users/me');
+        originalUserData = { ...data };
+        resetForm();
+    } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        toast.error('เกิดข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลผู้ใช้ได้');
+    }
+}
+
+const resetForm = () => {
+    if (originalUserData) {
+        form.firstName = originalUserData.firstName || '';
+        form.lastName = originalUserData.lastName || '';
+        form.email = originalUserData.email || '';
+        form.phoneNumber = originalUserData.phoneNumber || '';
+        previewUrl.value = originalUserData.profilePicture || `https://ui-avatars.com/api/?name=${form.firstName || 'U'}&background=random&size=128`;
+
+        form.currentPassword = '';
+        form.newPassword = '';
+        form.confirmNewPassword = '';
+        form.profilePictureFile = null;
+    }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return dayjs(dateString).format('D MMMM YYYY HH:mm');
+}
 
 onMounted(() => {
-    if (user.value) {
-        firstName.value = user.value.firstName || ''
-        lastName.value = user.value.lastName || ''
-        email.value = user.value.email || ''
-        phoneNumber.value = user.value.phoneNumber || ''
-    }
-
-    if (user.value.profilePicture) {
-        const pic = user.value.profilePicture
-        previewUrl.value = pic.startsWith('http')
-            ? pic
-            : `${useNuxtApp().$config.public.apiBase}${pic}`
-    }
-})
-
-function resetForm() {
-    if (user.value) {
-        firstName.value = user.value.firstName || ''
-        lastName.value = user.value.lastName || ''
-        email.value = user.value.email || ''
-        phoneNumber.value = user.value.phoneNumber || ''
-
-        currentPassword.value = user.value.currentPassword || ''
-        newPassword.value = user.value.newPassword || ''
-        confirmNewPassword.value = user.value.confirmNewPassword || ''
-    }
-}
-
-// ฟอร์แมตรูปวันที่
-function formatDate(raw) {
-    return raw ? dayjs(raw).format('YYYY-MM-DD HH:mm') : ''
-}
+    fetchUserData();
+});
 
 function handleFileChange(e) {
     const file = e.target.files?.[0]
     if (file) {
-        profilePictureFile.value = file
+        form.profilePictureFile = file
         previewUrl.value = URL.createObjectURL(file)
     }
 }
 
 async function handleProfileUpdate() {
+    isLoading.value = true;
+
     try {
-        // const payload = {
-        //     firstName: firstName.value,
-        //     lastName: lastName.value,
-        //     email: email.value
-        // }
+        const formData = new FormData()
+        formData.append('firstName', form.firstName);
+        formData.append('lastName', form.lastName);
+        formData.append('email', form.email);
+        formData.append('phoneNumber', form.phoneNumber);
 
-        const form = new FormData()
-        form.append('firstName', firstName.value)
-        form.append('lastName', lastName.value)
-        form.append('email', email.value)
-
-        if (profilePictureFile.value) {
-            form.append('profilePicture', profilePictureFile.value)
+        if (form.profilePictureFile) {
+            formData.append('profilePicture', form.profilePictureFile);
         }
+
         const updatedUser = await $api('/users/me', {
             method: 'PUT',
-            body: form
-        })
-        user.value = updatedUser
+            body: formData
+        });
 
-        if (currentPassword.value || newPassword.value || confirmNewPassword.value) {
-            if (!currentPassword.value || !newPassword.value || !confirmNewPassword.value) {
-                alert('กรุณากรอกรหัสผ่านให้ครบถ้วน')
-                return
+        userCookie.value = updatedUser;
+        originalUserData = { ...updatedUser };
+
+        let passwordChanged = false;
+        if (form.currentPassword || form.newPassword || form.confirmNewPassword) {
+            if (!form.currentPassword || !form.newPassword || !form.confirmNewPassword) {
+                throw new Error("หากต้องการเปลี่ยนรหัสผ่าน กรุณากรอกข้อมูลรหัสผ่านให้ครบทุกช่อง");
             }
-            if (newPassword.value !== confirmNewPassword.value) {
-                alert('รหัสผ่านใหม่ไม่ตรงกัน')
-                return
+            if (form.newPassword !== form.confirmNewPassword) {
+                throw new Error("รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน");
+            }
+            if (form.newPassword.length < 6) {
+                throw new Error("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร");
             }
 
             await $api('/auth/change-password', {
                 method: 'PUT',
                 body: {
-                    currentPassword: currentPassword.value,
-                    newPassword: newPassword.value,
-                    confirmNewPassword: confirmNewPassword.value
+                    currentPassword: form.currentPassword,
+                    newPassword: form.newPassword,
+                    confirmNewPassword: form.confirmNewPassword
                 }
-            })
-            alert('เปลี่ยนรหัสผ่านสำเร็จ')
+            });
 
-            currentPassword.value = ''
-            newPassword.value = ''
-            confirmNewPassword.value = ''
+            passwordChanged = true;
+            form.currentPassword = '';
+            form.newPassword = '';
+            form.confirmNewPassword = '';
         }
 
-        alert('อัพเดตโปรไฟล์สำเร็จ')
+        toast.success(
+            'อัปเดตสำเร็จ!',
+            passwordChanged ? 'โปรไฟล์และรหัสผ่านของคุณถูกบันทึกแล้ว' : 'ข้อมูลโปรไฟล์ของคุณถูกบันทึกแล้ว'
+        );
+
     } catch (err) {
-        console.error(err)
-        alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        const message = err.data?.message || err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+        toast.error('เกิดข้อผิดพลาด', message);
+    } finally {
+        isLoading.value = false;
+        if (fileInput.value) {
+            fileInput.value.value = '';
+        }
+        form.profilePictureFile = null;
     }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Scoped styles can be added here if needed */
+</style>
