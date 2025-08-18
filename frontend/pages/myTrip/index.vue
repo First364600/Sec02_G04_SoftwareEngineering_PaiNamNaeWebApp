@@ -132,8 +132,8 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div class="bg-white border-gray-200 rounded-lg shadow-md overflow-hidden sticky top-8">
-                        <div class="p-4 border-b border-gray-200">
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden sticky top-8">
+                        <div class="p-3  border-gray-200">
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ selectedTrip ? selectedTrip.origin + ' → ' +
                                 selectedTrip.destination : 'คลิกที่รายการเพื่อดูเส้นทาง' }}</p>
