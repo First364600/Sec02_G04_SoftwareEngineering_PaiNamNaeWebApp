@@ -3,34 +3,22 @@ const prisma = require('../utils/prisma');
 const getAllRoutes = async () => {
   return prisma.route.findMany({
     include: {
-      bookings: {
-        include: {
-          passenger: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profilePicture: true
-            }
-          }
-        }
-      },
-      driver:{
+      driver: {
         select: {
-          id:true,
-          firstName:true,
-          lastName:true,
-          gender:true,
-          profilePicture:true,
-          isVerified:true
+          id: true,
+          firstName: true,
+          lastName: true,
+          gender: true,
+          profilePicture: true,
+          isVerified: true
         }
       },
-      vehicle:{
-        select:{
-          vehicleModel:true,
-          vehicleType:true,
-          photos:true,
-          amenities:true
+      vehicle: {
+        select: {
+          vehicleModel: true,
+          vehicleType: true,
+          photos: true,
+          amenities: true
         }
       }
     },
@@ -53,6 +41,24 @@ const getRouteById = async (id) => {
             }
           }
         }
+      },
+      driver: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          gender: true,
+          profilePicture: true,
+          isVerified: true
+        }
+      },
+      vehicle: {
+        select: {
+          vehicleModel: true,
+          vehicleType: true,
+          photos: true,
+          amenities: true
+        }
       }
     },
   });
@@ -64,6 +70,7 @@ const getMyRoutes = async (driverId) => {
       driverId
     },
     include: {
+
       bookings: {
         include: {
           passenger: {
@@ -75,8 +82,27 @@ const getMyRoutes = async (driverId) => {
             }
           }
         }
+      },
+      driver: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          gender: true,
+          profilePicture: true,
+          isVerified: true
+        }
+      },
+      vehicle: {
+        select: {
+          vehicleModel: true,
+          vehicleType: true,
+          photos: true,
+          amenities: true
+        }
       }
     },
+
     orderBy: { createdAt: 'desc' },
   })
 }
