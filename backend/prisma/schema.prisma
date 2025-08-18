@@ -24,12 +24,14 @@ enum RouteStatus {
   FULL
   COMPLETED
   CANCELLED
+  IN_TRANSIT
 }
 
 enum BookingStatus {
   PENDING
   CONFIRMED
   REJECTED
+  CANCELLED
 }
 
 model User {
