@@ -118,7 +118,7 @@ const cancelBooking = async (id, passengerId) => {
   return prisma.$transaction(async (tx) => {
     const updated = await tx.booking.update({
       where: { id },
-      data: { status: BookingStatus.REJECTED },
+      data: { status: BookingStatus.CANCELLED },
     });
 
     // คืนที่นั่งให้ route
