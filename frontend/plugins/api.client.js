@@ -24,9 +24,10 @@ export default defineNuxtPlugin(() => {
           }
         },
 
-        async onResponseError({ response }) {
-          if (response.status === 401) {
-            // ล้างคุกกี้แล้วพาไป /login
+        async onResponseError({ request, response }) { 
+          const requestUrl = request.toString();
+
+          if (response.status === 401 && !requestUrl.includes('/auth/change-password')) {
             useCookie('token').value = null
             useCookie('user').value = null
             return navigateTo('/login')
