@@ -57,7 +57,31 @@ const createBooking = async (data, passengerId) => {
 const getMyBookings = async (passengerId) => {
   return prisma.booking.findMany({
     where: { passengerId },
-    include: { route: true },
+    include: {
+      route: {
+        include: {
+          driver: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              gender: true,
+              profilePicture: true,
+              isVerified: true
+            }
+          },
+          vehicle: {
+            select: {
+              vehicleModel: true,
+              vehicleType: true,
+              photos: true,
+              amenities: true
+            }
+          }
+        }
+      }
+
+    },
     orderBy: { createdAt: 'desc' },
   });
 };
