@@ -49,6 +49,17 @@ const getUserById = async (id) => {
     return safeUser
 }
 
+// const getMyUser = async (id) => {
+//     const user = await prisma.user.findUnique({ where: { id } })
+
+//     if (!user) {
+//         return null;
+//     }
+
+//     const { password, ...safeUser } = user;
+//     return safeUser
+// }
+
 const createUser = async (data) => {
     const existingUserByEmail = await getUserByEmail(data.email);
     if (existingUserByEmail) {

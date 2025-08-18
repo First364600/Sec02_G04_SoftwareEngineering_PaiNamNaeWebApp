@@ -24,6 +24,16 @@ const getUserById = asyncHandler(async (req, res) => {
     });
 });
 
+const getMyUser = asyncHandler(async (req, res) => {
+    const user = req.user.sub
+    const data = await userService.getUserById(user)
+    res.status(200).json({
+        success: true,
+        message: "User retrieved",
+        data: data
+    })
+
+})
 const createUser = asyncHandler(async (req, res) => {
     const userData = req.body;
 
@@ -53,7 +63,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     // เอาข้อมูล text fields ที่มากับ req.body
     const updateData = { ...req.body };
 
-    
+
     if (req.files?.nationalIdPhotoUrl) {
         const buf = req.files.nationalIdPhotoUrl[0].buffer;
         const result = await uploadToCloudinary(buf, 'painamnae/national_ids');
@@ -106,6 +116,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
 module.exports = {
     getAllUsers,
     getUserById,
+    getMyUser,
     createUser,
     updateCurrentUserProfile,
     adminUpdateUser,

@@ -44,6 +44,14 @@ router.patch(
 );
 
 // --- Public / User-specific Routes ---
+
+// GET /api/users/me
+router.get(
+    '/me',
+    protect,
+    userController.getMyUser
+);
+
 // GET /api/users/:id
 router.get(
     '/:id',
