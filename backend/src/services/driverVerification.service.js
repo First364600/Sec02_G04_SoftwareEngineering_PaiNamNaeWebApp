@@ -22,6 +22,11 @@ const getVerificationById = async (id) => {
 };
 
 const createVerification = async (data) => {
+  const existing = await getVerificationByUser(data.userId)
+  if(existing){
+    return updateVerification(existing.id,data)
+  }
+
   return prisma.$transaction(async (tx) => {
     const newRec = await tx.driverVerification.create({ data });
     await tx.user.update({
@@ -33,10 +38,15 @@ const createVerification = async (data) => {
 };
 
 const updateVerification = async (id, data) => {
+  const updatePayload = {
+    ...data,
+    status: 'PENDING'
+  };
   return prisma.driverVerification.update({
     where: { id },
-    data,
+    data: updatePayload,
   });
+
 };
 
 const updateVerificationStatus = async (id, status) => {
@@ -48,7 +58,7 @@ const updateVerificationStatus = async (id, status) => {
     if (status === 'APPROVED') {
       await tx.user.update({
         where: { id: verification.userId },
-        data: { isVerified: true , role: 'DRIVER' },
+        data: { isVerified: true, role: 'DRIVER' },
       });
     }
     else if (status === 'REJECTED') {
