@@ -2,7 +2,7 @@
     <div class="bg-gray-50">
         <div class="min-h-screen flex items-center justify-center py-8">
             <div
-                class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4 border border-gray-200">
+                class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4 border border-gray-300">
 
                 <ProfileSidebar />
 

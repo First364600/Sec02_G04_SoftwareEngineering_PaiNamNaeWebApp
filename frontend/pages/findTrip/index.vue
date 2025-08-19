@@ -1,7 +1,7 @@
 <template>
-    <div class="bg-gray-50 min-h-screen">
+    <div >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white  border border-gray-200 rounded-lg shadow-md p-6 mb-8">
+            <div class="bg-white  border border-gray-300 rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">ค้นหาการเดินทาง</h2>
                 <form @submit.prevent="handleSearch" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div>
@@ -40,8 +40,8 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
                 <div class="lg:col-span-2 ">
-                    <div class="bg-white rounded-lg shadow-md border border-gray-200">
-                        <div class="p-6 border-b border-gray-200">
+                    <div class="bg-white rounded-lg shadow-md border border-gray-300">
+                        <div class="p-6 border-b border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">ผลการค้นหา ({{ routes.length }} รายการ)</h3>
                         </div>
                         <div v-if="isLoading" class="p-6 text-center text-gray-500">
@@ -100,7 +100,7 @@
                                 </div>
 
                                 <div v-if="selectedRoute && selectedRoute.id === route.id"
-                                    class="mt-4 pt-4 border-t border-gray-200 animate-in slide-in-from-top duration-300">
+                                    class="mt-4 pt-4 border-t border-gray-300 animate-in slide-in-from-top duration-300">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <h5 class="font-medium text-gray-900 mb-2">รายละเอียดเส้นทาง</h5>
@@ -119,7 +119,7 @@
                                         <div v-if="route.conditions">
                                             <h5 class="font-medium text-gray-900 mb-2">เงื่อนไขการเดินทาง</h5>
                                             <p
-                                                class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-200">
+                                                class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-300">
                                                 {{ route.conditions }}
                                             </p>
                                         </div>
@@ -129,7 +129,7 @@
                                                 <div v-for="(photo, index) in route.photos.slice(0, 3)" :key="index"
                                                     class="">
                                                     <img :src="photo" alt="Vehicle photo"
-                                                        class="w-full aspect-video object-cover border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+                                                        class="w-full aspect-video object-cover border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
                                                 </div>
                                             </div>
                                         </div>
@@ -147,8 +147,8 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden sticky top-8 border border-gray-200">
-                        <div class="p-6 border-b border-gray-200">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden sticky top-8 border border-gray-300">
+                        <div class="p-6 border-b border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
                         </div>
                         <div ref="mapContainer" class="h-96"></div>
@@ -160,7 +160,7 @@
         <transition name="modal-fade">
             <div v-if="showModal && bookingRoute" class="modal-overlay" @click.self="closeModal">
                 <div class="modal-content">
-                    <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-300">
                         <h3 class="text-xl font-semibold text-gray-900">ยืนยันการจอง</h3>
                         <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,7 +252,7 @@
                                 <span class="text-gray-700">จำนวนที่นั่ง</span>
                                 <span class="text-gray-900 font-medium">{{ bookingSeats }} ที่นั่ง</span>
                             </div>
-                            <div class="border-t pt-2 mt-2 border-gray-200">
+                            <div class="border-t pt-2 mt-2 border-gray-300">
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold text-gray-900">ยอดรวม</span>
                                     <span class="font-bold text-blue-600 text-lg">{{ bookingTotalPrice }} บาท</span>

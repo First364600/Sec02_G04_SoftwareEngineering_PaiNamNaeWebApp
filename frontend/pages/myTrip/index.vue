@@ -1,12 +1,12 @@
 <template>
-    <div class="bg-gray-50">
+    <div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">การเดินทางของฉัน</h2>
                 <p class="mt-2 text-gray-600">จัดการและติดตามการเดินทางทั้งหมดของคุณ</p>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg shadow-md p-6 mb-8">
+            <div class="bg-white border border-gray-300 rounded-lg shadow-md p-6 mb-8">
                 <div class="flex flex-wrap gap-2">
                     <button v-for="tab in tabs" :key="tab.status" @click="activeTab = tab.status"
                         :class="['tab-button px-4 py-2 rounded-md font-medium', { 'active': activeTab === tab.status }]">
@@ -17,8 +17,8 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2">
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-md">
-                        <div class="p-6 border-b border-gray-200">
+                    <div class="bg-white border border-gray-300 rounded-lg shadow-md">
+                        <div class="p-6 border-b border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">รายการการเดินทาง</h3>
                         </div>
 
@@ -75,7 +75,7 @@
                                 </div>
 
                                 <div v-if="selectedTripId === trip.id"
-                                    class="mt-4 mb-5 pt-4 border-t border-gray-200 animate-in slide-in-from-top duration-300">
+                                    class="mt-4 mb-5 pt-4 border-t border-gray-300 animate-in slide-in-from-top duration-300">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <h5 class="font-medium text-gray-900 mb-2">รายละเอียดเส้นทาง</h5>
@@ -94,7 +94,7 @@
                                         <div v-if="trip.conditions">
                                             <h5 class="font-medium text-gray-900 mb-2">เงื่อนไขการเดินทาง</h5>
                                             <p
-                                                class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-200">
+                                                class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-300">
                                                 {{ trip.conditions }}
                                             </p>
                                         </div>
@@ -133,8 +133,8 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden sticky top-8">
-                        <div class="p-3  border-gray-200">
+                    <div class="bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden sticky top-8">
+                        <div class="p-3  border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
                             <p class="text-sm text-gray-600 mt-1">{{ selectedTrip ? selectedTrip.origin + ' → ' +
                                 selectedTrip.destination : 'คลิกที่รายการเพื่อดูเส้นทาง' }}</p>
