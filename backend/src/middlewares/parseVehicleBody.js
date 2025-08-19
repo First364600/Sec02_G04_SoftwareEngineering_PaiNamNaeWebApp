@@ -15,5 +15,14 @@ module.exports = (req, res, next) => {
         }
     }
 
+    // isDefault: ถ้าเป็น string 'true'/'false' ให้แปลงเป็น boolean
+    if (req.body.isDefault && typeof req.body.isDefault === 'string') {
+        if (req.body.isDefault.toLowerCase() === 'true') {
+            req.body.isDefault = true;
+        } else if (req.body.isDefault.toLowerCase() === 'false') {
+            req.body.isDefault = false;
+        }
+    }
+
     next();
 };
