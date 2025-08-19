@@ -1,12 +1,12 @@
 <template>
-    <div class="bg-gray-50">
-        <div class="min-h-screen flex items-center justify-center py-8">
+    <div >
+        <div class=" flex items-center justify-center py-8">
             <div
-                class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4 border border-gray-200">
+                class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4 border border-gray-300">
 
                 <ProfileSidebar />
 
-                <main class="flex-1 p-8 ">
+                <main class="flex-1 p-8">
                     <div class="text-center mb-8">
                         <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,130 +15,64 @@
                                 </path>
                             </svg>
                         </div>
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">การยืนยันตัวตนสำหรับผู้ขับขี่</h1>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">ข้อมูลรถยนต์ของฉัน</h1>
                         <p class="text-gray-600 max-w-md mx-auto">
-                            อัปโหลดภาพบัตรขับขี่ประจำตัวและรูปถ่าย เพื่อยืนยันตัวตนของคุณ
+                            จัดการข้อมูลรถยนต์ของคุณเพื่อใช้ในการสร้างเส้นทาง
                         </p>
                     </div>
 
-                    
+                    <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-300">
+                        <div
+                            class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-[#F2F2F2] p-4 md:px-6 md:py-6 rounded-[8px]">
+                            <p class="text-gray-800 text-base md:text-[18px] text-center sm:text-left">
+                                {{ vehicleCount > 0 ? `คุณมีรถยนต์ที่บันทึกไว้ ${vehicleCount} คัน` :
+                                    'คุณยังไม่มีข้อมูลรถยนต์' }}
+                            </p>
+                            <button @click="isModalOpen = true"
+                                class="bg-[#2563EB] hover:bg-blue-600 text-white text-sm md:text-[16px] px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+                                เพิ่ม / จัดการข้อมูล
+                            </button>
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>
+
+        <VehicleModal :show="isModalOpen" @close="closeAndRefresh" />
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, onMounted } from 'vue';
 import ProfileSidebar from '~/components/ProfileSidebar.vue';
-import { useToast } from '~/composables/useToast';
+import VehicleModal from '~/components/VehicleModal.vue';
 
 definePageMeta({
     middleware: 'auth'
 });
 
 const { $api } = useNuxtApp();
-const { toast } = useToast();
 
-const isLoading = ref(false);
-const licensePhotoInput = ref(null);
-const selfiePhotoInput = ref(null);
+const isModalOpen = ref(false);
+const vehicleCount = ref(0);
 
-const form = reactive({
-    licenseNumber: '',
-    firstNameOnLicense: '',
-    lastNameOnLicense: '',
-    licenseIssueDate: '',
-    licenseExpiryDate: '',
-    typeOnLicense: '',
-    licensePhoto: null,
-    selfiePhoto: null,
-});
-
-const previews = reactive({
-    licensePhoto: '',
-    selfiePhoto: ''
-});
-
-const isFormValid = computed(() => {
-    return form.licenseNumber && form.firstNameOnLicense && form.lastNameOnLicense &&
-        form.licenseIssueDate && form.licenseExpiryDate && form.typeOnLicense &&
-        form.licensePhoto && form.selfiePhoto;
-});
-
-const triggerFileInput = (type) => {
-    if (type === 'licensePhoto') {
-        licensePhotoInput.value?.click();
-    } else if (type === 'selfiePhoto') {
-        selfiePhotoInput.value?.click();
-    }
-};
-
-const handleFileChange = (event, type) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (type === 'licensePhoto') {
-        form.licensePhoto = file;
-        previews.licensePhoto = URL.createObjectURL(file);
-    } else if (type === 'selfiePhoto') {
-        form.selfiePhoto = file;
-        previews.selfiePhoto = URL.createObjectURL(file);
-    }
-};
-
-const resetForm = () => {
-    form.licenseNumber = '';
-    form.firstNameOnLicense = '';
-    form.lastNameOnLicense = '';
-    form.licenseIssueDate = '';
-    form.licenseExpiryDate = '';
-    form.typeOnLicense = '';
-    form.licensePhoto = null;
-    form.selfiePhoto = null;
-    previews.licensePhoto = '';
-    previews.selfiePhoto = '';
-
-    if (licensePhotoInput.value) licensePhotoInput.value.value = '';
-    if (selfiePhotoInput.value) selfiePhotoInput.value.value = '';
-};
-
-const handleSubmit = async () => {
-    if (!isFormValid.value) {
-        toast.warning('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลและอัปโหลดรูปภาพให้ครบทุกช่อง');
-        return;
-    }
-    isLoading.value = true;
+const fetchVehicles = async () => {
     try {
-        const formData = new FormData();
-        formData.append('licenseNumber', form.licenseNumber);
-        formData.append('firstNameOnLicense', form.firstNameOnLicense);
-        formData.append('lastNameOnLicense', form.lastNameOnLicense);
-        formData.append('typeOnLicense', form.typeOnLicense);
-        formData.append('licenseIssueDate', new Date(form.licenseIssueDate).toISOString());
-        formData.append('licenseExpiryDate', new Date(form.licenseExpiryDate).toISOString());
-
-        if (form.licensePhoto) {
-            formData.append('licensePhotoUrl', form.licensePhoto);
-        }
-        if (form.selfiePhoto) {
-            formData.append('selfiePhotoUrl', form.selfiePhoto);
-        }
-
-        await $api('/driver-verifications', {
-            method: 'POST',
-            body: formData,
-        });
-
-        toast.success('ส่งข้อมูลสำเร็จ', 'คำขอยืนยันตัวตนผู้ขับขี่ของคุณถูกส่งแล้ว');
-        resetForm();
-
+        const vehicles = await $api('/vehicles');
+        vehicleCount.value = vehicles.length;
     } catch (error) {
-        toast.error('เกิดข้อผิดพลาด', error.data?.message || 'ไม่สามารถส่งข้อมูลได้');
-    } finally {
-        isLoading.value = false;
+        console.error("Failed to fetch vehicles:", error);
     }
 };
+
+const closeAndRefresh = () => {
+    isModalOpen.value = false;
+    fetchVehicles(); // Refresh count when modal is closed
+};
+
+onMounted(() => {
+    fetchVehicles();
+});
 </script>
 
 <style scoped>
