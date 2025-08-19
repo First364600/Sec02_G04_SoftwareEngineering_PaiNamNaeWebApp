@@ -24,7 +24,11 @@ router.get(
 router.post(
   '/',
   protect,
-  upload.single('licensePhotoUrl'),
+  // upload.single('licensePhotoUrl'),
+  upload.fields([
+    { name: 'licensePhotoUrl', maxCount: 1 },
+    { name: 'selfiePhotoUrl', maxCount: 1 }
+  ]),
   validate({ body: createDriverVerificationSchema }),
   driverVerifController.createVerification
 );

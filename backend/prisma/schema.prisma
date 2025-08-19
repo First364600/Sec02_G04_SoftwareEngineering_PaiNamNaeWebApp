@@ -34,6 +34,13 @@ enum BookingStatus {
   CANCELLED
 }
 
+enum LicenseType {
+  PRIVATE_CAR_TEMPORARY // รถยนต์ส่วนบุคคลชั่วคราว (2 ปี)
+  PRIVATE_CAR          // รถยนต์ส่วนบุคคล (5 ปี)
+  PUBLIC_CAR           // รถยนต์สาธารณะ
+  LIFETIME             // ตลอดชีพ
+}
+
 model User {
   id                    String   @id @default(cuid())
   username              String   @unique
@@ -72,6 +79,8 @@ model DriverVerification {
   licenseIssueDate    DateTime
   licenseExpiryDate   DateTime
   licensePhotoUrl     String
+  selfiePhotoUrl      String
+  typeOnLicense       LicenseType
   status              VerificationStatus @default(PENDING)
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
