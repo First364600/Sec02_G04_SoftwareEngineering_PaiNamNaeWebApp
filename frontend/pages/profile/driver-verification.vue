@@ -15,9 +15,9 @@
                                 </path>
                             </svg>
                         </div>
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">การยืนยันตัวตนขั้นพื้นฐาน</h1>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">การยืนยันตัวตนสำหรับผู้ขับขี่</h1>
                         <p class="text-gray-600 max-w-md mx-auto">
-                            อัปโหลดภาพบัตรประชาชนและรูปถ่าย เพื่อยืนยันตัวตนของคุณ
+                            อัปโหลดภาพบัตรขับขี่ประจำตัวและรูปถ่าย เพื่อยืนยันตัวตนของคุณ
                         </p>
                     </div>
 
@@ -28,7 +28,7 @@
                                 <div class="flex items-center mb-6">
                                     <div class="step-indicator mr-4">1</div>
                                     <label class="text-xl font-semibold text-gray-800">
-                                        รูปบัตรประชาชน (ด้านหน้า) <span class="text-red-500">*</span>
+                                        รูปบัตรขับขี่ประจำตัว (ด้านหน้า) <span class="text-red-500">*</span>
                                     </label>
                                 </div>
                                 <h4 class="text-sm font-medium text-gray-700 mb-2">ตัวอย่างที่ถูกต้อง:</h4>
@@ -38,8 +38,9 @@
                                             <div class="relative z-10 h-full flex flex-col justify-between">
                                                 <div class="flex justify-between items-start">
                                                     <div>
-                                                        <div class="thai-text">ใบบัตรประชาชน</div>
-                                                        <div class="text-xs text-blue-800 font-bold">ID CARD</div>
+                                                        <div class="thai-text">ใบอนุญาติขับรถยนต์</div>
+                                                        <div class="text-xs text-blue-800 font-bold">DRIVING LICENSE
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center space-x-3">
@@ -140,10 +141,10 @@
                             <div class="relative">
                                 <div class="flex items-center mb-4">
                                     <div class="step-indicator mr-4">3</div>
-                                    <h2 class="text-xl font-semibold text-gray-800">ข้อมูลในบัตรประจำตัวประชาชน</h2>
+                                    <h2 class="text-xl font-semibold text-gray-800">ข้อมูลในบัตรขับขี่ประจำตัว</h2>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div>
+                                    <!-- <div>
                                         <label for="nationalIdNumber"
                                             class="block text-sm font-medium text-gray-700 mb-2">เลขบัตรประชาชน <span
                                                 class="text-red-500">*</span></label>
@@ -151,11 +152,51 @@
                                             maxlength="17" placeholder="x-xxxx-xxxxx-xx-x"
                                             class="w-full border border-gray-300 rounded-lg focus:outline-none px-3 py-2 focus:ring-2 focus:ring-blue-500"
                                             required />
+                                    </div> -->
+                                    <div>
+                                        <label for="nationalIdExpiryDate"
+                                            class="block text-sm font-medium text-gray-700 mb-2">ชื่อ (บนบัตร)<span
+                                                class="text-red-500">*</span></label>
+                                        <input v-model="form.nationalIdExpiryDate" id="No." type="text"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required />
                                     </div>
                                     <div>
                                         <label for="nationalIdExpiryDate"
-                                            class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุในบัตร <span
+                                            class="block text-sm font-medium text-gray-700 mb-2">นามสกุล (บนบัตร)
+                                            <span class="text-red-500">*</span></label>
+                                        <input v-model="form.nationalIdExpiryDate" id="type" type="text"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required />
+                                    </div>
+                                    <div>
+                                        <label for="nationalIdExpiryDate"
+                                            class="block text-sm font-medium text-gray-700 mb-2">เลขที่ใบขับขี่ <span
                                                 class="text-red-500">*</span></label>
+                                        <input v-model="form.nationalIdExpiryDate" id="No." type="text"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required />
+                                    </div>
+                                    <div>
+                                        <label for="nationalIdExpiryDate"
+                                            class="block text-sm font-medium text-gray-700 mb-2">ชนิด
+                                            <span class="text-red-500">*</span></label>
+                                        <input v-model="form.nationalIdExpiryDate" id="type" type="text"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required />
+                                    </div>
+                                    <div>
+                                        <label for="nationalIdExpiryDate"
+                                            class="block text-sm font-medium text-gray-700 mb-2">วันออกใบขับขี่ <span
+                                                class="text-red-500">*</span></label>
+                                        <input v-model="form.nationalIdExpiryDate" id="nationalIdExpiryDate" type="date"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required />
+                                    </div>
+                                    <div>
+                                        <label for="nationalIdExpiryDate"
+                                            class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุใบขับขี่
+                                            <span class="text-red-500">*</span></label>
                                         <input v-model="form.nationalIdExpiryDate" id="nationalIdExpiryDate" type="date"
                                             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
