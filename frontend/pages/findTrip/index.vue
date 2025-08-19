@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-white  border border-gray-300 rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">ค้นหาการเดินทาง</h2>
@@ -282,12 +282,15 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
 import { useToast } from '~/composables/useToast';
+import { useAuth } from '~/composables/useAuth';
+import { navigateTo } from '#app';
 
 dayjs.locale('th')
 dayjs.extend(buddhistEra)
 
 const { $api } = useNuxtApp()
 const { toast } = useToast();
+const { token } = useAuth();
 
 useHead({
     title: 'ค้นหาเส้นทาง - Car Pool',
@@ -405,6 +408,10 @@ const toggleDetails = (route) => {
 }
 
 function openModal(route) {
+    if (!token.value) {
+        return navigateTo('/login');
+    }
+    
     if (route && route.availableSeats > 0) {
         bookingRoute.value = route
         bookingSeats.value = 1

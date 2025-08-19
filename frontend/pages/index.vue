@@ -47,7 +47,7 @@
                     <div class="relative">
                         <div class="bg-white border border-gray-200 rounded-xl shadow-md p-2 card">
                             <img class="w-full h-80 object-cover rounded-lg" alt="Carpool preview"
-                                src="https://images.unsplash.com/photo-1549923746-c502d488b3ea?q=80&w=1600&auto=format&fit=crop" />
+                                src="https://transportation.ucsd.edu/_images/headers/carpool-header.jpg" />
                         </div>
                     </div>
                 </div>

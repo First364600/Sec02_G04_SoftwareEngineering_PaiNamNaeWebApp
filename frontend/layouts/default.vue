@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-gray-50 min-h-screen">
+    <div>
         <header class="bg-white shadow-sm sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
@@ -15,30 +15,33 @@
                             :class="{ 'text-blue-600': $route.path === '/findTrip' }">
                             ค้นหาเส้นทาง
                         </NuxtLink>
-
-                        <NuxtLink to="/createTrip"
-                            class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                            :class="{ 'text-blue-600': $route.path === '/createTrip' }">
-                            สร้างเส้นทาง
-                        </NuxtLink>
-
-                        <div class="relative dropdown-trigger">
-                            <NuxtLink to="/myTrip"
-                                class="text-gray-600 hover:text-blue-600 transition-colors duration-200 flex items-center"
-                                :class="{ 'text-blue-600': $route.path.startsWith('/myTrip') }">
-                                การเดินทางของฉัน
-                                <svg class="w-4 h-4 ml-1 transition-transform duration-200" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
+                        <div v-if="user && (user.role === 'PASSENGER' || user.role === 'DRIVER')">
+                            <NuxtLink to="/createTrip"
+                                class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                                :class="{ 'text-blue-600': $route.path === '/createTrip' }">
+                                สร้างเส้นทาง
                             </NuxtLink>
-                            <div
-                                class="dropdown-menu absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-arrow">
-                                <NuxtLink to="/"
-                                    class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
-                                    การเดินทางทั้งหมด
+                        </div>
+
+                        <div v-if="user && (user.role === 'PASSENGER' || user.role === 'DRIVER')">
+                            <div class="relative dropdown-trigger">
+                                <NuxtLink to="/myTrip"
+                                    class="text-gray-600 hover:text-blue-600 transition-colors duration-200 flex items-center"
+                                    :class="{ 'text-blue-600': $route.path.startsWith('/myTrip') }">
+                                    การเดินทางของฉัน
+                                    <svg class="w-4 h-4 ml-1 transition-transform duration-200" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </NuxtLink>
+                                <div
+                                    class="dropdown-menu absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-arrow">
+                                    <NuxtLink to="/"
+                                        class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
+                                        การเดินทางทั้งหมด
+                                    </NuxtLink>
+                                </div>
                             </div>
                         </div>
 

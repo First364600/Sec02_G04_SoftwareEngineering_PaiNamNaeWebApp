@@ -251,10 +251,11 @@
 </template>
 
 <script setup>
+// definePageMeta({ middleware: 'auth' })
 
 </script>
 
-<style  scoped>
+<style scoped>
 .upload-zone {
     transition: all 0.3s ease;
     cursor: pointer;
