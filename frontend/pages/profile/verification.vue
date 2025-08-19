@@ -6,7 +6,7 @@
 
                 <ProfileSidebar />
 
-                <main class="flex-1 p-8 overflow-y-auto" style="max-height: 90vh;">
+                <main class="flex-1 p-8 ">
                     <div class="text-center mb-8">
                         <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
