@@ -1,6 +1,6 @@
 <template>
   <div class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
-    <main class="bg-white rounded-lg shadow-lg max-w-md w-full p-8">
+    <main class="bg-white rounded-lg shadow-lg max-w-md w-full p-8 border border-gray-300">
       <h1 class="text-3xl font-bold text-blue-600 mb-6 text-center">เข้าสู่ระบบ</h1>
       <form @submit.prevent="submit" id="loginForm">
         <!-- username / Email -->
