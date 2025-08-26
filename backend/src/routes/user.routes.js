@@ -25,9 +25,9 @@ router.put(
     userController.adminUpdateUser
 );
 
-// DELETE /api/users/admin/:id
+// DELETE /api/admin/users/:id
 router.delete(
-    '/admin/:id',
+    '/admin/users/:id',
     protect,
     requireAdmin,
     validate({ params: idParamSchema }),
