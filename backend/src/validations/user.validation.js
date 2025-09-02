@@ -26,7 +26,11 @@ const updateUserSchema = z.object({
     displayName: z.string().min(1).optional(),
     photoURL: z.string().min(1).optional(),
     bio: z.string().min(1).optional(),
-    role: z.nativeEnum(Role).optional()
+    role: z.nativeEnum(Role).optional(),
+    isVerified: z.coerce.boolean({
+        required_error: "isVerified field is required",
+        invalid_type_error: "isVerified must be a boolean",
+    }),
 })
 
 const updateUserStatusSchema = z.object({
