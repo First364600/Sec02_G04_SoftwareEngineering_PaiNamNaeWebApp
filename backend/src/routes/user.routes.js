@@ -18,9 +18,14 @@ router.get(
 
 // PUT /api/users/admin/:id
 router.put(
-    '/admin/users/:id',
+    '/admin/:id',
     protect,
     requireAdmin,
+    upload.fields([
+        { name: 'nationalIdPhotoUrl', maxCount: 1 },
+        { name: 'selfiePhotoUrl', maxCount: 1 },
+        { name: 'profilePicture', maxCount: 1 },
+    ]),
     validate({ params: idParamSchema, body: updateUserSchema }),
     userController.adminUpdateUser
 );
