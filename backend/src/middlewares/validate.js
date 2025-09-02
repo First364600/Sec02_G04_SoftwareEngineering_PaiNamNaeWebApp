@@ -3,18 +3,22 @@ const { z } = require('zod');
 
 const validate = (schema) => (req, res, next) => {
     try {
-       
+
         const validationSchema = z.object({
             body: schema.body || z.any(),
             query: schema.query || z.any(),
             params: schema.params || z.any(),
         });
 
-        validationSchema.parse({
+        const parsed = validationSchema.parse({
             body: req.body,
             query: req.query,
             params: req.params,
         });
+
+        req.body = parsed.body;
+        req.query = parsed.query;
+        req.params = parsed.params;
 
         next();
     } catch (error) {
