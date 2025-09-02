@@ -61,7 +61,7 @@
                                         <div class="flex justify-between items-start">
                                             <div>
                                                 <!-- <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4> -->
-                                                <h3 class="font-semibold text-gray-900">จาก Lat: 16.39, Lng: 102.83 → ถึง Lat: 13.76, Lng: 100.50</h3>
+                                                <!-- <h3 class="font-semibold text-gray-900">จาก Lat: 16.39, Lng: 102.83 → ถึง Lat: 13.76, Lng: 100.50</h3> -->
                                                 <div class="flex items-center">
                                                     <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4>
 
