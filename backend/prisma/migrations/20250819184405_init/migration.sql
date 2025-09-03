@@ -5,10 +5,13 @@ CREATE TYPE "Role" AS ENUM ('PASSENGER', 'DRIVER', 'ADMIN');
 CREATE TYPE "VerificationStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateEnum
-CREATE TYPE "RouteStatus" AS ENUM ('AVAILABLE', 'FULL', 'COMPLETED');
+CREATE TYPE "RouteStatus" AS ENUM ('AVAILABLE', 'FULL', 'COMPLETED', 'CANCELLED', 'IN_TRANSIT');
 
 -- CreateEnum
-CREATE TYPE "BookingStatus" AS ENUM ('PENDING', 'CONFIRMED', 'REJECTED');
+CREATE TYPE "BookingStatus" AS ENUM ('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "LicenseType" AS ENUM ('PRIVATE_CAR_TEMPORARY', 'PRIVATE_CAR', 'PUBLIC_CAR', 'LIFETIME');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -27,6 +30,7 @@ CREATE TABLE "User" (
     "selfiePhotoUrl" TEXT,
     "role" "Role" NOT NULL DEFAULT 'PASSENGER',
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "otpCode" TEXT,
     "lastLogin" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +49,8 @@ CREATE TABLE "DriverVerification" (
     "licenseIssueDate" TIMESTAMP(3) NOT NULL,
     "licenseExpiryDate" TIMESTAMP(3) NOT NULL,
     "licensePhotoUrl" TEXT NOT NULL,
+    "selfiePhotoUrl" TEXT NOT NULL,
+    "typeOnLicense" "LicenseType" NOT NULL,
     "status" "VerificationStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -85,10 +91,11 @@ CREATE TABLE "Route" (
     "routeSummary" TEXT,
     "distance" TEXT,
     "duration" TEXT,
-    "waypoints" JSON NOT NULL,
-    "landmarks" JSON NOT NULL,
-    "steps" JSON NOT NULL,
+    "waypoints" JSON,
+    "landmarks" JSON,
+    "steps" JSON,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Route_pkey" PRIMARY KEY ("id")
 );
