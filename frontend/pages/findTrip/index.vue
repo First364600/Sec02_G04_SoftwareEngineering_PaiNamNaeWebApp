@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-white  border border-gray-300 rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-6">ค้นหาการเดินทาง</h2>
@@ -60,7 +60,25 @@
                                     <div class="flex-1">
                                         <div class="flex justify-between items-start">
                                             <div>
-                                                <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4>
+                                                <!-- <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4> -->
+                                                <!-- <h3 class="font-semibold text-gray-900">จาก Lat: 16.39, Lng: 102.83 → ถึง Lat: 13.76, Lng: 100.50</h3> -->
+                                                <div class="flex items-center">
+                                                    <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4>
+
+                                                    <div v-if="route.driver.isVerified"
+                                                        class="relative group ml-1.5 flex items-center">
+                                                        <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24"
+                                                            fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12c0 1.357-.6 2.573-1.549 3.397a4.49 4.49 0 01-1.307 3.498 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.07-.01l3.5-4.875z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                        <span
+                                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                            ผู้ขับขี่ยืนยันตัวตนแล้ว
+                                                        </span>
+                                                    </div>
+                                                </div>
                                                 <div class="flex items-center mt-1">
                                                     <div class="flex text-yellow-400">
                                                         <span v-for="star in 5" :key="star">{{ star <=
@@ -176,7 +194,23 @@
                                 <img :src="bookingRoute.driver.image" :alt="bookingRoute.driver.name"
                                     class="w-12 h-12 rounded-full object-cover">
                                 <div>
-                                    <div class="font-medium text-gray-900">{{ bookingRoute.driver.name }}</div>
+                                    <!-- <div class="font-medium text-gray-900">{{ bookingRoute.driver.name }}</div> -->
+                                    <div class="flex items-center">
+                                        <div class="font-medium text-gray-900">{{ bookingRoute.driver.name }}</div>
+
+                                        <div v-if="bookingRoute.driver.isVerified"
+                                            class="relative group ml-1.5 flex items-center">
+                                            <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12c0 1.357-.6 2.573-1.549 3.397a4.49 4.49 0 01-1.307 3.498 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.07-.01l3.5-4.875z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                            <span
+                                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                ผู้ขับขี่ยืนยันตัวตนแล้ว
+                                            </span>
+                                        </div>
+                                    </div>
                                     <div class="flex items-center">
                                         <div class="flex text-yellow-400 text-sm">
                                             <span v-for="star in 5" :key="star">{{ star <= bookingRoute.driver.rating
@@ -282,12 +316,15 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
 import { useToast } from '~/composables/useToast';
+import { useAuth } from '~/composables/useAuth';
+import { navigateTo } from '#app';
 
 dayjs.locale('th')
 dayjs.extend(buddhistEra)
 
 const { $api } = useNuxtApp()
 const { toast } = useToast();
+const { token } = useAuth();
 
 useHead({
     title: 'ค้นหาเส้นทาง - Car Pool',
@@ -351,6 +388,7 @@ async function handleSearch() {
                     image: route.driver.profilePicture || `https://ui-avatars.com/api/?name=${route.driver.firstName}&background=random&size=64`,
                     rating: 4.5,
                     reviews: Math.floor(Math.random() * 50) + 5,
+                    isVerified: route.driver.isVerified
                 };
 
                 const carDetailsList = [];
@@ -405,6 +443,10 @@ const toggleDetails = (route) => {
 }
 
 function openModal(route) {
+    if (!token.value) {
+        return navigateTo('/login');
+    }
+
     if (route && route.availableSeats > 0) {
         bookingRoute.value = route
         bookingSeats.value = 1

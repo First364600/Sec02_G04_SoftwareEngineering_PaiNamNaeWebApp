@@ -184,6 +184,8 @@ const tabs = [
     { status: 'all', label: 'ทั้งหมด' },
 ];
 
+definePageMeta({ middleware: 'auth' })
+
 // --- Computed Properties ---
 const filteredTrips = computed(() => {
     if (activeTab.value === 'all') return allTrips.value;
