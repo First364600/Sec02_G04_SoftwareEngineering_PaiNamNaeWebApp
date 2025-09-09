@@ -53,12 +53,11 @@ const goToLogin = () => {
 onMounted(() => {
   setTimeout(() => {
     goToLogin()
-  }, 4000)
+  }, 6000)
 })
 </script>
 
 <style scoped>
-/* ... (ส่วน style เหมือนเดิม) ... */
 .success-animation {
   animation: checkmark 0.6s ease-in-out;
 }
