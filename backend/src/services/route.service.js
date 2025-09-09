@@ -78,7 +78,9 @@ const getMyRoutes = async (driverId) => {
               id: true,
               firstName: true,
               lastName: true,
-              profilePicture: true
+              profilePicture: true,
+              isVerified:true,
+              email:true
             }
           }
         }

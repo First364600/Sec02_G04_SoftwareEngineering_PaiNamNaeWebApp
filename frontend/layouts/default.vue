@@ -15,6 +15,7 @@
                             :class="{ 'text-blue-600': $route.path === '/findTrip' }">
                             ค้นหาเส้นทาง
                         </NuxtLink>
+
                         <div v-if="user && (user.role === 'PASSENGER' || user.role === 'DRIVER')">
                             <NuxtLink to="/createTrip"
                                 class="text-gray-600 hover:text-blue-600 transition-colors duration-200"
@@ -23,27 +24,45 @@
                             </NuxtLink>
                         </div>
 
-                        <div v-if="user && (user.role === 'PASSENGER' || user.role === 'DRIVER')">
+                        <!-- ==================== แก้เฉพาะส่วนเมนูการเดินทางของฉัน ==================== -->
+                        <!-- ผู้โดยสาร: ลิงก์เดี่ยว ไม่มีดรอปดาวน์ -->
+                        <div v-if="user && user.role === 'PASSENGER'">
+                            <NuxtLink to="/myTrip"
+                                class="text-gray-600 hover:text-blue-600 transition-colors duration-200 flex items-center"
+                                :class="{ 'text-blue-600': $route.path.startsWith('/myTrip') }">
+                                การเดินทางของฉัน
+                            </NuxtLink>
+                        </div>
+
+                        <!-- คนขับ: แสดงคำว่า การเดินทางทั้งหมด + ดรอปดาวน์ (การเดินทางของฉัน / คำขอจองเส้นทางของฉัน) -->
+                        <div v-else-if="user && user.role === 'DRIVER'">
                             <div class="relative dropdown-trigger">
                                 <NuxtLink to="/myTrip"
                                     class="text-gray-600 hover:text-blue-600 transition-colors duration-200 flex items-center"
-                                    :class="{ 'text-blue-600': $route.path.startsWith('/myTrip') }">
-                                    การเดินทางของฉัน
+                                    :class="{ 'text-blue-600': $route.path.startsWith('/myTrip') || $route.path.startsWith('/myRoute') }">
+                                    การเดินทางทั้งหมด
                                     <svg class="w-4 h-4 ml-1 transition-transform duration-200" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </NuxtLink>
+
+                                <!-- เปลี่ยนเฉพาะ dropdown-menu ให้เหมือนกับโปรไฟล์ -->
                                 <div
-                                    class="dropdown-menu absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-arrow">
-                                    <NuxtLink to="/"
-                                        class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
-                                        การเดินทางทั้งหมด
+                                    class="dropdown-menu absolute top-full right-0 mt-5 w-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 user-dropdown-arrow">
+                                    <NuxtLink to="/myTrip"
+                                        class="w-full text-left block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 flex items-center">
+                                        การเดินทางของฉัน
+                                    </NuxtLink>
+                                    <NuxtLink to="/myRoute"
+                                        class="w-full text-left block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 flex items-center">
+                                        คำขอจองเส้นทางของฉัน
                                     </NuxtLink>
                                 </div>
                             </div>
                         </div>
+                        <!-- ==================== จบส่วนที่แก้ ==================== -->
 
                         <div v-if="!token" class="flex items-center space-x-3 ">
                             <NuxtLink to="/register"
@@ -100,6 +119,7 @@
                     </div>
                 </div>
 
+                <!-- ==================== Mobile Menu ==================== -->
                 <div v-show="isMobileMenuOpen" class="md:hidden border-t border-gray-200">
                     <div class="px-2 pt-2 pb-3 space-y-1 bg-white">
                         <NuxtLink to="/findTrip"
@@ -115,10 +135,19 @@
                             สร้างเส้นทาง
                         </NuxtLink>
 
-                        <div class="relative">
+                        <!-- ผู้โดยสาร: ลิงก์เดี่ยว -->
+                        <NuxtLink v-if="user && user.role === 'PASSENGER'" to="/myTrip"
+                            class="block px-3 py-2 rounded-md transition-colors duration-200"
+                            :class="$route.path.startsWith('/myTrip') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'"
+                            @click="closeMobileMenu">
+                            การเดินทางของฉัน
+                        </NuxtLink>
+
+                        <!-- คนขับ: เมนูย่อย 2 รายการ -->
+                        <div v-else-if="user && user.role === 'DRIVER'" class="relative">
                             <button @click="toggleMobileTripMenu"
                                 class="w-full text-left px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200 flex items-center justify-between">
-                                การเดินทางของฉัน
+                                การเดินทางทั้งหมด
                                 <svg class="w-4 h-4 transition-transform duration-200"
                                     :class="{ 'rotate-180': isMobileTripMenuOpen }" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -127,10 +156,15 @@
                                 </svg>
                             </button>
                             <div v-show="isMobileTripMenuOpen" class="ml-4 mt-1">
-                                <NuxtLink to="/"
+                                <NuxtLink to="/myTrip"
                                     class="block px-3 py-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200"
                                     @click="closeMobileMenu">
-                                    การเดินทางทั้งหมด
+                                    การเดินทางของฉัน
+                                </NuxtLink>
+                                <NuxtLink to="/myRoute"
+                                    class="block px-3 py-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200"
+                                    @click="closeMobileMenu">
+                                    คำขอจองเส้นทางของฉัน
                                 </NuxtLink>
                             </div>
                         </div>
@@ -173,6 +207,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- ==================== End Mobile Menu ==================== -->
             </div>
         </header>
 
