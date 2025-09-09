@@ -5,8 +5,8 @@
 
       <!-- Stepper Indicator -->
       <div class="relative mb-10">
-        <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2"></div>
-        <div class="absolute top-1/2 left-0 h-0.5 bg-blue-600 -translate-y-1/2 transition-all duration-500"
+        <div class="absolute left-0 right-0 top-5 h-0.5 bg-gray-200"></div>
+        <div class="absolute left-0 top-5 h-0.5 bg-blue-600 transition-all duration-500"
           :style="{ width: stepProgress }"></div>
         <div class="flex justify-between items-center relative">
           <div v-for="step in totalSteps" :key="step" class="flex flex-col items-center w-1/3 z-10">
@@ -188,8 +188,16 @@
           <div class="flex gap-4">
             <button type="button" @click="prevStep"
               class="w-full py-3 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition">ย้อนกลับ</button>
-            <button type="submit"
-              class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition">สมัครสมาชิก</button>
+            <button type="submit" :disabled="isLoading" class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition
+         disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center">
+              <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              {{ isLoading ? 'กำลังบันทึก...' : 'สมัครสมาชิก' }}
+            </button>
           </div>
         </div>
       </form>
@@ -202,7 +210,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import { useAuth } from '~/composables/useAuth';
 import { useRouter } from '#app';
 
@@ -231,6 +239,8 @@ const formData = reactive({
 const errors = reactive({});
 const idCardPreview = ref(null);
 const selfiePreview = ref(null);
+
+const isLoading = ref(false);
 
 onMounted(() => {
   const faScript = document.createElement('script');
@@ -324,6 +334,8 @@ const prevStep = () => {
 
 const handleRegister = async () => {
   if (validationFunctions[currentStep.value - 1]()) {
+    isLoading.value = true;
+    await nextTick();
     console.log('Form is valid, preparing data to submit...');
     const parts = formData.expiryDate.split('/');
     const isoDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).toISOString();
@@ -348,6 +360,8 @@ const handleRegister = async () => {
       console.error('Registration failed:', err);
       const errorMessage = err.data?.message || 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
       alert(errorMessage);
+    } finally {
+      isLoading.value = false;
     }
   }
 };
