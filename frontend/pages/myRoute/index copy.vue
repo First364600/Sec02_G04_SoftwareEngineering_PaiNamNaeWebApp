@@ -50,74 +50,26 @@
                                                 class="status-badge status-cancelled">ยกเลิก</span>
                                         </div>
                                         <p class="text-sm text-gray-600 mt-1">จุดนัดพบ: {{ trip.pickupPoint }}</p>
-                                        <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
+                                        <p class="text-sm text-gray-600">
+                                            วันที่: {{ trip.date }} เวลา: {{ trip.time }}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div class="flex items-center space-x-4 mb-4">
                                     <img :src="trip.passenger.image" :alt="trip.passenger.name"
-                                        class="w-15 h-15 rounded-full object-cover" />
+                                        class="w-12 h-12 rounded-full object-cover" />
                                     <div class="flex-1">
+                                        <h5 class="font-medium text-gray-900">{{ trip.passenger.name }}</h5>
                                         <div class="flex items-center">
-                                            <h5 class="font-medium text-gray-900">{{ trip.passenger.name }}</h5>
-
-                                            <div v-if="trip.passenger.isVerified"
-                                                class="relative group ml-1.5 flex items-center">
-                                                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24"
-                                                    fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12c0 1.357-.6 2.573-1.549 3.397a4.49 4.49 0 01-1.307 3.498 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.07-.01l3.5-4.875z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                                <span
-                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                                    ผู้โดยสารยืนยันตัวตนแล้ว
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <!-- <p v-if="trip.passenger.email" class="text-xs text-gray-500 mt-0.5">
-                                                อีเมล:
-                                                <a :href="`mailto:${trip.passenger.email}`"
-                                                    class="text-blue-600 hover:underline" @click.stop>
-                                                    {{ trip.passenger.email }}
-                                                </a>
-                                            </p> -->
-                                        <div class="flex">
-                                            <p v-if="trip.passenger.email" class="text-xs text-gray-500 mt-0.5">
-                                                อีเมล:
-                                                <a :href="`mailto:${trip.passenger.email}`"
-                                                    class="text-blue-600 hover:underline" @click.stop>
-                                                    {{ trip.passenger.email }}
-                                                </a>
-                                            </p>
-                                            <button v-if="trip.passenger.email"
-                                                class="ml-1 inline-flex items-center  rounded text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                title="คัดลอกอีเมล" aria-label="คัดลอกอีเมล"
-                                                @click.stop="copyEmail(trip.passenger.email)">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor">
-
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 7h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M16 7V5a2 2 0 00-2-2H8a2 2 0 00-2 2v2" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div class="flex items-center mt-1">
                                             <div class="flex text-yellow-400 text-sm">
                                                 <span>
                                                     {{ '★'.repeat(Math.round(trip.passenger.rating)) }}{{ '☆'.repeat(5 -
-                                                        Math.round(trip.passenger.rating)) }}
+                                                    Math.round(trip.passenger.rating)) }}
                                                 </span>
                                             </div>
-                                            <span class="ml-2 text-sm text-gray-600">
-                                                {{ trip.passenger.rating }} ({{ trip.passenger.reviews }} รีวิว)
-                                            </span>
+                                            <span class="ml-2 text-sm text-gray-600">{{ trip.passenger.rating }} ({{
+                                                trip.passenger.reviews }} รีวิว)</span>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -144,14 +96,14 @@
                                     </div>
                                     <div class="mt-4 space-y-4">
                                         <div v-if="trip.conditions">
-                                            <h5 class="text-gray-900 font-medium mb-2">เงื่อนไขการเดินทาง</h5>
+                                            <h5 class="font-medium text-gray-900 mb-2">เงื่อนไขการเดินทาง</h5>
                                             <p
                                                 class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-300">
                                                 {{ trip.conditions }}
                                             </p>
                                         </div>
                                         <div v-if="trip.photos && trip.photos.length > 0">
-                                            <h5 class="text-gray-900 font-medium mb-2">รูปภาพรถยนต์</h5>
+                                            <h5 class="font-medium text-gray-900 mb-2">รูปภาพรถยนต์</h5>
                                             <div class="grid grid-cols-3 gap-2 mt-2">
                                                 <div v-for="(photo, index) in trip.photos.slice(0, 3)" :key="index">
                                                     <img :src="photo" alt="Vehicle photo"
@@ -196,7 +148,7 @@
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
                             <p class="text-sm text-gray-600 mt-1">
                                 {{ selectedTrip ? selectedTrip.origin + ' → ' + selectedTrip.destination :
-                                    'คลิกที่รายการเพื่อดูเส้นทาง'
+                                'คลิกที่รายการเพื่อดูเส้นทาง'
                                 }}
                             </p>
                         </div>
@@ -220,6 +172,7 @@ import buddhistEra from 'dayjs/plugin/buddhistEra'
 import ConfirmModal from '~/components/ConfirmModal.vue'
 import { useToast } from '~/composables/useToast'
 
+// Setup dayjs for Thai locale
 dayjs.locale('th')
 dayjs.extend(buddhistEra)
 
@@ -246,11 +199,12 @@ const tabs = [
 
 definePageMeta({ middleware: 'auth' })
 
-// --- Computed ---
+// --- Computed Properties ---
 const filteredTrips = computed(() => {
     if (activeTab.value === 'all') return allTrips.value
     return allTrips.value.filter(trip => trip.status === activeTab.value)
 })
+
 const selectedTrip = computed(() => {
     return allTrips.value.find(trip => trip.id === selectedTripId.value) || null
 })
@@ -259,8 +213,8 @@ const selectedTrip = computed(() => {
 async function fetchMyRoutes() {
     isLoading.value = true
     try {
-        const routes = await $api('/routes/me')
-
+        const routes = await $api('/routes/me') // GET driver routes
+        // flatten bookings to trip-like rows
         const formatted = []
         for (const r of routes) {
             const carDetailsList = []
@@ -289,9 +243,6 @@ async function fetchMyRoutes() {
                     passenger: {
                         name: `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร',
                         image: b.passenger?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.passenger?.firstName || 'P')}&background=random&size=64`,
-                        // [ADDED] เก็บ email และ isVerified (ยังไม่แสดง isVerified)
-                        email: b.passenger?.email || '',
-                        isVerified: !!b.passenger?.isVerified,
                         rating: 4.5,
                         reviews: Math.floor(Math.random() * 50) + 5,
                     },
@@ -320,7 +271,9 @@ const getTripCount = (status) => {
 
 const toggleTripDetails = (tripId) => {
     const tripForMap = allTrips.value.find(trip => trip.id === tripId)
-    if (tripForMap) updateMap(tripForMap)
+    if (tripForMap) {
+        updateMap(tripForMap)
+    }
     selectedTripId.value = selectedTripId.value === tripId ? null : tripId
 }
 
@@ -336,7 +289,7 @@ const updateMap = (trip) => {
     map.fitBounds(currentPolyline.getBounds(), { padding: [40, 40] })
 }
 
-// --- Modal ---
+// --- Modal Logic ---
 const isModalVisible = ref(false)
 const tripToAction = ref(null)
 const modalContent = ref({ title: '', message: '', confirmText: '', action: null, variant: 'danger' })
@@ -380,6 +333,7 @@ const handleConfirmAction = async () => {
     if (!tripToAction.value) return
     const action = modalContent.value.action
     const bookingId = tripToAction.value.id
+
     try {
         if (action === 'confirm') {
             await $api(`/bookings/${bookingId}/status`, { method: 'PATCH', body: { status: 'CONFIRMED' } })
@@ -388,7 +342,9 @@ const handleConfirmAction = async () => {
             await $api(`/bookings/${bookingId}/status`, { method: 'PATCH', body: { status: 'REJECTED' } })
             toast.success('สำเร็จ', 'ปฏิเสธคำขอแล้ว')
         } else if (action === 'delete') {
+            // TODO: เพิ่ม endpoint ลบ (ถ้ามี)
             console.log(`Delete booking ${bookingId} (TODO)`)
+            // toast.success('ลบรายการสำเร็จ', 'รายการได้ถูกลบออกจากประวัติแล้ว')
         }
         closeConfirmModal()
         await fetchMyRoutes()
@@ -399,16 +355,7 @@ const handleConfirmAction = async () => {
     }
 }
 
-const copyEmail = async (email) => {
-    try {
-        await navigator.clipboard.writeText(email)
-        toast.success('คัดลอกแล้ว', email)
-    } catch (e) {
-        toast.error('คัดลอกไม่สำเร็จ', 'ลองใหม่อีกครั้ง')
-    }
-}
-
-// --- Lifecycle ---
+// --- Lifecycle and Watchers ---
 useHead({
     title: 'คำขอจองเส้นทางของฉัน - ไปนำแหน่',
     link: [{ rel: 'stylesheet', href: 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css' }],
@@ -434,12 +381,13 @@ onMounted(() => {
 
 watch(activeTab, () => {
     selectedTripId.value = null
-    if (filteredTrips.value.length > 0) updateMap(filteredTrips.value[0])
+    if (filteredTrips.value.length > 0) {
+        updateMap(filteredTrips.value[0])
+    }
 })
 </script>
 
 <style scoped>
-/* (สไตล์ทั้งหมดคงเดิม) */
 .trip-card {
     transition: all 0.3s ease;
     cursor: pointer;
