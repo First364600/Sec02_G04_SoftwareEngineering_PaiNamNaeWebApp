@@ -24,10 +24,19 @@ export function useAuth() {
     return res
   }
 
-  const register = async (email, password, firstName, lastName) => {
+  // const register = async (email, password, firstName, lastName) => {
+  //   const res = await $api('/users', {
+  //     method: 'POST',
+  //     body: { email, password, firstName, lastName }
+  //   })
+  //   return res
+  // }
+
+  const register = async (formData) => {
+    // ฟังก์ชันนี้จะรับ FormData ที่สร้างจากหน้า register.vue มาโดยตรง
     const res = await $api('/users', {
       method: 'POST',
-      body: { email, password, firstName, lastName }
+      body: formData // ส่ง FormData ไปทั้งก้อน ไม่ต้องแปลงเป็น JSON
     })
     return res
   }

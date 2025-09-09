@@ -327,6 +327,7 @@ const handleRegister = async () => {
     console.log('Form is valid, preparing data to submit...');
     const parts = formData.expiryDate.split('/');
     const isoDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).toISOString();
+
     const dataToSubmit = new FormData();
     dataToSubmit.append('email', formData.email);
     dataToSubmit.append('username', formData.username);
@@ -342,11 +343,11 @@ const handleRegister = async () => {
 
     try {
       await register(dataToSubmit);
-      alert('สมัครสมาชิกสำเร็จ!');
-      router.push('/login');
+      router.push('/register/success');
     } catch (err) {
       console.error('Registration failed:', err);
-      alert('สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+      const errorMessage = err.data?.message || 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+      alert(errorMessage);
     }
   }
 };
