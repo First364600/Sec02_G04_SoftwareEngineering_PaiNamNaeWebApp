@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require('../utils/cloudinary');
+const userService = require("../services/user.service");
 
 const getVehicles = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
@@ -32,7 +33,7 @@ const getVehicleById = asyncHandler(async (req, res) => {
 
 const createVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
-  const payload = {...req.body};
+  const payload = { ...req.body };
 
   if (req.files?.photos) {
     const uploads = await Promise.all(
@@ -55,7 +56,7 @@ const createVehicle = asyncHandler(async (req, res) => {
 const updateVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const { id } = req.params
-  const payload = {...req.body};
+  const payload = { ...req.body };
 
   if (req.files?.photos) {
     const uploads = await Promise.all(
@@ -99,11 +100,71 @@ const setDefaultVehicle = asyncHandler(async (req, res) => {
   });
 });
 
+const adminCreateVehicle = asyncHandler(async (req, res) => {
+  const { userId } = req.body
+  const payload = { ...req.body };
+
+  await userService.getUserById(userId)
+
+  if (req.files?.photos) {
+    const uploads = await Promise.all(
+      req.files.photos.map(file =>
+        uploadToCloudinary(file.buffer, 'painamnae/vehicles')
+      )
+    );
+
+    payload.photos = uploads.map(u => u.url); // เก็บเป็น array ของ URL
+  }
+
+  const newVehicle = await vehicleService.createVehicle(payload, userId);
+  res.status(201).json({
+    success: true,
+    message: "Vehicle created successfully.",
+    data: newVehicle,
+  });
+})
+
+const adminUpdateVehicle = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const payload = { ...req.body };
+
+  if (payload.userId) {
+    await userService.getUserById(payload.userId);
+  }
+
+  if (req.files?.photos) {
+    const uploads = await Promise.all(
+      req.files.photos.map(file => uploadToCloudinary(file.buffer, 'painamnae/vehicles'))
+    );
+    payload.photos = uploads.map(u => u.url);
+  }
+
+  const updated = await vehicleService.updateVehicleByAdmin(id, payload);
+  res.status(200).json({
+    success: true,
+    message: "Vehicle (by admin) updated successfully.",
+    data: updated,
+  });
+});
+
+const adminDeleteVehicle = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const result = await vehicleService.deleteVehicleByAdmin(id);
+  res.status(200).json({
+    success: true,
+    message: "Vehicle (by admin) deleted successfully.",
+    data: result,
+  });
+});
+
 module.exports = {
   getVehicles,
   getVehicleById,
   createVehicle,
   updateVehicle,
   deleteVehicle,
-  setDefaultVehicle
+  setDefaultVehicle,
+  adminCreateVehicle,
+  adminUpdateVehicle,
+  adminDeleteVehicle
 };
