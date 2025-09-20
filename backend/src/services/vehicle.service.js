@@ -50,24 +50,48 @@ const createVehicle = async (data, userId) => {
 //   }
 // };
 
+// const updateVehicle = async (vehicleId, userId, updateData) => {
+//   const existingVehicle = await prisma.vehicle.findFirst({
+//     where: { id: vehicleId, userId },
+//   });
+//   if (!existingVehicle) {
+//     throw new Error("Vehicle not found or access denied");
+//   }
+
+//   if (updateData.isDefault === true && !existingVehicle.isDefault) {
+//     await prisma.vehicle.updateMany({
+//       where: { userId, isDefault: true, NOT: { id: vehicleId } },
+//       data: { isDefault: false },
+//     });
+//   }
+
+//   return prisma.vehicle.update({
+//     where: { id: vehicleId },
+//     data: updateData,
+//   });
+// };
+
 const updateVehicle = async (vehicleId, userId, updateData) => {
-  const existingVehicle = await prisma.vehicle.findFirst({
-    where: { id: vehicleId, userId },
-  });
-  if (!existingVehicle) {
-    throw new Error("Vehicle not found or access denied");
-  }
+  return prisma.$transaction(async (tx) => {
 
-  if (updateData.isDefault === true && !existingVehicle.isDefault) {
-    await prisma.vehicle.updateMany({
-      where: { userId, isDefault: true, NOT: { id: vehicleId } },
-      data: { isDefault: false },
+    const existing = await tx.vehicle.findUnique({ where: { id: vehicleId } });
+    if (!existing || existing.userId !== userId) {
+      throw new ApiError(404, 'Vehicle not found or access denied');
+    }
+
+    if (updateData.isDefault === true && !existing.isDefault) {
+      await tx.vehicle.updateMany({
+        where: { userId, isDefault: true, NOT: { id: vehicleId } },
+        data: { isDefault: false },
+      });
+    }
+
+    const updated = await tx.vehicle.update({
+      where: { id: vehicleId },
+      data: { ...updateData, userId },
     });
-  }
 
-  return prisma.vehicle.update({
-    where: { id: vehicleId },
-    data: updateData,
+    return updated;
   });
 };
 
