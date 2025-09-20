@@ -7,6 +7,8 @@ const {
   idParamSchema,
   createRouteSchema,
   updateRouteSchema,
+  createRouteByAdminSchema,
+  updateRouteByAdminSchema,
 } = require("../validations/route.validation");
 
 const router = express.Router();
@@ -55,4 +57,31 @@ router.delete(
   routeController.deleteRoute
 );
 
+// --- Admin Routes ---
+// POST /routes/admin
+router.post(
+  "/admin",
+  protect,
+  requireAdmin,
+  validate({ body: createRouteByAdminSchema }),
+  routeController.adminCreateRoute
+);
+
+// PUT /routes/admin/:id
+router.put(
+  "/admin/:id",
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema, body: updateRouteByAdminSchema }),
+  routeController.adminUpdateRoute
+);
+
+// DELETE /routes/admin/:id
+router.delete(
+  "/admin/:id",
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  routeController.adminDeleteRoute
+);
 module.exports = router;
