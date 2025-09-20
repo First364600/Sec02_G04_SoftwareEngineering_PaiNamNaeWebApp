@@ -114,11 +114,52 @@ const setDefaultVehicle = async (vehicleId, userId) => {
   });
 };
 
+const getVehicleByIdAdmin = async (vehicleId) => {
+  const v = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+  if (!v) throw new ApiError(404, 'Vehicle not found');
+  return v;
+};
+
+const updateVehicleByAdmin = async (vehicleId, updateData) => {
+  const existing = await getVehicleByIdAdmin(vehicleId);
+
+  const targetUserId = updateData.userId ?? existing.userId;
+
+  return prisma.$transaction(async (tx) => {
+    // ถ้าจะตั้ง default ให้คันนี้ → reset คันอื่นของเจ้าของเป้าหมาย
+    if (updateData.isDefault === true) {
+      await tx.vehicle.updateMany({
+        where: { userId: targetUserId, isDefault: true, NOT: { id: vehicleId } },
+        data: { isDefault: false },
+      });
+    }
+
+    const updated = await tx.vehicle.update({
+      where: { id: vehicleId },
+      data: {
+        ...updateData,
+        userId: targetUserId,
+      },
+    });
+
+    return updated;
+  });
+};
+
+const deleteVehicleByAdmin = async (vehicleId) => {
+  await getVehicleByIdAdmin(vehicleId);
+  await prisma.vehicle.delete({ where: { id: vehicleId } });
+  return { id: vehicleId };
+};
+
 module.exports = {
   getAllVehicles,
   getVehicleById,
   createVehicle,
   updateVehicle,
   deleteVehicle,
-  setDefaultVehicle
+  setDefaultVehicle,
+  getVehicleByIdAdmin,
+  updateVehicleByAdmin,
+  deleteVehicleByAdmin
 };
