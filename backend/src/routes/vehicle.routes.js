@@ -1,8 +1,13 @@
 const express = require('express');
 const validate = require('../middlewares/validate');
 const vehicleController = require('../controllers/vehicle.controller');
-const { idParamSchema, createVehicleSchema, updateVehicleSchema } = require('../validations/vehicle.validation');
-const { protect } = require('../middlewares/auth');
+const { idParamSchema,
+  createVehicleSchema,
+  updateVehicleSchema,
+  createVehicleByAdminSchema,
+  updateVehicleByAdminSchema
+} = require('../validations/vehicle.validation');
+const { protect, requireAdmin } = require('../middlewares/auth');
 const upload = require('../middlewares/upload.middleware');
 const parseVehicleBody = require('../middlewares/parseVehicleBody');
 
@@ -57,6 +62,36 @@ router.put(
   protect,
   validate({ params: idParamSchema }),
   vehicleController.setDefaultVehicle
+);
+
+// --- Admin Vehicles ---
+//POST 
+router.post(
+  '/admin',
+  protect,
+  requireAdmin,
+  upload.fields([{ name: 'photos', maxCount: 5 }]),
+  parseVehicleBody,
+  validate({ body: createVehicleByAdminSchema }),
+  vehicleController.adminCreateVehicle
+);
+
+router.put(
+  '/admin/:id',
+  protect,
+  requireAdmin,
+  upload.fields([{ name: 'photos', maxCount: 5 }]),
+  parseVehicleBody,
+  validate({ params: idParamSchema, body: updateVehicleByAdminSchema }),
+  vehicleController.adminUpdateVehicle
+);
+
+router.delete(
+  '/admin/:id',
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  vehicleController.adminDeleteVehicle
 );
 
 module.exports = router;
