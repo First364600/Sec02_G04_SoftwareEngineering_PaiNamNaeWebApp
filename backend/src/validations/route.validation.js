@@ -27,8 +27,19 @@ const idParamSchema = z.object({
 
 const updateRouteSchema = createRouteSchema.partial();
 
+const createRouteByAdminSchema = createRouteSchema.extend({
+  driverId: z.string().cuid({ message: "driverId must be a CUID" }),
+});
+
+const updateRouteByAdminSchema = updateRouteSchema.extend({
+  driverId: z.string().cuid({ message: "driverId must be a CUID" }).optional(),
+});
+
+
 module.exports = {
   idParamSchema,
   createRouteSchema,
   updateRouteSchema,
+  createRouteByAdminSchema,
+  updateRouteByAdminSchema
 };
