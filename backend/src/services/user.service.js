@@ -1,5 +1,5 @@
 const prisma = require("../utils/prisma");
-
+const ApiError = require('../utils/ApiError');
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
 
@@ -42,7 +42,7 @@ const getUserById = async (id) => {
     const user = await prisma.user.findUnique({ where: { id } })
 
     if (!user) {
-        return null;
+        throw new ApiError(404, 'User not found');
     }
 
     const { password, ...safeUser } = user;
