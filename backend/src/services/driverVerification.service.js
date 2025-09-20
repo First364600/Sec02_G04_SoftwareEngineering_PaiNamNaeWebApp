@@ -23,8 +23,8 @@ const getVerificationById = async (id) => {
 
 const createVerification = async (data) => {
   const existing = await getVerificationByUser(data.userId)
-  if(existing){
-    return updateVerification(existing.id,data)
+  if (existing) {
+    return updateVerification(existing.id, data)
   }
 
   return prisma.$transaction(async (tx) => {
@@ -84,6 +84,14 @@ const updateVerificationStatus = async (id, status) => {
   });
 };
 
+const isDriverApproved = async (userId) => {
+  const rec = await prisma.driverVerification.findUnique({
+    where: { userId },
+    select: { status: true },
+  });
+  return rec?.status === 'APPROVED';
+};
+
 module.exports = {
   getVerificationByUser,
   getAllVerifications,
@@ -91,4 +99,5 @@ module.exports = {
   createVerification,
   updateVerification,
   updateVerificationStatus,
+  isDriverApproved
 };
