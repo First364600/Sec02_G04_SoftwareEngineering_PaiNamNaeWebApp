@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const routeService = require("../services/route.service");
 const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
+const verifService = require("../services/driverVerification.service");
 
 const getAllRoutes = asyncHandler(async (req, res) => {
   const routes = await routeService.getAllRoutes();
@@ -24,7 +25,7 @@ const getRouteById = asyncHandler(async (req, res) => {
   });
 });
 
-const getMyRoutes = asyncHandler(async (req,res) =>{
+const getMyRoutes = asyncHandler(async (req, res) => {
   const driverId = req.user.sub
   const list = await routeService.getMyRoutes(driverId)
   res.status(200).json({
@@ -109,6 +110,86 @@ const deleteRoute = asyncHandler(async (req, res) => {
   });
 });
 
+const adminCreateRoute = asyncHandler(async (req, res) => {
+  const { driverId, vehicleId, ...routeFields } = req.body;
+
+  const approved = await verifService.isDriverApproved(driverId);
+  if (!approved) {
+    throw new ApiError(400, "ไม่สามารถสร้างเส้นทางให้ไดรเวอร์ที่ยังไม่ได้รับการอนุมัติได้");
+  }
+
+  await vehicleService.getVehicleById(vehicleId, driverId);
+
+  const payload = {
+    ...routeFields,
+    driverId,
+    vehicleId,
+    departureTime: new Date(routeFields.departureTime),
+  };
+
+  const newRoute = await routeService.createRoute(payload);
+  res.status(201).json({
+    success: true,
+    message: "Route (by admin) created successfully",
+    data: newRoute,
+  });
+});
+
+const adminUpdateRoute = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { driverId, vehicleId, ...routeFields } = req.body;
+
+  const existing = await routeService.getRouteById(id);
+  if (!existing) throw new ApiError(404, "Route not found");
+
+  let newDriverId = existing.driverId;
+  let newVehicleId = existing.vehicleId;
+
+  if (driverId) {
+    const approved = await verifService.isDriverApproved(driverId);
+    if (!approved) {
+      throw new ApiError(400, "ไม่สามารถเปลี่ยนไปใช้ไดรเวอร์ที่ยังไม่ได้รับการอนุมัติได้");
+    }
+    newDriverId = driverId;
+  }
+
+  if (vehicleId) {
+    const ownerToCheck = driverId ? driverId : newDriverId;
+    await vehicleService.getVehicleById(vehicleId, ownerToCheck);
+    newVehicleId = vehicleId;
+  }
+
+  const payload = {
+    ...routeFields,
+    driverId: newDriverId,
+    vehicleId: newVehicleId,
+    ...(routeFields.departureTime && {
+      departureTime: new Date(routeFields.departureTime),
+    }),
+  };
+
+  const updated = await routeService.updateRoute(id, payload);
+  res.status(200).json({
+    success: true,
+    message: "Route (by admin) updated successfully",
+    data: updated,
+  });
+});
+
+const adminDeleteRoute = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const existing = await routeService.getRouteById(id);
+  if (!existing) throw new ApiError(404, "Route not found");
+
+  const result = await routeService.deleteRoute(id);
+  res.status(200).json({
+    success: true,
+    message: "Route (by admin) deleted successfully",
+    data: result,
+  });
+});
+
 module.exports = {
   getAllRoutes,
   getRouteById,
@@ -116,4 +197,7 @@ module.exports = {
   createRoute,
   updateRoute,
   deleteRoute,
+  adminCreateRoute,
+  adminUpdateRoute,
+  adminDeleteRoute
 };
