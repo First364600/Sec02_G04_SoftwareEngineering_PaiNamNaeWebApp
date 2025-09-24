@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const ApiError = require('../utils/ApiError');
 const { verifyToken } = require('../utils/jwt');
