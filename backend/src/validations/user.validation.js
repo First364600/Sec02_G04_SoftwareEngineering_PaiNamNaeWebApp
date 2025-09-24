@@ -18,20 +18,24 @@ const idParamSchema = z.object({
     id: z.string().cuid({ message: "Invalid CUID format" }),
 });
 
-const updateUserSchema = z.object({
+const updateMyProfileSchema = z.object({
     email: z.string().email("Invalid email format").optional(),
     username: z.string().min(6, "username is require").optional(),
     firstName: z.string().min(1, "firstname is require").optional(),
     lastName: z.string().min(1, "lastname is require").optional(),
-    displayName: z.string().min(1).optional(),
-    photoURL: z.string().min(1).optional(),
-    bio: z.string().min(1).optional(),
-    role: z.nativeEnum(Role).optional(),
-    isVerified: z.coerce.boolean({
-        required_error: "isVerified field is required",
-        invalid_type_error: "isVerified must be a boolean",
-    }),
+    phoneNumber: z.string().min(10, "phoneNumber is require").optional(),
+    gender: z.string().min(1, "gender is require").optional(),
+    // role: z.nativeEnum(Role).optional(),
+    // isVerified: z.coerce.boolean({
+    //     required_error: "isVerified field is required",
+    //     invalid_type_error: "isVerified must be a boolean",
+    // }).optional(),
 })
+
+const updateUserByAdminSchema = updateMyProfileSchema.extend({
+    role: z.nativeEnum(Role).optional(),
+    isVerified: z.coerce.boolean().optional(),
+});
 
 const updateUserStatusSchema = z.object({
     isActive: z.boolean({
@@ -43,6 +47,7 @@ const updateUserStatusSchema = z.object({
 module.exports = {
     idParamSchema,
     createUserSchema,
-    updateUserSchema,
+    updateMyProfileSchema,
     updateUserStatusSchema,
+    updateUserByAdminSchema,
 }

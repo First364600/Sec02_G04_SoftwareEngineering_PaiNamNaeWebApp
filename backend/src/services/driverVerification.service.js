@@ -84,12 +84,12 @@ const updateVerificationStatus = async (id, status) => {
   });
 };
 
-const isDriverApproved = async (userId) => {
+const canCreateRoutes = async (userId) => {
   const rec = await prisma.driverVerification.findUnique({
     where: { userId },
     select: { status: true },
   });
-  return rec?.status === 'APPROVED';
+  return rec?.status === 'APPROVED' || rec?.status === 'PENDING';
 };
 
 module.exports = {
@@ -99,5 +99,5 @@ module.exports = {
   createVerification,
   updateVerification,
   updateVerificationStatus,
-  isDriverApproved
+  canCreateRoutes
 };

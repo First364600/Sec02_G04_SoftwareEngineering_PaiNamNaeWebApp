@@ -4,6 +4,16 @@ const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const userService = require("../services/user.service");
 
+const listMyVehicles = asyncHandler(async (req, res) => {
+  const ownerId = req.user.sub;
+  const result = await vehicleService.searchMyVehicles(ownerId, req.query);
+  res.status(200).json({
+    success: true,
+    message: "Vehicles retrieved successfully.",
+    ...result
+  });
+});
+
 const getVehicles = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const list = await vehicleService.getAllVehicles(ownerId);
@@ -100,6 +110,24 @@ const setDefaultVehicle = asyncHandler(async (req, res) => {
   });
 });
 
+const adminListVehicles = asyncHandler(async (req, res) => {
+  const result = await vehicleService.searchVehiclesAdmin(req.query);
+  res.status(200).json({
+    success: true,
+    message: "Vehicles (admin) retrieved successfully.",
+    ...result
+  });
+});
+
+const adminListVehiclesByUser = asyncHandler(async (req, res) => {
+  const result = await vehicleService.searchVehiclesAdmin({ ...req.query, userId: req.params.userId });
+  res.status(200).json({
+    success: true,
+    message: "User's vehicles (admin) retrieved successfully.",
+    ...result
+  });
+});
+
 const adminCreateVehicle = asyncHandler(async (req, res) => {
   const { userId } = req.body
   const payload = { ...req.body };
@@ -158,6 +186,7 @@ const adminDeleteVehicle = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  listMyVehicles,
   getVehicles,
   getVehicleById,
   createVehicle,
@@ -166,5 +195,7 @@ module.exports = {
   setDefaultVehicle,
   adminCreateVehicle,
   adminUpdateVehicle,
-  adminDeleteVehicle
+  adminDeleteVehicle,
+  adminListVehiclesByUser,
+  adminListVehicles,
 };

@@ -1,6 +1,77 @@
 const prisma = require('../utils/prisma');
 const ApiError = require('../utils/ApiError');
 
+const baseOrder = { createdAt: 'desc' };
+
+const buildVehicleWhere = (opts = {}) => {
+  const {
+    q, vehicleType, color, isDefault, seatMin, seatMax, amenitiesAny, amenitiesAll, userId
+  } = opts;
+
+  return {
+    ...(userId && { userId }),
+    ...(vehicleType && { vehicleType: { contains: vehicleType, mode: 'insensitive' } }),
+    ...(color && { color: { contains: color, mode: 'insensitive' } }),
+    ...(typeof isDefault === 'boolean' ? { isDefault } : {}),
+    ...(typeof seatMin === 'number' || typeof seatMax === 'number'
+      ? {
+        seatCapacity: {
+          ...(typeof seatMin === 'number' ? { gte: seatMin } : {}),
+          ...(typeof seatMax === 'number' ? { lte: seatMax } : {}),
+        }
+      }
+      : {}),
+    ...(amenitiesAny && amenitiesAny.length ? { amenities: { hasSome: amenitiesAny } } : {}),
+    ...(amenitiesAll && amenitiesAll.length ? { amenities: { hasEvery: amenitiesAll } } : {}),
+    ...(q ? {
+      OR: [
+        { vehicleModel: { contains: q, mode: 'insensitive' } },
+        { vehicleType: { contains: q, mode: 'insensitive' } },
+        { color: { contains: q, mode: 'insensitive' } },
+        { licensePlate: { contains: q, mode: 'insensitive' } },
+      ]
+    } : {}),
+  };
+};
+
+const searchMyVehicles = async (ownerId, opts) => {
+  const {
+    page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc', ...filters
+  } = opts || {};
+  const where = buildVehicleWhere({ ...filters, userId: ownerId });
+
+  const skip = (page - 1) * limit, take = limit;
+
+  const [total, data] = await prisma.$transaction([
+    prisma.vehicle.count({ where }),
+    prisma.vehicle.findMany({
+      where, orderBy: { [sortBy]: sortOrder }, skip, take,
+    })
+  ]);
+
+  return { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+};
+
+const searchVehiclesAdmin = async (opts) => {
+  const {
+    page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc', ...filters
+  } = opts || {};
+  const where = buildVehicleWhere(filters);
+  const skip = (page - 1) * limit, take = limit;
+
+  const [total, data] = await prisma.$transaction([
+    prisma.vehicle.count({ where }),
+    prisma.vehicle.findMany({
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      skip, take,
+      include: { user: { select: { id: true, firstName: true, lastName: true, email: true } } } // useful in admin table
+    })
+  ]);
+
+  return { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+};
+
 const getAllVehicles = async (userId) => {
   return prisma.vehicle.findMany({
     where: { userId },
@@ -8,12 +79,19 @@ const getAllVehicles = async (userId) => {
   });
 };
 
+// const getVehicleById = async (vehicleId, userId) => {
+//   const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId, userId } });
+//   if (!vehicle) {
+//     throw new ApiError(404, 'Vehicle not found');
+//   }
+//   return vehicle;
+// };
 const getVehicleById = async (vehicleId, userId) => {
-  const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId, userId } });
-  if (!vehicle) {
-    throw new ApiError(404, 'Vehicle not found');
+  const v = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+  if (!v || v.userId !== userId) {
+    throw new ApiError(404, 'Vehicle not found or access denied');
   }
-  return vehicle;
+  return v;
 };
 
 const createVehicle = async (data, userId) => {
@@ -177,6 +255,9 @@ const deleteVehicleByAdmin = async (vehicleId) => {
 };
 
 module.exports = {
+  searchMyVehicles,
+  searchVehiclesAdmin,
+  
   getAllVehicles,
   getVehicleById,
   createVehicle,

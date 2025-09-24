@@ -167,8 +167,11 @@ const deleteBooking = async (id, userId) => {
     include: { route: true },
   });
   if (!booking) throw new ApiError(404, 'Booking not found');
-  if (booking.status !== BookingStatus.REJECTED) {
-    throw new ApiError(400, 'Only cancelled/rejected bookings can be deleted');
+  // if (booking.status !== BookingStatus.REJECTED) {
+  //   throw new ApiError(400, 'Only cancelled/rejected bookings can be deleted');
+  // }
+  if (![BookingStatus.CANCELLED, BookingStatus.REJECTED].includes(booking.status)) {
+    throw new ApiError(400, 'Only cancelled or rejected bookings can be deleted');
   }
   if (
     booking.passengerId !== userId &&

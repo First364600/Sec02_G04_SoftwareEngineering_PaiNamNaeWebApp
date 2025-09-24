@@ -2,7 +2,7 @@ const express = require('express');
 const userController = require("../controllers/user.controller");
 const validate = require('../middlewares/validate');
 const upload = require('../middlewares/upload.middleware');
-const { idParamSchema, createUserSchema, updateUserSchema, updateUserStatusSchema } = require('../validations/user.validation');
+const { idParamSchema, createUserSchema, updateMyProfileSchema, updateUserByAdminSchema, updateUserStatusSchema } = require('../validations/user.validation');
 const { protect, requireAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
@@ -26,13 +26,13 @@ router.put(
         { name: 'selfiePhotoUrl', maxCount: 1 },
         { name: 'profilePicture', maxCount: 1 },
     ]),
-    validate({ params: idParamSchema, body: updateUserSchema }),
+    validate({ params: idParamSchema, body: updateUserByAdminSchema }),
     userController.adminUpdateUser
 );
 
-// DELETE /api/admin/users/:id
+// DELETE /api/users/admin/:id
 router.delete(
-    '/admin/users/:id',
+    '/admin/:id',
     protect,
     requireAdmin,
     validate({ params: idParamSchema }),
@@ -48,8 +48,7 @@ router.patch(
     userController.setUserStatus
 );
 
-// --- Public / User-specific Routes ---
-
+// --- Public Routes ---
 // GET /api/users/me
 router.get(
     '/me',
@@ -84,7 +83,7 @@ router.put(
         { name: 'selfiePhotoUrl', maxCount: 1 },
         { name: 'profilePicture', maxCount: 1 },
     ]),
-    validate({ body: updateUserSchema }),
+    validate({ body: updateMyProfileSchema }),
     userController.updateCurrentUserProfile
 );
 
