@@ -89,6 +89,11 @@ model DriverVerification {
   status              VerificationStatus @default(PENDING)
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([licenseIssueDate])
+  @@index([licenseExpiryDate])
 }
 
 model Vehicle {
