@@ -67,6 +67,11 @@ model User {
   vehicles              Vehicle[]
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
+
+  @@index([role])
+  @@index([isActive])
+  @@index([isVerified])
+  @@index([createdAt])
 }
 
 model DriverVerification {
