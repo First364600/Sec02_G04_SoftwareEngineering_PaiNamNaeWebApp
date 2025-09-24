@@ -51,7 +51,7 @@ model User {
   gender                String?
   phoneNumber           String?
   profilePicture        String?
-  nationalIdNumber      String?
+  nationalIdNumber      String?  @unique
   nationalIdPhotoUrl    String?  @unique
   nationalIdExpiryDate  DateTime?
   selfiePhotoUrl        String?
@@ -102,6 +102,11 @@ model Vehicle {
   updatedAt     DateTime @updatedAt
 
   routes        Route[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([vehicleType])
+  @@index([seatCapacity])
 }
 
 model Route {
@@ -127,6 +132,12 @@ model Route {
   updatedAt     DateTime @updatedAt
 
   bookings        Booking[]
+
+  @@index([driverId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([departureTime])
 }
 
 model Booking {
