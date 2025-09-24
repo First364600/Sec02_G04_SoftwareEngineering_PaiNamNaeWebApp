@@ -5,9 +5,9 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Web-Blog API Documentation',
+            title: 'Painamnae API',
             version: packageJson.version,
-            description: 'API documentation for the Web-Blog application, built with Express.js and Prisma.',
+            description: 'API for ride sharing (users, drivers, vehicles, routes, bookings).',
         },
         components: {
             securitySchemes: {
