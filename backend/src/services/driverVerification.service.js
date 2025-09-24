@@ -1,5 +1,92 @@
 const prisma = require('../utils/prisma');
 
+const searchVerifications = async (opts = {}) => {
+  const {
+    page = 1,
+    limit = 20,
+    q,
+    status,
+    typeOnLicense,
+    createdFrom, createdTo,
+    issueFrom, issueTo,
+    expiryFrom, expiryTo,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = opts;
+
+  const where = {
+    ...(status && { status }),
+    ...(typeOnLicense && { typeOnLicense }),
+    ...((createdFrom || createdTo) ? {
+      createdAt: {
+        ...(createdFrom ? { gte: new Date(createdFrom) } : {}),
+        ...(createdTo ? { lte: new Date(createdTo) } : {}),
+      }
+    } : {}),
+    ...((issueFrom || issueTo) ? {
+      licenseIssueDate: {
+        ...(issueFrom ? { gte: new Date(issueFrom) } : {}),
+        ...(issueTo ? { lte: new Date(issueTo) } : {}),
+      }
+    } : {}),
+    ...((expiryFrom || expiryTo) ? {
+      licenseExpiryDate: {
+        ...(expiryFrom ? { gte: new Date(expiryFrom) } : {}),
+        ...(expiryTo ? { lte: new Date(expiryTo) } : {}),
+      }
+    } : {}),
+    ...(q ? {
+      OR: [
+        { licenseNumber: { contains: q, mode: 'insensitive' } },
+        {
+          user: {
+            is: {
+              OR: [
+                { email: { contains: q, mode: 'insensitive' } },
+                { username: { contains: q, mode: 'insensitive' } },
+                { firstName: { contains: q, mode: 'insensitive' } },
+                { lastName: { contains: q, mode: 'insensitive' } },
+                { phoneNumber: { contains: q, mode: 'insensitive' } },
+              ]
+            }
+          }
+        }
+      ]
+    } : {}),
+  };
+
+  const skip = (page - 1) * limit;
+  const take = limit;
+
+  const [total, data] = await prisma.$transaction([
+    prisma.driverVerification.count({ where }),
+    prisma.driverVerification.findMany({
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      skip, take,
+      include: {
+        user: {
+          select: {
+            id: true, email: true, username: true,
+            firstName: true, lastName: true, phoneNumber: true,
+            role: true, isVerified: true, isActive: true,
+          }
+        }
+      }
+    })
+  ]);
+
+  return {
+    data,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    }
+  };
+};
+
 const getVerificationByUser = async (userId) => {
   return prisma.driverVerification.findUnique({
     where: { userId },
@@ -93,6 +180,7 @@ const canCreateRoutes = async (userId) => {
 };
 
 module.exports = {
+  searchVerifications,
   getVerificationByUser,
   getAllVerifications,
   getVerificationById,

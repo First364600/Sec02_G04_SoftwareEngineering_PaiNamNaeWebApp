@@ -3,6 +3,15 @@ const verifService = require("../services/driverVerification.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 
+const adminListVerifications = asyncHandler(async (req, res) => {
+  const result = await verifService.searchVerifications(req.query);
+  res.status(200).json({
+    success: true,
+    message: "Driver verifications (admin) retrieved successfully",
+    ...result,
+  });
+});
+
 const getMyVerification = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
   const record = await verifService.getVerificationByUser(userId);
@@ -123,6 +132,7 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  adminListVerifications,
   getMyVerification,
   createVerification,
   updateVerification,

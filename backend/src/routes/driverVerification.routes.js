@@ -1,6 +1,6 @@
 const express = require('express');
 const validate = require('../middlewares/validate');
-const upload   = require('../middlewares/upload.middleware');
+const upload = require('../middlewares/upload.middleware');
 const { protect, requireAdmin } = require('../middlewares/auth');
 const driverVerifController = require('../controllers/driverVerification.controller');
 const {
@@ -8,6 +8,7 @@ const {
   createDriverVerificationSchema,
   updateDriverVerificationSchema,
   updateVerificationStatusSchema,
+  listDriverVerifsQuerySchema,
 } = require('../validations/driverVerification.validation');
 
 const router = express.Router();
@@ -48,7 +49,8 @@ router.get(
   '/',
   protect,
   requireAdmin,
-  driverVerifController.getAllVerifications
+  validate({ query: listDriverVerifsQuerySchema }),
+  driverVerifController.adminListVerifications
 );
 
 // GET /driver-verifications/:id
