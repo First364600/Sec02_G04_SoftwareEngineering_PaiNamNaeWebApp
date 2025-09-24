@@ -3,6 +3,15 @@ const userService = require("../services/user.service");
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 
+const adminListUsers = asyncHandler(async (req, res) => {
+    const result = await userService.searchUsers(req.query);
+    res.status(200).json({
+        success: true,
+        message: "Users (admin) retrieved",
+        ...result,
+    });
+});
+
 const getAllUsers = asyncHandler(async (req, res) => {
     const users = await userService.getAllUsers();
     res.status(200).json({
@@ -114,6 +123,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+    adminListUsers,
     getAllUsers,
     getUserById,
     getMyUser,

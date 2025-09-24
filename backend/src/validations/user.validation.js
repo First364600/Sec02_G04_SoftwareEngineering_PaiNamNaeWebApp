@@ -11,7 +11,7 @@ const createUserSchema = z.object({
     gender: z.string().min(1, "gender is require"), // หรือ z.enum(['MALE', 'FEMALE'])
     nationalIdNumber: z.string().length(13, "nationalIdNumber must be 13 digits"),
     nationalIdExpiryDate: z.string().datetime({ message: "Invalid date format for nationalIdExpiryDate" }),
-    role: z.nativeEnum(Role).optional()
+    // role: z.nativeEnum(Role).optional()
 })
 
 const idParamSchema = z.object({
@@ -35,6 +35,7 @@ const updateMyProfileSchema = z.object({
 const updateUserByAdminSchema = updateMyProfileSchema.extend({
     role: z.nativeEnum(Role).optional(),
     isVerified: z.coerce.boolean().optional(),
+    isActive: z.coerce.boolean().optional(),
 });
 
 const updateUserStatusSchema = z.object({
@@ -44,10 +45,27 @@ const updateUserStatusSchema = z.object({
     }),
 });
 
+const listUsersQuerySchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+
+    q: z.string().trim().min(1).optional(),
+    role: z.nativeEnum(Role).optional(),
+    isActive: z.coerce.boolean().optional(),
+    isVerified: z.coerce.boolean().optional(),
+
+    createdFrom: z.string().refine(v => !isNaN(Date.parse(v)), { message: "Invalid createdFrom" }).optional(),
+    createdTo: z.string().refine(v => !isNaN(Date.parse(v)), { message: "Invalid createdTo" }).optional(),
+
+    sortBy: z.enum(['createdAt', 'lastLogin', 'email', 'username', 'firstName', 'lastName']).default('createdAt'),
+    sortOrder: z.enum(['asc', 'desc']).default('desc'),
+});
+
 module.exports = {
     idParamSchema,
     createUserSchema,
     updateMyProfileSchema,
     updateUserStatusSchema,
     updateUserByAdminSchema,
+    listUsersQuerySchema,
 }

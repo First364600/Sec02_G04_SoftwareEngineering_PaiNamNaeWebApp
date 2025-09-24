@@ -3,6 +3,71 @@ const ApiError = require('../utils/ApiError');
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
 
+const searchUsers = async (opts = {}) => {
+    const {
+        page = 1,
+        limit = 20,
+        q,
+        role,
+        isActive,
+        isVerified,
+        createdFrom,
+        createdTo,
+        sortBy = 'createdAt',
+        sortOrder = 'desc',
+    } = opts;
+
+    const where = {
+        ...(role && { role }),
+        ...(typeof isActive === 'boolean' ? { isActive } : {}),
+        ...(typeof isVerified === 'boolean' ? { isVerified } : {}),
+        ...((createdFrom || createdTo) ? {
+            createdAt: {
+                ...(createdFrom ? { gte: new Date(createdFrom) } : {}),
+                ...(createdTo ? { lte: new Date(createdTo) } : {}),
+            }
+        } : {}),
+        ...(q ? {
+            OR: [
+                { email: { contains: q, mode: 'insensitive' } },
+                { username: { contains: q, mode: 'insensitive' } },
+                { firstName: { contains: q, mode: 'insensitive' } },
+                { lastName: { contains: q, mode: 'insensitive' } },
+                { phoneNumber: { contains: q, mode: 'insensitive' } },
+            ]
+        } : {}),
+    };
+
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const [total, dataRaw] = await prisma.$transaction([
+        prisma.user.count({ where }),
+        prisma.user.findMany({
+            where,
+            orderBy: { [sortBy]: sortOrder },
+            skip, take,
+            select: {
+                id: true, email: true, username: true,
+                firstName: true, lastName: true, gender: true,
+                phoneNumber: true, profilePicture: true,
+                role: true, isVerified: true, isActive: true,
+                createdAt: true, updatedAt: true,
+            }
+        })
+    ]);
+
+    return {
+        data: dataRaw,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        }
+    };
+};
+
 const getUserByEmail = async (email) => {
     return await prisma.user.findUnique({ where: { email } })
 }
@@ -140,6 +205,7 @@ const setUserStatus = async (id, isActive) => {
 };
 
 module.exports = {
+    searchUsers,
     getAllUsers,
     getUserById,
     createUser,
