@@ -34,7 +34,7 @@ const listDriverVerifsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 
-  q: z.string().trim().min(1).optional(),                 // ค้นหา licenseNumber + user(email/username/ชื่อ/เบอร์)
+  q: z.string().trim().min(1).optional(),
   status: z.nativeEnum(VerificationStatus).optional(),
   typeOnLicense: z.nativeEnum(LicenseType).optional(),
 
