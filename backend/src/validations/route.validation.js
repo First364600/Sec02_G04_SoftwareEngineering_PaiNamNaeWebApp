@@ -35,11 +35,32 @@ const updateRouteByAdminSchema = updateRouteSchema.extend({
   driverId: z.string().cuid({ message: "driverId must be a CUID" }).optional(),
 });
 
+const adminDriverIdParamSchema = z.object({
+  driverId: z.string().cuid({ message: "Invalid driver ID format" }),
+});
+
+const listRoutesQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+
+  q: z.string().trim().min(1).optional(), // free text
+  status: z.nativeEnum(RouteStatus).optional(),
+  driverId: z.string().cuid().optional(),
+  vehicleId: z.string().cuid().optional(),
+
+  dateFrom: z.string().refine(v => !isNaN(Date.parse(v)), { message: "Invalid dateFrom" }).optional(),
+  dateTo: z.string().refine(v => !isNaN(Date.parse(v)), { message: "Invalid dateTo" }).optional(),
+
+  sortBy: z.enum(["createdAt", "departureTime", "pricePerSeat", "availableSeats"]).default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+});
 
 module.exports = {
   idParamSchema,
   createRouteSchema,
   updateRouteSchema,
   createRouteByAdminSchema,
-  updateRouteByAdminSchema
+  updateRouteByAdminSchema,
+  adminDriverIdParamSchema,
+  listRoutesQuerySchema
 };

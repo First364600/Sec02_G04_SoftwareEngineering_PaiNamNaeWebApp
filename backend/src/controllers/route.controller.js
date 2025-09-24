@@ -13,6 +13,24 @@ const getAllRoutes = asyncHandler(async (req, res) => {
   });
 });
 
+const listRoutes = asyncHandler(async (req, res) => {
+  const result = await routeService.searchRoutes(req.query);
+  res.status(200).json({
+    success: true,
+    message: "Routes retrieved successfully",
+    ...result,
+  });
+});
+
+const adminListRoutes = asyncHandler(async (req, res) => {
+  const result = await routeService.searchRoutes(req.query);
+  res.status(200).json({
+    success: true,
+    message: "Routes (admin) retrieved successfully",
+    ...result,
+  });
+});
+
 const getRouteById = asyncHandler(async (req, res) => {
   const route = await routeService.getRouteById(req.params.id);
   if (!route) {
@@ -31,6 +49,16 @@ const getMyRoutes = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Route retrieved successfully",
+    data: list
+  })
+})
+
+const adminGetRoutesByDriver = asyncHandler(async (req, res) => {
+  const { driverId } = req.params
+  const list = await routeService.getMyRoutes(driverId)
+  res.status(200).json({
+    success: true,
+    message: "retrieved successfully",
     data: list
   })
 })
@@ -113,9 +141,9 @@ const deleteRoute = asyncHandler(async (req, res) => {
 const adminCreateRoute = asyncHandler(async (req, res) => {
   const { driverId, vehicleId, ...routeFields } = req.body;
 
-  const approved = await verifService.isDriverApproved(driverId);
+  const approved = await verifService.canCreateRoutes(driverId);
   if (!approved) {
-    throw new ApiError(400, "ไม่สามารถสร้างเส้นทางให้ไดรเวอร์ที่ยังไม่ได้รับการอนุมัติได้");
+    throw new ApiError(400, "ไม่สามารถสร้างเส้นทางให้ไดรเวอร์ที่ยังไม่ได้ยืนยันตัวตน (ต้องมีรายการยืนยันและสถานะไม่เป็น REJECTED)");
   }
 
   await vehicleService.getVehicleById(vehicleId, driverId);
@@ -146,9 +174,9 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
   let newVehicleId = existing.vehicleId;
 
   if (driverId) {
-    const approved = await verifService.isDriverApproved(driverId);
+    const approved = await verifService.canCreateRoutes(driverId);
     if (!approved) {
-      throw new ApiError(400, "ไม่สามารถเปลี่ยนไปใช้ไดรเวอร์ที่ยังไม่ได้รับการอนุมัติได้");
+      throw new ApiError(400, "ไม่สามารถสร้างเส้นทางให้ไดรเวอร์ที่ยังไม่ได้ยืนยันตัวตน (ต้องมีรายการยืนยันและสถานะไม่เป็น REJECTED)");
     }
     newDriverId = driverId;
   }
@@ -192,6 +220,8 @@ const adminDeleteRoute = asyncHandler(async (req, res) => {
 
 module.exports = {
   getAllRoutes,
+  listRoutes,
+  adminListRoutes,
   getRouteById,
   getMyRoutes,
   createRoute,
@@ -199,5 +229,6 @@ module.exports = {
   deleteRoute,
   adminCreateRoute,
   adminUpdateRoute,
-  adminDeleteRoute
+  adminDeleteRoute,
+  adminGetRoutesByDriver,
 };
