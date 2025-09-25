@@ -1,5 +1,5 @@
 <template>
-    <header class="fixed top-0 left-0 right-0 z-50 h-16 bg-white shadow-sm">
+    <header class="fixed top-0 left-0 right-0 z-50 h-16 bg-white border border-gray-300 shadow-sm">
         <div class="flex items-center justify-between h-full px-4">
             <div class="flex items-center gap-4">
                 <!-- Mobile Menu Toggle -->
@@ -24,9 +24,10 @@
                 </button>
 
                 <div class="flex items-center gap-3">
-                    <span class="hidden text-sm text-gray-700 md:block">Musharof</span>
+                    <span class="hidden text-sm text-gray-700 md:block">{{ user.firstName }}</span>
                     <div class="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-full">
-                        <span class="font-semibold text-white">M</span>
+                        <span class="font-semibold text-white"><i
+                                class="w-6 text-lg text-center text-whrite-500 fas fa-user"></i></span>
                     </div>
                 </div>
             </div>
@@ -35,5 +36,8 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
+const { token, user } = useAuth()
 </script>

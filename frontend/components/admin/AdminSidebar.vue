@@ -28,7 +28,8 @@
                             id="ecom-menu-icon"></i>
                     </button>
                     <div id="ecom-menu" class="hidden mt-1 ml-12 space-y-1 sidebar-text">
-                        <a href="#" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600">Logout</a>
+                        <button @click="logout"
+                            class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600">Logout</button>
                     </div>
                 </div>
             </nav>
@@ -37,4 +38,8 @@
 </template>
 
 <script setup>
+
+import { useAuth } from '~/composables/useAuth'
+
+const { logout } = useAuth()
 </script>
