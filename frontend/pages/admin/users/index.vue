@@ -208,6 +208,11 @@
                                     </td>
 
                                     <td class="px-4 py-3 ">
+                                        <button @click="onViewUser(u)"
+                                            class="p-2 text-gray-500 transition-colors hover:text-emerald-600"
+                                            title="ดูรายละเอียด" aria-label="ดูรายละเอียด">
+                                            <i class="text-lg fa-regular fa-eye"></i>
+                                        </button>
                                         <button @click="onEditUser(u)"
                                             class="p-2 text-gray-500 transition-colors hover:text-blue-600"
                                             title="แก้ไข" aria-label="แก้ไข">
