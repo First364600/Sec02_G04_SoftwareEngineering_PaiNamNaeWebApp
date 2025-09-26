@@ -22,6 +22,14 @@ export default defineNuxtPlugin(() => {
         response._data = response._data.data
       }
     },
+    // onResponse({ response }) {
+    //   const b = response._data
+    //   if (b && typeof b === 'object' && Object.prototype.hasOwnProperty.call(b, 'data')) {
+    //     response._data = Object.prototype.hasOwnProperty.call(b, 'pagination')
+    //       ? { data: b.data, pagination: b.pagination }   
+    //       : b.data                                       
+    //   }
+    // },
 
     onResponseError({ response }) {
       let body = response?._data
@@ -39,7 +47,7 @@ export default defineNuxtPlugin(() => {
       throw createError({
         statusCode: response?.status || 500,
         statusMessage: msg,
-        data: body, // <-- อันนี้คือสิ่งที่หน้าเพจไปอ่าน err.data.message
+        data: body,
       })
     },
   })
