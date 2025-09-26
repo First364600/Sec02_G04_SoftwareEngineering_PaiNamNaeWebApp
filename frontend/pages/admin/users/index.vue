@@ -10,10 +10,19 @@
             <div class="mx-auto max-w-8xl">
                 <!-- Title + Controls -->
                 <div class="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
-                    <h1 class="text-2xl font-semibold text-gray-800">Users (Admin)</h1>
+                    <!-- Left: Title + Create Button -->
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-2xl font-semibold text-gray-800">Users (Admin)</h1>
 
+                        <!-- New: Create User button -->
+                        <button @click="onCreateUser"
+                            class="inline-flex items-center gap-2 px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 ">
+                            <i class="fa-solid fa-plus"></i>
+                            <span class="hidden sm:inline">สร้างผู้ใช้ใหม่</span>
+                        </button>
+                    </div>
 
-                    <!-- Quick Search -->
+                    <!-- Right: Quick Search -->
                     <div class="flex items-center gap-2">
                         <input v-model.trim="filters.q" @keyup.enter="applyFilters" type="text"
                             placeholder="ค้นหา : Email / User / Name"
@@ -430,6 +439,11 @@ useHead({
         }
     ]
 })
+
+function onCreateUser() {
+    // ปรับเส้นทางได้ตามโครงโปรเจกต์ของคุณ
+    navigateTo('/admin/users/create').catch(() => { })
+}
 
 function defineGlobalScripts() {
     window.toggleSidebar = function () {

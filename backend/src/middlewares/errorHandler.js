@@ -47,6 +47,10 @@ const errorHandler = (err, req, res, next) => {
         message = 'เกิดข้อผิดพลาดภายในระบบ กรุณาลองใหม่ภายหลัง';
     }
 
+    if (!res.headersSent) {
+        res.set('Content-Type', 'application/json; charset=utf-8');
+    }
+
     res.status(statusCode).json({
         success: false,
         message,
