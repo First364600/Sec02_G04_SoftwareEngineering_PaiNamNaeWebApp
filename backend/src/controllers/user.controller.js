@@ -118,7 +118,17 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
 });
 
 const setUserStatus = asyncHandler(async (req, res) => {
-    const updatedUser = await userService.setUserStatus(req.params.id, req.body.isActive);
+    const { isActive, isVerified } = req.body
+
+    //const updatedUser = await userService.setUserStatus(req.params.id, req.body.isActive);
+
+    let updatedUser;
+    if (isActive) {
+        updatedUser = await userService.setUserStatusActive(req.params.id, isActive)
+    }
+    else if (isVerified) {
+        updatedUser = await userService.setUserStatusVerified(req.params.id, isVerified)
+    }
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
 

@@ -40,9 +40,13 @@ const updateUserByAdminSchema = updateMyProfileSchema.extend({
 
 const updateUserStatusSchema = z.object({
     isActive: z.boolean({
-        required_error: "isActive field is required",
+        // required_error: "isActive field is required",
         invalid_type_error: "isActive must be a boolean",
-    }),
+    }).optional(),
+    isVerified: z.boolean({
+        // required_error: "isActive field is required",
+        invalid_type_error: "isActive must be a boolean",
+    }).optional(),
 });
 
 const listUsersQuerySchema = z.object({

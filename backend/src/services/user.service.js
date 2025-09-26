@@ -194,10 +194,20 @@ const deleteUser = async (id) => {
     return safeDeletedUser;
 };
 
-const setUserStatus = async (id, isActive) => {
+const setUserStatusActive = async (id, isActive) => {
     const updatedUser = await prisma.user.update({
         where: { id },
         data: { isActive: isActive },
+    });
+
+    const { password, ...safeUser } = updatedUser;
+    return safeUser;
+};
+
+const setUserStatusVerified = async (id, isVerified) => {
+    const updatedUser = await prisma.user.update({
+        where: { id },
+        data: { isVerified: isVerified },
     });
 
     const { password, ...safeUser } = updatedUser;
@@ -214,6 +224,7 @@ module.exports = {
     comparePassword,
     updatePassword,
     deleteUser,
-    setUserStatus,
+    setUserStatusActive,
+    setUserStatusVerified,
     updateUserProfile,
 };
