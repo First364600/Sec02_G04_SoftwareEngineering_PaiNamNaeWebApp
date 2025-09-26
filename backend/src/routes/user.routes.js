@@ -40,6 +40,15 @@ router.delete(
     userController.adminDeleteUser
 );
 
+// GET /api/users/admin/:id
+router.get(
+    '/admin/:id',
+    protect,
+    requireAdmin,
+    validate({ params: idParamSchema }),
+    userController.getUserById
+);
+
 // PATCH /api/users/admin/:id/status
 router.patch(
     '/admin/:id/status',
