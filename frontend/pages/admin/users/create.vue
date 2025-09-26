@@ -175,7 +175,7 @@
 
         <!-- Mobile Overlay -->
         <div id="overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"
-            onclick="closeMobileSidebar()"></div>
+            @click="closeMobileSidebar"></div>
     </div>
 </template>
 
@@ -217,6 +217,14 @@ useHead({
     link: [{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }]
 })
 
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('overlay')
+    if (!sidebar || !overlay) return
+    sidebar.classList.remove('mobile-open')
+    overlay.classList.add('hidden')
+}
+
 function defineGlobalScripts() {
     window.toggleSidebar = function () {
         const sidebar = document.getElementById('sidebar')
@@ -241,13 +249,13 @@ function defineGlobalScripts() {
         overlay.classList.toggle('hidden')
     }
 
-    window.closeMobileSidebar = function () {
-        const sidebar = document.getElementById('sidebar')
-        const overlay = document.getElementById('overlay')
-        if (!sidebar || !overlay) return
-        sidebar.classList.remove('mobile-open')
-        overlay.classList.add('hidden')
-    }
+    // window.closeMobileSidebar = function () {
+    //     const sidebar = document.getElementById('sidebar')
+    //     const overlay = document.getElementById('overlay')
+    //     if (!sidebar || !overlay) return
+    //     sidebar.classList.remove('mobile-open')
+    //     overlay.classList.add('hidden')
+    // }
 
     window.__adminResizeHandler__ = function () {
         const sidebar = document.getElementById('sidebar')
