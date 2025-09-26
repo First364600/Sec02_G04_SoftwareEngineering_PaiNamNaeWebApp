@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between h-full px-4">
             <div class="flex items-center gap-4">
                 <!-- Mobile Menu Toggle -->
-                <button onclick="toggleMobileSidebar()" class="text-gray-600 lg:hidden hover:text-blue-600">
+                <button @click="toggleMobileSidebar" class="text-gray-600 lg:hidden hover:text-blue-600">
                     <i class="text-xl fas fa-bars"></i>
                 </button>
 
@@ -26,8 +26,9 @@
                 <div class="flex items-center gap-3">
                     <span class="hidden text-sm text-gray-700 md:block">{{ user.firstName }}</span>
                     <div class="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-full">
-                        <span class="font-semibold text-white"><i
-                                class="w-6 text-lg text-center text-whrite-500 fas fa-user"></i></span>
+                        <span class="font-semibold text-white">
+                            <i class="w-6 text-lg text-center fas fa-user"></i>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -40,4 +41,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { token, user } = useAuth()
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar')
+    const overlay = document.getElementById('overlay')
+    if (!sidebar || !overlay) return
+    sidebar.classList.toggle('mobile-open')
+    overlay.classList.toggle('hidden')
+}
 </script>
