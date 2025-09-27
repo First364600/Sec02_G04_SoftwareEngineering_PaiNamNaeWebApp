@@ -13,7 +13,7 @@
                     <div class="flex items-center gap-3">
                         <h1 class="text-2xl font-semibold text-gray-800">Users (Admin)</h1>
                         <button @click="onCreateUser"
-                            class="inline-flex items-center gap-2 px-3 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 ">
+                            class="inline-flex items-center gap-2 px-3 py-2 text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700">
                             <i class="fa-solid fa-plus"></i>
                             <span class="hidden sm:inline">สร้างผู้ใช้ใหม่</span>
                         </button>
@@ -25,7 +25,7 @@
                             placeholder="ค้นหา : Email / User / Name"
                             class="max-w-full px-3 py-2 border border-gray-300 rounded-md w-72 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         <button @click="applyFilters"
-                            class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                            class="px-4 py-2 text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700">
                             ค้นหา
                         </button>
                     </div>
@@ -101,11 +101,11 @@
                         <!-- Actions (2/24) -->
                         <div class="flex items-end justify-end gap-2 mt-1 lg:col-span-4 lg:mt-0">
                             <button @click="clearFilters"
-                                class="px-3 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+                                class="px-3 py-2 text-gray-700 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
                                 ล้างตัวกรอง
                             </button>
                             <button @click="applyFilters"
-                                class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                                class="px-4 py-2 text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700">
                                 ใช้ตัวกรอง
                             </button>
                         </div>
@@ -209,17 +209,17 @@
 
                                     <td class="px-4 py-3 ">
                                         <button @click="onViewUser(u)"
-                                            class="p-2 text-gray-500 transition-colors hover:text-emerald-600"
+                                            class="p-2 text-gray-500 transition-colors cursor-pointer hover:text-emerald-600"
                                             title="ดูรายละเอียด" aria-label="ดูรายละเอียด">
                                             <i class="text-lg fa-regular fa-eye"></i>
                                         </button>
                                         <button @click="onEditUser(u)"
-                                            class="p-2 text-gray-500 transition-colors hover:text-blue-600"
+                                            class="p-2 text-gray-500 transition-colors cursor-pointer hover:text-blue-600"
                                             title="แก้ไข" aria-label="แก้ไข">
                                             <i class="text-lg fa-regular fa-pen-to-square"></i>
                                         </button>
                                         <button @click="askDelete(u)"
-                                            class="p-2 text-gray-500 transition-colors hover:text-red-600" title="ลบ"
+                                            class="p-2 text-gray-500 transition-colors cursor-pointer hover:text-red-600" title="ลบ"
                                             aria-label="ลบ">
                                             <i class="text-lg fa-regular fa-trash-can"></i>
                                         </button>
@@ -561,6 +561,10 @@ useHead({
 
 function onCreateUser() {
     navigateTo('/admin/users/create').catch(() => { })
+}
+
+function onViewUser(u) {
+  navigateTo(`/admin/users/${u.id}`).catch(() => {})
 }
 
 function closeMobileSidebar() {
