@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const verifService = require("../services/driverVerification.service");
 const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require("../utils/cloudinary");
+const notifService = require('../services/notification.service');
 
 const adminListVerifications = asyncHandler(async (req, res) => {
   const result = await verifService.searchVerifications(req.query);
@@ -56,6 +57,17 @@ const createVerification = asyncHandler(async (req, res) => {
   };
 
   const newRec = await verifService.createVerification(payload);
+
+  const notifPayload = {
+    userId,
+    type: 'VERIFICATION',
+    title: 'คำขอคนขับถูกส่งแล้ว',
+    body: 'เราได้รับข้อมูลใบขับขี่ของคุณแล้ว กำลังรอแอดมินตรวจสอบ',
+    link: '/driver-verification',
+  }
+
+  await notifService.createNotificationByAdmin(notifPayload)
+
   res.status(201).json({
     success: true,
     message: "Driver verification submitted and pending approval",

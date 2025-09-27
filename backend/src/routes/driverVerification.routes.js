@@ -13,6 +13,34 @@ const {
 
 const router = express.Router();
 
+// --- Admin routes ---
+// GET /driver-verifications
+router.get(
+  '/',
+  protect,
+  requireAdmin,
+  validate({ query: listDriverVerifsQuerySchema }),
+  driverVerifController.adminListVerifications
+);
+
+// GET /driver-verifications/:id
+router.get(
+  '/:id',
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  driverVerifController.getVerificationById
+);
+
+// PATCH /driver-verifications/:id/status
+router.patch(
+  '/:id/status',
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema, body: updateVerificationStatusSchema }),
+  driverVerifController.updateVerificationStatus
+);
+
 // --- Driver routes ---
 // GET /driver-verifications/me
 router.get(
@@ -42,33 +70,4 @@ router.put(
   validate({ params: idParamSchema, body: updateDriverVerificationSchema }),
   driverVerifController.updateVerification
 );
-
-// --- Admin routes ---
-// GET /driver-verifications
-router.get(
-  '/',
-  protect,
-  requireAdmin,
-  validate({ query: listDriverVerifsQuerySchema }),
-  driverVerifController.adminListVerifications
-);
-
-// GET /driver-verifications/:id
-router.get(
-  '/:id',
-  protect,
-  requireAdmin,
-  validate({ params: idParamSchema }),
-  driverVerifController.getVerificationById
-);
-
-// PATCH /driver-verifications/:id/status
-router.patch(
-  '/:id/status',
-  protect,
-  requireAdmin,
-  validate({ params: idParamSchema, body: updateVerificationStatusSchema }),
-  driverVerifController.updateVerificationStatus
-);
-
 module.exports = router;

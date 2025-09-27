@@ -14,5 +14,6 @@ router.use('/vehicles', vehicleRoutes);
 router.use('/routes', routeRoutes);
 router.use('/driver-verifications', driverVerifRoutes);
 router.use('/bookings', bookingRoutes);
+router.use('/notifications', require('./notification.routes'));
 
 module.exports = router;
