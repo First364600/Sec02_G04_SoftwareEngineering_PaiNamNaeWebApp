@@ -162,7 +162,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
         try {
             if (isVerified === true) {
                 await notifService.createNotificationByAdmin({
-                    userId: updatedUser.userId,
+                    userId: updatedUser.id,
                     type: 'VERIFICATION',
                     title: 'ยืนยันตัวตนสำเร็จ',
                     body: 'แอดมินได้ตรวจสอบบัญชีของคุณแล้ว ตอนนี้คุณสามารถใช้งานได้เต็มรูปแบบ',
@@ -175,7 +175,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
             }
             else if (isVerified === false) {
                 await notifService.createNotificationByAdmin({
-                    userId: updatedUser.userId,
+                    userId: updatedUser.id,
                     type: 'VERIFICATION',
                     title: 'ยืนยันตัวตนไม่สำเร็จ',
                     body: 'ข้อมูลบัตรประชาชน/รูปถ่ายของคุณไม่ผ่านการตรวจสอบ กรุณาตรวจสอบและส่งใหม่อีกครั้ง',
