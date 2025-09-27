@@ -17,6 +17,18 @@ const parseBooleanQuery = z.preprocess((v) => {
     return v; // ให้ z.boolean() จับ error ต่อถ้าไม่แมตช์
 }, z.boolean().optional());
 
+const urlOrPath = z.string().refine((v) => {
+    if (!v) return false;
+    try {
+        // ถ้าเป็น URL เต็ม เช่น http(s)://... → ผ่าน
+        new URL(v);
+        return true;
+    } catch {
+        // ถ้าไม่ใช่ URL เต็ม ให้ยอมรับกรณีขึ้นต้นด้วย '/'
+        return v.startsWith('/');
+    }
+}, { message: 'link must be an absolute URL or a leading-slash path' });
+
 // ========= User: list =========
 const listMyNotificationsQuerySchema = z.object({
     page: z.coerce.number().int().min(1).default(1),
@@ -46,7 +58,7 @@ const createNotificationAdminSchema = z.object({
     type: z.nativeEnum(NotificationType).default('SYSTEM').optional(),
     title: z.string().min(1, 'title is required'),
     body: z.string().min(1, 'body is required'),
-    link: z.string().url('link must be a valid URL').optional(),
+    link: urlOrPath.optional(),
     // metadata ยอมรับอะไรก็ได้ (เช่น object), ให้ frontend ส่ง JSON แล้ว parse ก่อนก็ได้
     metadata: z.any().optional(),
 });
