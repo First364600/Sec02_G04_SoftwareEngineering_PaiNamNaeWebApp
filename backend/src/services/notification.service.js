@@ -134,7 +134,6 @@ const getMyNotificationById = async (id, ownerId) => {
 };
 
 const createNotificationByAdmin = async (payload) => {
-    // ตรวจว่ามี user จริงไหม
     const user = await prisma.user.findUnique({ where: { id: payload.userId }, select: { id: true } });
     if (!user) throw new ApiError(404, 'User not found');
 
