@@ -117,9 +117,11 @@ model Notification {
 
   readAt    DateTime?
   createdAt DateTime         @default(now())
+  adminReviewedAt DateTime?
 
   @@index([userId, createdAt])
   @@index([userId, readAt])
+  @@index([adminReviewedAt])
 }
 
 model Vehicle {
