@@ -81,6 +81,11 @@ const createUser = asyncHandler(async (req, res) => {
         title: 'ข้อมูลยืนยันตัวตนถูกส่งแล้ว',
         body: 'เราได้รับข้อมูลบัตรประชาชนและรูปถ่ายของคุณแล้ว กำลังรอแอดมินตรวจสอบ',
         link: '/profile/verification',
+        metadata: {
+            kind: 'identity_verification_submission',
+            userId: newUser.id,
+            initiatedBy: 'user'
+        }
     }
 
     await notifService.createNotificationByAdmin(notifPayload)
@@ -152,6 +157,39 @@ const setUserStatus = asyncHandler(async (req, res) => {
         ...(typeof isActive === 'boolean' ? { isActive } : {}),
         ...(typeof isVerified === 'boolean' ? { isVerified } : {}),
     });
+
+    if (typeof isVerified === 'boolean') {
+        try {
+            if (isVerified === true) {
+                await notifService.createNotificationByAdmin({
+                    userId: updatedUser.userId,
+                    type: 'VERIFICATION',
+                    title: 'ยืนยันตัวตนสำเร็จ',
+                    body: 'แอดมินได้ตรวจสอบบัญชีของคุณแล้ว ตอนนี้คุณสามารถใช้งานได้เต็มรูปแบบ',
+                    link: '/profile/verification',
+                    metadata: {
+                        kind: 'user_verification',
+                        userId: updatedUser.id,
+                    }
+                });
+            }
+            else if (isVerified === false) {
+                await notifService.createNotificationByAdmin({
+                    userId: updatedUser.userId,
+                    type: 'VERIFICATION',
+                    title: 'ยืนยันตัวตนไม่สำเร็จ',
+                    body: 'ข้อมูลบัตรประชาชน/รูปถ่ายของคุณไม่ผ่านการตรวจสอบ กรุณาตรวจสอบและส่งใหม่อีกครั้ง',
+                    link: '/profile/verification',
+                    metadata: {
+                        kind: 'user_verification',
+                        userId: updatedUser.id,
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Failed to create verification notification:', e);
+        }
+    }
 
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
