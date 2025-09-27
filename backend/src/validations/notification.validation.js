@@ -6,6 +6,17 @@ const idParamSchema = z.object({
     id: z.string().cuid({ message: 'Invalid notification ID format' }),
 });
 
+const parseBooleanQuery = z.preprocess((v) => {
+    if (v === undefined) return undefined;
+    if (typeof v === 'boolean') return v;
+    if (typeof v === 'string') {
+        const s = v.toLowerCase();
+        if (s === 'true' || s === '1') return true;
+        if (s === 'false' || s === '0') return false;
+    }
+    return v; // ให้ z.boolean() จับ error ต่อถ้าไม่แมตช์
+}, z.boolean().optional());
+
 // ========= User: list =========
 const listMyNotificationsQuerySchema = z.object({
     page: z.coerce.number().int().min(1).default(1),
@@ -13,7 +24,8 @@ const listMyNotificationsQuerySchema = z.object({
 
     q: z.string().trim().min(1).optional(), // ค้น title/body
     type: z.nativeEnum(NotificationType).optional(),
-    read: z.coerce.boolean().optional(), // true → readAt != null, false → readAt == null
+    //read: z.coerce.boolean().optional(), // true → readAt != null, false → readAt == null
+    read: parseBooleanQuery,
 
     createdFrom: z.string().refine(v => !v || !isNaN(Date.parse(v)), { message: 'Invalid createdFrom' }).optional(),
     createdTo: z.string().refine(v => !v || !isNaN(Date.parse(v)), { message: 'Invalid createdTo' }).optional(),
@@ -25,6 +37,7 @@ const listMyNotificationsQuerySchema = z.object({
 // ========= Admin: list =========
 const listNotificationsAdminQuerySchema = listMyNotificationsQuerySchema.extend({
     userId: z.string().cuid().optional(),
+    adminReviewed: parseBooleanQuery.optional(),
 });
 
 // ========= Admin: create =========
