@@ -105,6 +105,23 @@ const updateVerification = asyncHandler(async (req, res) => {
   };
 
   const updated = await verifService.updateVerification(id, payload);
+
+  const notifPayload = {
+    userId,
+    type: 'VERIFICATION',
+    title: 'คำขอคนขับถูกส่งแล้ว',
+    body: 'เราได้รับข้อมูลใบขับขี่ของคุณแล้ว กำลังรอแอดมินตรวจสอบ',
+    link: '/driver-verification',
+    metadata: {
+      kind: 'driver_verification',
+      verificationId: updated.id,
+      userId: updated.userId,
+      status: updated.status
+    }
+  }
+
+  await notifService.createNotificationByAdmin(notifPayload)
+
   res.status(200).json({
     success: true,
     message: "Driver verification updated successfully",
@@ -136,6 +153,55 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const updated = await verifService.updateVerificationStatus(id, status);
+
+  try {
+    if (status === 'APPROVED') {
+      await notifService.createNotificationByAdmin({
+        userId: updated.userId,
+        type: 'VERIFICATION',
+        title: 'ยืนยันตัวตนคนขับสำเร็จ',
+        body: 'แอดมินได้อนุมัติคำขอของคุณแล้ว ตอนนี้คุณสามารถสร้างเส้นทางได้',
+        link: '/driver-verification',
+        metadata: {
+          kind: 'driver_verification',
+          verificationId: updated.id,
+          userId: updated.userId,
+          status: updated.status
+        }
+      });
+    } else if (status === 'REJECTED') {
+      await notifService.createNotificationByAdmin({
+        userId: updated.userId,
+        type: 'VERIFICATION',
+        title: 'คำขอคนขับถูกปฏิเสธ',
+        body: 'ข้อมูลใบขับขี่/รูปถ่ายของคุณไม่ผ่านการตรวจสอบ กรุณาตรวจสอบและส่งใหม่อีกครั้ง',
+        link: '/driver-verification',
+        metadata: {
+          kind: 'driver_verification',
+          verificationId: updated.id,
+          userId: updated.userId,
+          status: updated.status
+        }
+      });
+    } else if (status === 'PENDING') {
+      await notifService.createNotificationByAdmin({
+        userId: updated.userId,
+        type: 'VERIFICATION',
+        title: 'คำขอคนขับอยู่ระหว่างตรวจสอบ',
+        body: 'เราได้รับคำขอของคุณแล้ว กำลังอยู่ระหว่างการตรวจสอบโดยแอดมิน',
+        link: '/driver-verification',
+        metadata: {
+          kind: 'driver_verification',
+          verificationId: updated.id,
+          userId: updated.userId,
+          status: updated.status
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Failed to create verification notification:', e);
+  }
+
   res.status(200).json({
     success: true,
     message: `Driver verification status updated to ${status}`,
