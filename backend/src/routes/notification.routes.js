@@ -40,6 +40,15 @@ router.delete(
     controller.adminDeleteNotification
 );
 
+// PATCH /api/notifications/admin/:id/read
+router.patch(
+    '/admin/:id/read',
+    protect,
+    requireAdmin,
+    validate({ params: idParamSchema }),
+    controller.adminMarkRead
+);
+
 // ===== User =====
 // GET /api/notifications
 router.get(

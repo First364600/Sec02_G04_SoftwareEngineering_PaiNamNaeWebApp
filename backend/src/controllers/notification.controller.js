@@ -28,6 +28,15 @@ const markRead = asyncHandler(async (req, res) => {
     });
 });
 
+const adminMarkRead = asyncHandler(async (req, res) => {
+    const data = await notifService.adminMarkRead(req.params.id);
+    res.status(200).json({
+        success: true,
+        message: 'Notification marked as read',
+        data,
+    });
+});
+
 const markUnread = asyncHandler(async (req, res) => {
     const data = await notifService.markUnread(req.params.id, req.user.sub);
     res.status(200).json({
@@ -101,5 +110,6 @@ module.exports = {
     countUnread,
     adminListNotifications,
     adminCreateNotification,
+    adminMarkRead,
     adminDeleteNotification,
 };

@@ -10,11 +10,12 @@ const baseSelect = {
     link: true,
     metadata: true,
     readAt: true,
+    adminReviewedAt: true,
     createdAt: true,
 };
 
 const buildWhere = (opts = {}) => {
-    const { q, type, read, createdFrom, createdTo, userId } = opts;
+    const { q, type, read, createdFrom, createdTo, userId, adminReviewed } = opts;
 
     return {
         ...(userId && { userId }),
@@ -23,6 +24,9 @@ const buildWhere = (opts = {}) => {
             ? (read
                 ? { readAt: { not: null } }
                 : { readAt: null })
+            : {}),
+        ...(typeof adminReviewed === 'boolean'
+            ? (adminReviewed ? { adminReviewedAt: { not: null } } : { adminReviewedAt: null })
             : {}),
         ...((createdFrom || createdTo)
             ? {
@@ -163,6 +167,17 @@ const markUnread = async (id, ownerId) => {
     });
 };
 
+const adminMarkRead = async (id) => {
+    const n = await prisma.notification.findUnique({ where: { id } });
+    if (!n) throw new ApiError(404, 'Notification not found');
+
+    return prisma.notification.update({
+        where: { id },
+        data: { adminReviewedAt: new Date() },
+        select: baseSelect,
+    });
+};
+
 const markAllRead = async (ownerId) => {
     const result = await prisma.notification.updateMany({
         where: { userId: ownerId, readAt: null },
@@ -205,4 +220,5 @@ module.exports = {
     deleteMyNotification,
     deleteNotificationByAdmin,
     countUnread,
+    adminMarkRead,
 };
