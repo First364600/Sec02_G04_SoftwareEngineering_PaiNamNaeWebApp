@@ -41,6 +41,13 @@ enum LicenseType {
   LIFETIME             // ตลอดชีพ
 }
 
+enum NotificationType {
+  SYSTEM
+  VERIFICATION
+  BOOKING
+  ROUTE
+}
+
 model User {
   id                    String   @id @default(cuid())
   username              String   @unique
@@ -65,6 +72,7 @@ model User {
 
   driverVerification    DriverVerification?
   vehicles              Vehicle[]
+  notification          Notification[]
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
 
@@ -94,6 +102,24 @@ model DriverVerification {
   @@index([createdAt])
   @@index([licenseIssueDate])
   @@index([licenseExpiryDate])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      NotificationType @default(SYSTEM)
+  title     String
+  body      String
+  link      String?
+  metadata  Json?            @db.Json
+
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }
 
 model Vehicle {
