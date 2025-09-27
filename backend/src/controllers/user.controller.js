@@ -170,6 +170,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
                     metadata: {
                         kind: 'user_verification',
                         userId: updatedUser.id,
+                        initiatedBy: 'system'
                     }
                 });
             }
@@ -183,6 +184,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
                     metadata: {
                         kind: 'user_verification',
                         userId: updatedUser.id,
+                        initiatedBy: 'system'
                     }
                 });
             }
