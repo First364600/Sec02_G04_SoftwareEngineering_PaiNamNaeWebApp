@@ -64,6 +64,13 @@ const createVerification = asyncHandler(async (req, res) => {
     title: 'คำขอคนขับถูกส่งแล้ว',
     body: 'เราได้รับข้อมูลใบขับขี่ของคุณแล้ว กำลังรอแอดมินตรวจสอบ',
     link: '/driver-verification',
+    metadata: {
+      kind: 'driver_verification',
+      verificationId: newRec.id,
+      userId: newRec.userId,
+      status: newRec.status,
+      initiatedBy: 'user'
+    }
   }
 
   await notifService.createNotificationByAdmin(notifPayload)
@@ -116,7 +123,8 @@ const updateVerification = asyncHandler(async (req, res) => {
       kind: 'driver_verification',
       verificationId: updated.id,
       userId: updated.userId,
-      status: updated.status
+      status: updated.status,
+      initiatedBy: 'user'
     }
   }
 
@@ -166,7 +174,8 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
           kind: 'driver_verification',
           verificationId: updated.id,
           userId: updated.userId,
-          status: updated.status
+          status: updated.status,
+          initiatedBy: 'system'
         }
       });
     } else if (status === 'REJECTED') {
@@ -180,7 +189,8 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
           kind: 'driver_verification',
           verificationId: updated.id,
           userId: updated.userId,
-          status: updated.status
+          status: updated.status,
+          initiatedBy: 'system'
         }
       });
     } else if (status === 'PENDING') {
@@ -194,7 +204,8 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
           kind: 'driver_verification',
           verificationId: updated.id,
           userId: updated.userId,
-          status: updated.status
+          status: updated.status,
+          initiatedBy: 'user'
         }
       });
     }
