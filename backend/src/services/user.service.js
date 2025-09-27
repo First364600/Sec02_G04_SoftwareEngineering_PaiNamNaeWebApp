@@ -114,6 +114,19 @@ const getUserById = async (id) => {
     return safeUser
 }
 
+const getUserPublicById = async (id) => {
+    const user = await prisma.user.findUnique({
+        where: { id },
+        select: {
+            id: true, firstName: true, lastName: true,
+            profilePicture: true, role: true, isVerified: true,
+            createdAt: true
+        }
+    });
+    if (!user) throw new ApiError(404, 'User not found');
+    return user;
+};
+
 // const getMyUser = async (id) => {
 //     const user = await prisma.user.findUnique({ where: { id } })
 
@@ -194,25 +207,25 @@ const deleteUser = async (id) => {
     return safeDeletedUser;
 };
 
-const setUserStatusActive = async (id, isActive) => {
-    const updatedUser = await prisma.user.update({
-        where: { id },
-        data: { isActive: isActive },
-    });
+// const setUserStatusActive = async (id, isActive) => {
+//     const updatedUser = await prisma.user.update({
+//         where: { id },
+//         data: { isActive: isActive },
+//     });
 
-    const { password, ...safeUser } = updatedUser;
-    return safeUser;
-};
+//     const { password, ...safeUser } = updatedUser;
+//     return safeUser;
+// };
 
-const setUserStatusVerified = async (id, isVerified) => {
-    const updatedUser = await prisma.user.update({
-        where: { id },
-        data: { isVerified: isVerified },
-    });
+// const setUserStatusVerified = async (id, isVerified) => {
+//     const updatedUser = await prisma.user.update({
+//         where: { id },
+//         data: { isVerified: isVerified },
+//     });
 
-    const { password, ...safeUser } = updatedUser;
-    return safeUser;
-};
+//     const { password, ...safeUser } = updatedUser;
+//     return safeUser;
+// };
 
 module.exports = {
     searchUsers,
@@ -224,7 +237,6 @@ module.exports = {
     comparePassword,
     updatePassword,
     deleteUser,
-    setUserStatusActive,
-    setUserStatusVerified,
     updateUserProfile,
+    getUserPublicById,
 };

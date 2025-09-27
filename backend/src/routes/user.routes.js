@@ -70,7 +70,7 @@ router.get(
 router.get(
     '/:id',
     validate({ params: idParamSchema }),
-    userController.getUserById
+    userController.getUserPublicById
 );
 
 // POST /api/users

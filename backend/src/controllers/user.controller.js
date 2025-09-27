@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const userService = require("../services/user.service");
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
+const notifService = require('../services/notification.service');
 
 const adminListUsers = asyncHandler(async (req, res) => {
     const result = await userService.searchUsers(req.query);
@@ -23,6 +24,18 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
     const user = await userService.getUserById(req.params.id);
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    res.status(200).json({
+        success: true,
+        message: "User retrieved",
+        data: user
+    });
+});
+
+const getUserPublicById = asyncHandler(async (req, res) => {
+    const user = await userService.getUserPublicById(req.params.id);
     if (!user) {
         throw new ApiError(404, "User not found");
     }
@@ -61,6 +74,17 @@ const createUser = asyncHandler(async (req, res) => {
     userData.selfiePhotoUrl = selfieResult.url;
 
     const newUser = await userService.createUser(userData);
+
+    const notifPayload = {
+        userId: newUser.id,
+        type: 'VERIFICATION',
+        title: 'ข้อมูลยืนยันตัวตนถูกส่งแล้ว',
+        body: 'เราได้รับข้อมูลบัตรประชาชนและรูปถ่ายของคุณแล้ว กำลังรอแอดมินตรวจสอบ',
+        link: '/profile/verification',
+    }
+
+    await notifService.createNotificationByAdmin(notifPayload)
+
     res.status(201).json({
         success: true,
         message: "User created successfully. Please wait for verification.",
@@ -120,15 +144,15 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
 const setUserStatus = asyncHandler(async (req, res) => {
     const { isActive, isVerified } = req.body
 
-    //const updatedUser = await userService.setUserStatus(req.params.id, req.body.isActive);
+    if (typeof isActive !== 'boolean' && typeof isVerified !== 'boolean') {
+        throw new ApiError(400, 'Provide at least one of isActive or isVerified as boolean');
+    }
 
-    let updatedUser;
-    if (isActive) {
-        updatedUser = await userService.setUserStatusActive(req.params.id, isActive)
-    }
-    else if (isVerified) {
-        updatedUser = await userService.setUserStatusVerified(req.params.id, isVerified)
-    }
+    let updatedUser = await userService.updateUserProfile(req.params.id, {
+        ...(typeof isActive === 'boolean' ? { isActive } : {}),
+        ...(typeof isVerified === 'boolean' ? { isVerified } : {}),
+    });
+
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
 
@@ -137,6 +161,7 @@ module.exports = {
     getAllUsers,
     getUserById,
     getMyUser,
+    getUserPublicById,
     createUser,
     updateCurrentUserProfile,
     adminUpdateUser,
