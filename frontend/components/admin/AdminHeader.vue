@@ -18,10 +18,10 @@
 
             <!-- Right -->
             <div class="flex items-center gap-4">
-                <!-- Bell + Dropdown (wrap ด้วย relative ของตัวเอง) -->
+                <!-- Bell + Dropdown -->
                 <div class="relative">
                     <!-- Bell -->
-                    <button ref="bellBtn" class="relative text-gray-600 hover:text-blue-600" @click="toggleNotif"
+                    <button ref="bellBtn" class="relative text-gray-600 hover:text-blue-600" @click="onBellClick"
                         aria-haspopup="true" :aria-expanded="openNotif ? 'true' : 'false'">
                         <i class="text-xl fas fa-bell"></i>
                         <span v-if="unreadCount > 0"
@@ -34,9 +34,9 @@
                         leave-active-class="transition duration-100 ease-in"
                         leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-1 opacity-0">
                         <div v-if="openNotif" ref="notifPanel" class="absolute top-full right-0 mt-3
-               w-[360px] max-w-[90vw] max-h-[70vh]
-               bg-white border border-gray-200 rounded-2xl shadow-xl
-               overflow-hidden z-[60] origin-top">
+                     w-[360px] max-w-[90vw] max-h-[70vh]
+                     bg-white border border-gray-200 rounded-2xl shadow-xl
+                     overflow-hidden z-[60] origin-top">
                             <!-- Header -->
                             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                                 <h3 class="text-lg font-semibold text-gray-800">Notification</h3>
@@ -47,18 +47,19 @@
 
                             <!-- List -->
                             <div class="max-h-[56vh] overflow-y-auto">
-                                <div v-if="notifications.length === 0"
+                                <div v-if="notifications.length === 0 && !loading"
                                     class="px-4 py-8 text-sm text-center text-gray-500">
                                     ไม่มีการแจ้งเตือน
                                 </div>
+                                <div v-if="loading" class="px-4 py-4 text-sm text-gray-500">กำลังโหลด…</div>
 
-                                <button v-for="(n, idx) in notifications" :key="idx" class="w-full text-left"
+                                <button v-for="(n, idx) in notifications" :key="n.id || idx" class="w-full text-left"
                                     @click="openNotif = false">
                                     <div class="px-4 py-3 hover:bg-gray-50">
                                         <div class="flex items-start gap-3">
                                             <!-- จุดสถานะ -->
                                             <span class="inline-block w-2 h-2 mt-1 rounded-full"
-                                                :class="n.read ? 'bg-gray-300' : 'bg-emerald-500'"></span>
+                                                :class="n.readAt ? 'bg-gray-300' : 'bg-emerald-500'"></span>
 
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-sm font-medium text-gray-900 truncate">
@@ -74,13 +75,14 @@
                                         </div>
                                     </div>
 
-                                    <div class="mx-4 border-t border-gray-200" v-if="idx !== notifications.length - 1"></div>
+                                    <div class="mx-4 border-t border-gray-200" v-if="idx !== notifications.length - 1">
+                                    </div>
                                 </button>
                             </div>
 
                             <!-- Footer -->
                             <div class="px-4 py-3 bg-white border-t border-gray-200">
-                                <NuxtLink to="/admin/notifications"
+                                <NuxtLink to="/"
                                     class="block w-full px-4 py-2 text-sm font-medium text-center text-blue-700 rounded-lg bg-blue-50 hover:bg-blue-100"
                                     @click="openNotif = false">
                                     View All Notification
@@ -103,10 +105,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRuntimeConfig, useCookie } from '#app'
 import { useAuth } from '~/composables/useAuth'
 
 const { token, user } = useAuth()
+
 function toggleMobileSidebar() {
     const sidebar = document.getElementById('sidebar')
     const overlay = document.getElementById('overlay')
@@ -116,21 +120,67 @@ function toggleMobileSidebar() {
 }
 
 const openNotif = ref(false)
+const loading = ref(false)
 const bellBtn = ref(null)
 const notifPanel = ref(null)
+const notifications = ref([])
 
-/* ตัวอย่างโครงสร้างข้อมูลแจ้งเตือน
-   ในโปรดักชันดึงจาก API แล้ว map ให้มี title, body, createdAt, read */
-const notifications = ref([
-    { title: 'ยืนยันตัวตนไม่สำเร็จ', body: 'กรุณาอัปโหลดภาพบัตรประชาชนที่ชัดเจนอีกครั้ง', createdAt: Date.now() - 5 * 60 * 1000, read: false },
-    { title: 'รูปถ่ายใบหน้าไม่ชัดเจน', body: 'โปรดถ่ายใหม่ให้เห็นใบหน้าชัดเจนและไม่มีแสงสะท้อน', createdAt: Date.now() - 15 * 60 * 1000, read: true },
-    { title: 'การยืนยันตัวตนสำเร็จ', body: 'ขอบคุณที่ยืนยันตัวตน ระบบได้เปิดใช้งานทั้งหมดแล้ว', createdAt: Date.now() - 60 * 60 * 1000, read: true },
-])
-
-const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
+const unreadCount = computed(() =>
+    notifications.value.filter(n => !n.readAt).length
+)
 
 function toggleNotif() {
     openNotif.value = !openNotif.value
+}
+
+/** กดกระดิ่ง: เปิด dropdown และโหลด (ถ้ายังไม่โหลด) */
+async function onBellClick() {
+    toggleNotif()
+    if (openNotif.value && notifications.value.length === 0) {
+        await fetchAdminNotifications()
+    }
+}
+
+/** โหลด notification ของ ADMIN */
+async function fetchAdminNotifications() {
+    try {
+        if (!user?.value || String(user.value.role).toUpperCase() !== 'ADMIN') return
+        loading.value = true
+
+        const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
+        const tk =
+            useCookie('token')?.value ||
+            token?.value ||
+            (process.client ? localStorage.getItem('token') : '')
+
+        const res = await $fetch('/notifications/admin', {
+            baseURL: apiBase,
+            headers: {
+                Accept: 'application/json',
+                ...(tk ? { Authorization: `Bearer ${tk}` } : {}),
+            },
+            query: { page: 1, limit: 20 },
+        })
+
+        const raw = Array.isArray(res?.data) ? res.data : []
+
+        // กรองเฉพาะที่มี metadata.initiatedBy === 'user'
+        const list = raw.filter(it => (it?.metadata?.initiatedBy || '').toLowerCase() === 'user')
+
+        // map ให้เหลือ field ที่ใช้ใน UI
+        notifications.value = list.map(it => ({
+            id: it.id,
+            title: it.title || '-',
+            body: it.body || '',
+            createdAt: it.createdAt || Date.now(),
+            readAt: it.readAt || null,
+        }))
+    } catch (err) {
+        console.error(err)
+        notifications.value = []
+    } finally {
+        loading.value = false
+    }
 }
 
 function onClickOutside(e) {
@@ -146,6 +196,8 @@ function onKey(e) {
 onMounted(() => {
     document.addEventListener('click', onClickOutside)
     document.addEventListener('keydown', onKey)
+    // โหลดครั้งแรกแบบเงียบ ๆ สำหรับ admin (optional)
+    if (String(user?.value?.role || '').toUpperCase() === 'ADMIN') fetchAdminNotifications()
 })
 onUnmounted(() => {
     document.removeEventListener('click', onClickOutside)
@@ -164,6 +216,7 @@ function timeAgo(ts) {
     return `${d} d ago`
 }
 </script>
+
 <style scoped>
 /* ตัดคำ body ให้ดูเรียบร้อย */
 .line-clamp-2 {
