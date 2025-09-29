@@ -136,6 +136,14 @@ const updateVerification = async (id, data) => {
 
 };
 
+const updateVerificationByAdmin = async (id, data) => {
+  return prisma.driverVerification.update({
+    where: { id },
+    data,
+    include: { user: true },
+  });
+};
+
 const updateVerificationStatus = async (id, status) => {
   return prisma.$transaction(async (tx) => {
     const verification = await tx.driverVerification.update({
@@ -179,6 +187,22 @@ const canCreateRoutes = async (userId) => {
   return rec?.status === 'APPROVED' || rec?.status === 'PENDING';
 };
 
+const createVerificationByAdmin = async (data) => {
+  const existing = await getVerificationByUser(data.userId);
+  if (existing) {
+    return updateVerificationByAdmin(existing.id, data);
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const newRec = await tx.driverVerification.create({ data });
+    await tx.user.update({
+      where: { id: data.userId },
+      data: { role: 'DRIVER' },
+    });
+    return newRec;
+  });
+};
+
 module.exports = {
   searchVerifications,
   getVerificationByUser,
@@ -187,5 +211,7 @@ module.exports = {
   createVerification,
   updateVerification,
   updateVerificationStatus,
-  canCreateRoutes
+  canCreateRoutes,
+  updateVerificationByAdmin,
+  createVerificationByAdmin
 };

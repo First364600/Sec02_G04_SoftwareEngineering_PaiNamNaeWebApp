@@ -9,6 +9,8 @@ const {
   updateDriverVerificationSchema,
   updateVerificationStatusSchema,
   listDriverVerifsQuerySchema,
+  createDriverVerificationByAdminSchema,
+  updateDriverVerificationByAdminSchema,
 } = require('../validations/driverVerification.validation');
 
 const router = express.Router();
@@ -30,6 +32,32 @@ router.get(
   requireAdmin,
   validate({ params: idParamSchema }),
   driverVerifController.getVerificationById
+);
+
+// POST /driver-verifications/admin
+router.post(
+  '/admin',
+  protect,
+  requireAdmin,
+  upload.fields([
+    { name: 'licensePhotoUrl', maxCount: 1 },
+    { name: 'selfiePhotoUrl', maxCount: 1 }
+  ]),
+  validate({ body: createDriverVerificationByAdminSchema }),
+  driverVerifController.adminCreateVerification
+);
+
+// PUT /driver-verifications/admin/:id
+router.put(
+  '/admin/:id',
+  protect,
+  requireAdmin,
+  upload.fields([
+    { name: 'licensePhotoUrl', maxCount: 1 },
+    { name: 'selfiePhotoUrl', maxCount: 1 }
+  ]),
+  validate({ params: idParamSchema, body: updateDriverVerificationByAdminSchema }),
+  driverVerifController.adminUpdateVerification
 );
 
 // PATCH /driver-verifications/:id/status

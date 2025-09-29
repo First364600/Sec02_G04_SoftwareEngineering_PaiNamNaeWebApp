@@ -114,7 +114,7 @@ const updateVerification = asyncHandler(async (req, res) => {
   const updated = await verifService.updateVerification(id, payload);
 
   const notifPayload = {
-    userId,
+    userId: updated.userId,
     type: 'VERIFICATION',
     title: 'คำขอคนขับถูกส่งแล้ว',
     body: 'เราได้รับข้อมูลใบขับขี่ของคุณแล้ว กำลังรอแอดมินตรวจสอบ',
@@ -220,6 +220,60 @@ const updateVerificationStatus = asyncHandler(async (req, res) => {
   });
 });
 
+const adminCreateVerification = asyncHandler(async (req, res) => {
+  const payload = { ...req.body };
+
+  if (req.files?.licensePhotoUrl) {
+    const r = await uploadToCloudinary(req.files.licensePhotoUrl[0].buffer, "painamnae/licenses");
+    payload.licensePhotoUrl = r.url;
+  }
+  if (req.files?.selfiePhotoUrl) {
+    const r = await uploadToCloudinary(req.files.selfiePhotoUrl[0].buffer, "painamnae/selfies");
+    payload.selfiePhotoUrl = r.url;
+  }
+
+  if (payload.licenseIssueDate) payload.licenseIssueDate = new Date(payload.licenseIssueDate);
+  if (payload.licenseExpiryDate) payload.licenseExpiryDate = new Date(payload.licenseExpiryDate);
+
+  const created = await verifService.createVerificationByAdmin(payload);
+
+  res.status(201).json({
+    success: true,
+    message: "Driver verification (by admin) created successfully",
+    data: created,
+  });
+});
+
+
+const adminUpdateVerification = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const existing = await verifService.getVerificationById(id);
+  if (!existing) throw new ApiError(404, "Verification not found");
+
+  const payload = { ...req.body };
+
+  if (req.files?.licensePhotoUrl) {
+    const r = await uploadToCloudinary(req.files.licensePhotoUrl[0].buffer, "painamnae/licenses");
+    payload.licensePhotoUrl = r.url;
+  }
+  if (req.files?.selfiePhotoUrl) {
+    const r = await uploadToCloudinary(req.files.selfiePhotoUrl[0].buffer, "painamnae/selfies");
+    payload.selfiePhotoUrl = r.url;
+  }
+
+  // แปลงวันที่ (ถ้ามาเป็น string)
+  if (payload.licenseIssueDate) payload.licenseIssueDate = new Date(payload.licenseIssueDate);
+  if (payload.licenseExpiryDate) payload.licenseExpiryDate = new Date(payload.licenseExpiryDate);
+
+  const updated = await verifService.updateVerificationByAdmin(id, payload);
+
+  res.status(200).json({
+    success: true,
+    message: "Driver verification (by admin) updated successfully",
+    data: updated,
+  });
+});
+
 module.exports = {
   adminListVerifications,
   getMyVerification,
@@ -228,4 +282,6 @@ module.exports = {
   getAllVerifications,
   getVerificationById,
   updateVerificationStatus,
+  adminCreateVerification,
+  adminUpdateVerification
 };

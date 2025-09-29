@@ -17,6 +17,24 @@ const createDriverVerificationSchema = z.object({
   }),
 });
 
+const createDriverVerificationByAdminSchema = z.object({
+  userId: z.string().cuid({ message: "userId must be a CUID" }),
+  licenseNumber: z.string().min(1, "License number is required"),
+  firstNameOnLicense: z.string().min(1, "First name on license is required"),
+  lastNameOnLicense: z.string().min(1, "Last name on license is required"),
+  typeOnLicense: z.nativeEnum(LicenseType, {
+    required_error: "License type is required",
+    invalid_type_error: "Invalid license type",
+  }),
+  licenseIssueDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format for licenseIssueDate",
+  }),
+  licenseExpiryDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format for licenseExpiryDate",
+  }),
+  status: z.nativeEnum(VerificationStatus).optional(),
+});
+
 const idParamSchema = z.object({
   id: z.string().cuid({ message: "Invalid DriverVerification ID format" }),
 });
@@ -52,6 +70,12 @@ const listDriverVerifsQuerySchema = z.object({
   ]).default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
+const updateDriverVerificationByAdminSchema = createDriverVerificationByAdminSchema
+  .partial()
+  .extend({
+    licenseNumber: z.string().min(1).optional(),
+    userId: z.string().cuid().optional(),
+  });
 
 module.exports = {
   idParamSchema,
@@ -59,4 +83,6 @@ module.exports = {
   updateDriverVerificationSchema,
   updateVerificationStatusSchema,
   listDriverVerifsQuerySchema,
+  updateDriverVerificationByAdminSchema,
+  createDriverVerificationByAdminSchema,
 };
