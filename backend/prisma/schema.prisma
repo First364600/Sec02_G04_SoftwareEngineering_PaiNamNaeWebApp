@@ -160,6 +160,9 @@ model Route {
   pricePerSeat    Float
   conditions      String?
   status          RouteStatus @default(AVAILABLE)
+  routePolyline String?
+  distanceMeters Int?
+  durationSeconds Int?
   routeSummary    String?
   distance        String?
   duration        String?
