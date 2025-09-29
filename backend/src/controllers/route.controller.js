@@ -3,6 +3,7 @@ const routeService = require("../services/route.service");
 const vehicleService = require("../services/vehicle.service");
 const ApiError = require("../utils/ApiError");
 const verifService = require("../services/driverVerification.service");
+const { getDirections } = require("../utils/googleMaps");
 
 const getAllRoutes = asyncHandler(async (req, res) => {
   const routes = await routeService.getAllRoutes();
@@ -76,6 +77,43 @@ const createRoute = asyncHandler(async (req, res) => {
     departureTime: new Date(routeFields.departureTime),
   };
 
+  // ===== Enrich จาก Google Directions =====
+  const directions = await getDirections({
+    origin: payload.startLocation,
+    destination: payload.endLocation,
+    alternatives: false,
+    departureTime: payload.departureTime.toISOString()
+  });
+
+  const primary = directions.routes?.[0];
+  const leg = primary?.legs?.[0];
+
+  if (primary && leg) {
+    payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+    // text (เก็บเพื่อแสดงผล legacy)
+    payload.distance = leg.distance?.text || null;
+    payload.duration = leg.duration?.text || null;
+    // raw (ใหม่)
+    payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+    payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
+    // polyline
+    payload.routePolyline = primary.overview_polyline?.points || null;
+
+    payload.steps = leg.steps?.map(s => ({
+      html_instructions: s.html_instructions,
+      distance: s.distance?.text,
+      duration: s.duration?.text,
+      start_location: s.start_location,
+      end_location: s.end_location,
+      travel_mode: s.travel_mode,
+      maneuver: s.maneuver || null,
+    })) || [];
+
+    payload.waypoints = primary.waypoint_order || [];
+    // (ถ้าจะคง landmarks เดิมไว้ก็ได้)
+    payload.landmarks = { overview_polyline: payload.routePolyline };
+  }
+
   const newRoute = await routeService.createRoute(payload);
   res.status(201).json({
     success: true,
@@ -110,6 +148,50 @@ const updateRoute = asyncHandler(async (req, res) => {
       departureTime: new Date(routeFields.departureTime),
     }),
   };
+
+  // ===== รีเฟรชข้อมูล Directions เฉพาะเมื่อจุดสำคัญเปลี่ยน =====
+  const startChanged = routeFields.startLocation !== undefined &&
+    JSON.stringify(routeFields.startLocation) !== JSON.stringify(existing.startLocation);
+  const endChanged = routeFields.endLocation !== undefined &&
+    JSON.stringify(routeFields.endLocation) !== JSON.stringify(existing.endLocation);
+  const timeChanged = routeFields.departureTime !== undefined;
+
+  if (startChanged || endChanged || timeChanged) {
+    const origin = payload.startLocation ?? existing.startLocation;
+    const destination = payload.endLocation ?? existing.endLocation;
+    const depTime = (payload.departureTime ?? existing.departureTime).toISOString();
+
+    const directions = await getDirections({
+      origin,
+      destination,
+      alternatives: false,
+      departureTime: depTime
+    });
+
+    const primary = directions.routes?.[0];
+    const leg = primary?.legs?.[0];
+
+    if (primary && leg) {
+      payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+      payload.distance = leg.distance?.text || null;
+      payload.duration = leg.duration?.text || null;
+      payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+      payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
+      payload.routePolyline = primary.overview_polyline?.points || null;
+
+      payload.steps = leg.steps?.map(s => ({
+        html_instructions: s.html_instructions,
+        distance: s.distance?.text,
+        duration: s.duration?.text,
+        start_location: s.start_location,
+        end_location: s.end_location,
+        travel_mode: s.travel_mode,
+        maneuver: s.maneuver || null,
+      })) || [];
+      payload.waypoints = primary.waypoint_order || [];
+      payload.landmarks = { overview_polyline: payload.routePolyline };
+    }
+  }
 
   const updated = await routeService.updateRoute(id, payload);
   res.status(200).json({
@@ -155,6 +237,38 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
     departureTime: new Date(routeFields.departureTime),
   };
 
+  // Enrich แบบเดียวกับ createRoute
+  const directions = await getDirections({
+    origin: payload.startLocation,
+    destination: payload.endLocation,
+    alternatives: false,
+    departureTime: payload.departureTime.toISOString()
+  });
+
+  const primary = directions.routes?.[0];
+  const leg = primary?.legs?.[0];
+
+  if (primary && leg) {
+    payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+    payload.distance = leg.distance?.text || null;
+    payload.duration = leg.duration?.text || null;
+    payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+    payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
+    payload.routePolyline = primary.overview_polyline?.points || null;
+
+    payload.steps = leg.steps?.map(s => ({
+      html_instructions: s.html_instructions,
+      distance: s.distance?.text,
+      duration: s.duration?.text,
+      start_location: s.start_location,
+      end_location: s.end_location,
+      travel_mode: s.travel_mode,
+      maneuver: s.maneuver || null,
+    })) || [];
+    payload.waypoints = primary.waypoint_order || [];
+    payload.landmarks = { overview_polyline: payload.routePolyline };
+  }
+
   const newRoute = await routeService.createRoute(payload);
   res.status(201).json({
     success: true,
@@ -195,6 +309,58 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
       departureTime: new Date(routeFields.departureTime),
     }),
   };
+
+  // ===== รีคอมพิวต์ Directions ถ้า origin/destination/เวลาออกเดินทาง เปลี่ยน =====
+  const startChanged = routeFields.startLocation !== undefined &&
+    JSON.stringify(routeFields.startLocation) !== JSON.stringify(existing.startLocation);
+  const endChanged = routeFields.endLocation !== undefined &&
+    JSON.stringify(routeFields.endLocation) !== JSON.stringify(existing.endLocation);
+  const timeChanged = routeFields.departureTime !== undefined;
+
+  if (startChanged || endChanged || timeChanged) {
+    const origin = payload.startLocation ?? existing.startLocation;
+    const destination = payload.endLocation ?? existing.endLocation;
+    const depTime = (payload.departureTime ?? existing.departureTime).toISOString();
+
+    const directions = await getDirections({
+      origin,
+      destination,
+      alternatives: false,
+      departureTime: depTime
+    });
+
+    const primary = directions.routes?.[0];
+    const leg = primary?.legs?.[0];
+
+    if (primary && leg) {
+      payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+
+      // แสดงผลแบบข้อความ (คงไว้)
+      payload.distance = leg.distance?.text || null;
+      payload.duration = leg.duration?.text || null;
+
+      // หน่วยดิบใหม่
+      payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+      payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
+
+      // polyline หลัก
+      payload.routePolyline = primary.overview_polyline?.points || null;
+
+      // steps/waypoints
+      payload.steps = leg.steps?.map(s => ({
+        html_instructions: s.html_instructions,
+        distance: s.distance?.text,
+        duration: s.duration?.text,
+        start_location: s.start_location,
+        end_location: s.end_location,
+        travel_mode: s.travel_mode,
+        maneuver: s.maneuver || null,
+      })) || [];
+
+      payload.waypoints = primary.waypoint_order || [];
+      payload.landmarks = { overview_polyline: payload.routePolyline };
+    }
+  }
 
   const updated = await routeService.updateRoute(id, payload);
   res.status(200).json({
