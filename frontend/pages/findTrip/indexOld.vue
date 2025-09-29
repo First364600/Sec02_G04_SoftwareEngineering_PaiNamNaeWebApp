@@ -60,10 +60,8 @@
                                     <div class="flex-1">
                                         <div class="flex items-start justify-between">
                                             <div>
-
-                                                <h3 class="font-semibold text-gray-900">
-                                                    {{ route.originName }} → {{ route.destinationName }}
-                                                </h3>
+                                                <!-- <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4> -->
+                                                <!-- <h3 class="font-semibold text-gray-900">จาก Lat: 16.39, Lng: 102.83 → ถึง Lat: 13.76, Lng: 100.50</h3> -->
                                                 <div class="flex items-center">
                                                     <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4>
 
@@ -104,12 +102,8 @@
                                                 <span class="ml-1">{{ route.departureTime }}</span>
                                                 <span class="mx-2 text-gray-300">|</span>
                                                 <span class="font-medium">ระยะเวลา:</span>
-                                                <span class="ml-1">{{ route.durationText }}</span>
-                                                <span class="mx-2 text-gray-300">|</span>
-                                                <span class="font-medium">ระยะทาง:</span>
-                                                <span class="ml-1">{{ route.distanceText }}</span>
+                                                <span class="ml-1">{{ route.duration }}</span>
                                             </div>
-
                                             <div class="flex items-center mt-2 text-sm text-gray-600">
                                                 <span :class="[
                                                     'px-2 py-1 rounded-full text-xs font-medium',
@@ -331,26 +325,24 @@ dayjs.extend(buddhistEra)
 const { $api } = useNuxtApp()
 const { toast } = useToast();
 const { token } = useAuth();
-const config = useRuntimeConfig()
-const GMAPS_CB = '__gmapsReady__'
-
-const headScripts = []
-if (process.client && !window.google?.maps) {
-    headScripts.push({
-        key: 'gmaps',                        // ทำให้ Nuxt dedupe
-        src: `https://maps.googleapis.com/maps/api/js?key=${config.public.googleMapsApiKey}&libraries=places,geometry&callback=${GMAPS_CB}`,
-        async: true,
-        defer: true
-    })
-}
 
 useHead({
     title: 'ค้นหาเส้นทาง - Car Pool',
     link: [
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap' },
-        // { rel: 'stylesheet', href: 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css' }
+        { rel: 'stylesheet', href: 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css' }
     ],
-    script: headScripts
+    script: [
+        {
+            src: 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
+            defer: true,
+            onload: () => {
+                nextTick(() => {
+                    initializeMap()
+                })
+            }
+        }
+    ]
 })
 
 const searchForm = ref({
@@ -365,12 +357,7 @@ const selectedRoute = ref(null)
 const isLoading = ref(false)
 
 const mapContainer = ref(null)
-let gmap = null               // แผนที่ของ Google
-let activePolyline = null     // เส้นทางที่กำลังแสดงอยู่
-let startMarker = null
-let endMarker = null
-let geocoder = null
-const mapReady = ref(false)
+let map = null
 
 const showModal = ref(false)
 const bookingRoute = ref(null)
@@ -388,157 +375,70 @@ async function handleSearch() {
     selectedRoute.value = null
 
     try {
-        const apiRes = await $api('/routes')
-        const raw = (apiRes?.data || apiRes || []).filter(r => r.status === 'AVAILABLE')
-
-        // map ข้อมูลฐาน
-        routes.value = raw.map(route => ({
-            id: route.id,
-            availableSeats: route.availableSeats,
-            price: route.pricePerSeat,
-            departureTime: dayjs(route.departureTime).format('HH:mm น.'),
-            date: dayjs(route.departureTime).format('D MMMM BBBB'),
-            start: route.startLocation,
-            end: route.endLocation,
-            // ตั้งชื่อเริ่มต้นเป็นพิกัดไว้ก่อน (กันหน้ากระพริบ)
-            originName: `(${route.startLocation.lat.toFixed(2)}, ${route.startLocation.lng.toFixed(2)})`,
-            destinationName: `(${route.endLocation.lat.toFixed(2)}, ${route.endLocation.lng.toFixed(2)})`,
-            driver: {
-                name: `${route.driver?.firstName || ''} ${route.driver?.lastName || ''}`.trim() || 'ไม่ระบุชื่อ',
-                image: route.driver?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(route.driver?.firstName || 'U')}&background=random&size=64`,
-                rating: 4.5,
-                reviews: Math.floor(Math.random() * 50) + 5,
-                isVerified: !!route.driver?.isVerified
-            },
-            carDetails: route.vehicle
-                ? [`${route.vehicle.vehicleModel} (${route.vehicle.vehicleType})`, ...(route.vehicle.amenities || [])]
-                : ['ไม่มีข้อมูลรถ'],
-            conditions: route.conditions,
-            photos: route.vehicle?.photos || [],
-            durationText: route.duration || '-',    // ใช้ค่าจาก backend ที่ส่งมาแล้ว (เช่น "9 ชั่วโมง 10 นาที")
-            distanceText: route.distance || '-',    // เช่น "687 กม."
-            polyline: route.routePolyline || null,
-        }))
-
-        // รอให้ geocoder พร้อมก่อนค่อยทำ reverse geocode
-        await waitMapReady()
-
-        const jobs = routes.value.map(async (r, i) => {
-            const [o, d] = await Promise.all([
-                reverseGeocode(r.start.lat, r.start.lng),
-                reverseGeocode(r.end.lat, r.end.lng)
-            ])
-            // แปลงให้อ่านง่าย
-            routes.value[i].originName = formatShortAddress(o) || routes.value[i].originName
-            routes.value[i].destinationName = formatShortAddress(d) || routes.value[i].destinationName
+        const apiResponse = await $api('/routes', {
+            // params: searchForm.value 
         })
-        // ไม่จำเป็นต้อง await ตรงนี้ก็ได้ ถ้าอยากให้เด้งชื่อทีหลัง
-        await Promise.allSettled(jobs)
 
-    } catch (e) {
-        console.error('Failed to fetch routes:', e)
+        const formattedRoutes = apiResponse
+            .filter(route => route.status === 'AVAILABLE')
+            .map(route => {
+
+                const driverData = {
+                    name: `${route.driver.firstName} ${route.driver.lastName}`,
+                    image: route.driver.profilePicture || `https://ui-avatars.com/api/?name=${route.driver.firstName}&background=random&size=64`,
+                    rating: 4.5,
+                    reviews: Math.floor(Math.random() * 50) + 5,
+                    isVerified: route.driver.isVerified
+                };
+
+                const carDetailsList = [];
+                if (route.vehicle) {
+                    carDetailsList.push(`${route.vehicle.vehicleModel} (${route.vehicle.vehicleType})`);
+                    if (route.vehicle.amenities && route.vehicle.amenities.length > 0) {
+                        carDetailsList.push(...route.vehicle.amenities);
+                    }
+                } else {
+                    carDetailsList.push('ไม่มีข้อมูลรถ');
+                }
+
+                return {
+                    id: route.id,
+                    availableSeats: route.availableSeats,
+                    price: route.pricePerSeat,
+                    departureTime: dayjs(route.departureTime).format('HH:mm น.'),
+                    date: dayjs(route.departureTime).format('D MMMM BBBB'),
+                    origin: `จาก Lat: ${route.startLocation.lat.toFixed(2)}, Lng: ${route.startLocation.lng.toFixed(2)}`,
+                    destination: `ถึง Lat: ${route.endLocation.lat.toFixed(2)}, Lng: ${route.endLocation.lng.toFixed(2)}`,
+                    driver: driverData,
+                    carDetails: carDetailsList,
+                    conditions: route.conditions,
+                    photos: route.vehicle?.photos,
+                    stops: ['จุดแวะพัก (รอข้อมูล)'],
+                    duration: route.duration || 'ประมาณ 8 ชั่วโมง',
+                    coordinates: [
+                        [route.startLocation.lat, route.startLocation.lng],
+                        [route.endLocation.lat, route.endLocation.lng]
+                    ]
+                }
+            })
+
+        routes.value = formattedRoutes
+
+    } catch (error) {
+        console.error("Failed to fetch routes:", error)
         routes.value = []
     } finally {
         isLoading.value = false
     }
 }
 
-function reverseGeocode(lat, lng) {
-    return new Promise((resolve) => {
-        if (!geocoder) return resolve(null)
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status !== 'OK' || !results?.length) return resolve(null)
-            resolve(results[0]) // << คืน object เพื่อให้ formatShortAddress ใช้ address_components ได้
-        })
-    })
-}
-
+// [UPDATED] Removed the call to updateMapForRoute
 const toggleDetails = (route) => {
     if (selectedRoute.value && selectedRoute.value.id === route.id) {
         selectedRoute.value = null
-        clearMapDrawing()
     } else {
         selectedRoute.value = route
-        updateMapForRoute(route)
-    }
-}
-
-function waitMapReady() {
-    return new Promise((resolve) => {
-        if (mapReady.value) return resolve(true)
-        const t = setInterval(() => {
-            if (mapReady.value) {
-                clearInterval(t)
-                resolve(true)
-            }
-        }, 50)
-    })
-}
-
-function formatShortAddress(geocodeResult) {
-    if (!geocodeResult) return null
-    // ลองหยิบ locality / sublocality (ตำบล/เขต) + administrative_area_level_1 (จังหวัด)
-    const comps = geocodeResult.address_components || []
-    const byType = (t) => comps.find(c => c.types.includes(t))?.long_name
-
-    const locality =
-        byType('sublocality') ||
-        byType('locality') ||
-        byType('administrative_area_level_2') // อำเภอ/เขต
-
-    const province = byType('administrative_area_level_1') // จังหวัด
-
-    if (locality && province) return `${locality}, ${province}`
-    if (province) return province
-    // fallback เป็น formatted_address (สั้นสุดเท่าที่ได้)
-    return geocodeResult.formatted_address || null
-}
-
-function clearMapDrawing() {
-    if (activePolyline) { activePolyline.setMap(null); activePolyline = null }
-    if (startMarker) { startMarker.setMap(null); startMarker = null }
-    if (endMarker) { endMarker.setMap(null); endMarker = null }
-}
-
-async function updateMapForRoute(route) {
-    if (!route) return
-    // รอให้ Map พร้อมแน่ๆ
-    await waitMapReady()
-    if (!gmap || !(gmap instanceof google.maps.Map)) return
-
-    clearMapDrawing()
-
-    // วางหมุด
-    startMarker = new google.maps.Marker({
-        position: { lat: route.start.lat, lng: route.start.lng },
-        map: gmap, label: 'A'
-    })
-    endMarker = new google.maps.Marker({
-        position: { lat: route.end.lat, lng: route.end.lng },
-        map: gmap, label: 'B'
-    })
-
-    // วาดเส้นจาก polyline ถ้ามี
-    if (route.polyline && google.maps.geometry?.encoding) {
-        const path = google.maps.geometry.encoding.decodePath(route.polyline)
-        activePolyline = new google.maps.Polyline({
-            path, map: gmap, strokeColor: '#2563eb', strokeOpacity: 0.9, strokeWeight: 5,
-        })
-        const bounds = new google.maps.LatLngBounds()
-        path.forEach(p => bounds.extend(p))
-        gmap.fitBounds(bounds) // << ตัด arg ที่ 2 ออก ป้องกัน overload เพี้ยน
-    } else {
-        // ไม่มี polyline: fit จาก A-B
-        const sw = new google.maps.LatLng(
-            Math.min(route.start.lat, route.end.lat),
-            Math.min(route.start.lng, route.end.lng)
-        )
-        const ne = new google.maps.LatLng(
-            Math.max(route.start.lat, route.end.lat),
-            Math.max(route.start.lng, route.end.lng)
-        )
-        const bounds = new google.maps.LatLngBounds(sw, ne)
-        gmap.fitBounds(bounds) // << ไม่ส่ง padding
+        // updateMapForRoute(route) // <-- We don't call this anymore
     }
 }
 
@@ -614,35 +514,24 @@ async function confirmBooking() {
 }
 
 const initializeMap = () => {
-    if (!mapContainer.value || gmap) return
-    gmap = new google.maps.Map(mapContainer.value, {
-        center: { lat: 13.7563, lng: 100.5018 },
-        zoom: 6,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: true,
-    })
-    geocoder = new google.maps.Geocoder()
-    mapReady.value = true
+    if (typeof L === 'undefined' || !mapContainer.value || map) return
+
+    try {
+        map = L.map(mapContainer.value).setView([13.7563, 100.5018], 6) // Centered on Bangkok, zoomed out
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map)
+    } catch (error) {
+        console.error('Error initializing map:', error)
+    }
 }
 
 onMounted(() => {
-    // โหลดเสร็จแล้วในหน้านี้อยู่แล้ว
-    if (window.google?.maps) {
-        initializeMap()
-        handleSearch()
-        return
+    if (window.L) {
+        initializeMap();
     }
-
-    // ยังไม่เสร็จ: รอ callback จากสคริปต์
-    window[GMAPS_CB] = () => {
-        try {
-            delete window[GMAPS_CB]
-        } catch { }
-        initializeMap()
-        handleSearch()
-    }
-})
+    handleSearch();
+});
 </script>
 
 <style scoped>
