@@ -11,7 +11,7 @@ const createUserSchema = z.object({
     gender: z.string().min(1, "gender is require"), // หรือ z.enum(['MALE', 'FEMALE'])
     nationalIdNumber: z.string().length(13, "nationalIdNumber must be 13 digits"),
     nationalIdExpiryDate: z.string().datetime({ message: "Invalid date format for nationalIdExpiryDate" }),
-    // role: z.nativeEnum(Role).optional()
+    role: z.nativeEnum(Role).optional()
 })
 
 const idParamSchema = z.object({
