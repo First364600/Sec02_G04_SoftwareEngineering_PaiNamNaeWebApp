@@ -308,6 +308,7 @@ const user = ref(null)
 const FIXED_TYPE = 'VERIFICATION'
 const FIXED_TITLE = 'ยืนยันตัวตนไม่สำเร็จ'
 const FIXED_LINK = '/profile/verification'
+const FIXED_initiatedBy = 'system'
 
 const sending = ref(false)
 const presetKey = ref('')
@@ -357,6 +358,7 @@ async function sendNotification() {
             metadata: {
                 kind: 'user_verification',
                 userId: user.value.id,
+                initiatedBy: FIXED_initiatedBy,
             },
         }
 
