@@ -26,6 +26,15 @@ router.get(
   vehicleController.adminListVehicles
 );
 
+// GET /api/vehicles/admin/:id
+router.get(
+  '/admin/:id',
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  vehicleController.getVehicleByIdadmin
+);
+
 // GET /api/vehicles/admin/user/:userId
 router.get(
   '/admin/user/:userId',

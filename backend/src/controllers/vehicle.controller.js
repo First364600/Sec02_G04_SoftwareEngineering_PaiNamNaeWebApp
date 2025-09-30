@@ -41,6 +41,22 @@ const getVehicleById = asyncHandler(async (req, res) => {
   });
 });
 
+const getVehicleByIdadmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const vehicle = await vehicleService.getVehicleByIdAdmin(id);
+
+  if (!vehicle) {
+    throw new ApiError(404, "Vehicle not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Vehicle retrieved successfully.",
+    data: vehicle,
+  });
+});
+
+
 const createVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const payload = { ...req.body };
@@ -198,4 +214,5 @@ module.exports = {
   adminDeleteVehicle,
   adminListVehiclesByUser,
   adminListVehicles,
+  getVehicleByIdadmin,
 };
