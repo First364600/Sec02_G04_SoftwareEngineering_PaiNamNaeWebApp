@@ -903,32 +903,19 @@ function setPickerMarker(latlng) {
 
 async function resolvePicked(latlng) {
     const lat = latlng.lat(), lng = latlng.lng()
-
-    // 1) reverse geocode หาที่อยู่ก่อน
-    const geocodeRes = await new Promise((resolve) => {
+    // ใช้ Geocoding API ผ่าน geocoder ที่มีอยู่แล้ว
+    const res = await new Promise((resolve) => {
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
             if (status === 'OK' && results?.length) resolve(results[0])
             else resolve(null)
         })
     })
-
+    // ใช้ logic เดิมให้ได้ "ชื่อสั้น" + เก็บ meta
     let name = ''
-    if (geocodeRes) {
-        const parts = await extractNameParts(geocodeRes)
-        name = parts.name || '' // พยายามใช้ชื่อสั้นตาม logic เดิมก่อน
+    if (res) {
+        const parts = await extractNameParts(res)
+        name = parts.name || res.formatted_address || ''
     }
-
-    // 2) ถ้าได้เป็น Plus Code หรือยังว่าง ให้ลองหา POI ใกล้เคียงมาใช้ชื่อแทน
-    if (!name || isPlusCode(name)) {
-        const poi = await findNearestPoi(lat, lng, 120)
-        if (poi?.name) {
-            name = poi.name
-        } else if (geocodeRes?.formatted_address) {
-            // fallback สุดท้าย: ใช้ formatted_address (ตัด "Thailand/ไทย" ออก)
-            name = geocodeRes.formatted_address.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-        }
-    }
-
     pickedPlace.value = { name, lat, lng }
 }
 
@@ -949,35 +936,13 @@ function applyPickedPlace() {
     }
     closePlacePicker()
 }
+
 function closePlacePicker() {
     showPlacePicker.value = false
     pickingField.value = null
     // cleanup marker/map reference (ตัว DOM จะถูกทิ้งเมื่อ modal ปิด)
     placePickerMarker = null
     placePickerMap = null
-}
-
-function isPlusCode(text) {
-    if (!text) return false
-    // ครอบคลุมรูปแบบมาตรฐาน เช่น "FRGG+799" หรือ "FRGG+799, Khon Kaen"
-    return /^[A-Z0-9]{4,}\+[A-Z0-9]{2,}/i.test(text.trim())
-}
-
-// helper: หา POI ที่ใกล้ที่สุดจากพิกัด เพื่อเอาชื่อมาใช้
-function findNearestPoi(lat, lng, radius = 100) {
-    return new Promise((resolve) => {
-        if (!placesService) return resolve(null)
-        placesService.nearbySearch(
-            { location: { lat, lng }, radius }, // ใช้ radius เล็ก ๆ ให้ได้ชื่อที่เกี่ยวข้องจริง
-            (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-                    resolve(results[0])   // เอาตัวที่ใกล้ที่สุด
-                } else {
-                    resolve(null)
-                }
-            }
-        )
-    })
 }
 
 onMounted(() => {

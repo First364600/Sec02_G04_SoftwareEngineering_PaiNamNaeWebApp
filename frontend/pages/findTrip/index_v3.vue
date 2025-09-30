@@ -4,42 +4,16 @@
             <div class="p-6 mb-8 bg-white border border-gray-300 rounded-lg shadow-md">
                 <h2 class="mb-6 text-xl font-semibold text-gray-900">ค้นหาการเดินทาง</h2>
                 <form @submit.prevent="handleSearch" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
-                    <!-- จุดเริ่มต้น -->
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">จุดเริ่มต้น</label>
-                        <div class="relative">
-                            <input ref="originInputEl" v-model="searchForm.origin" type="text"
-                                placeholder="เช่น กรุงเทพฯ"
-                                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <!-- ไอคอนปักหมุด -->
-                            <button type="button" @click="openPlacePicker('origin')"
-                                class="absolute inset-y-0 my-auto text-gray-500 right-2 hover:text-blue-600"
-                                title="เลือกจากแผนที่">
-                                <!-- pin icon -->
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path
-                                        d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-                                </svg>
-                            </button>
-                        </div>
+                        <input ref="originInputEl" v-model="searchForm.origin" type="text" placeholder="เช่น กรุงเทพฯ"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
-                    <!-- จุดปลายทาง -->
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">จุดปลายทาง</label>
-                        <div class="relative">
-                            <input ref="destinationInputEl" v-model="searchForm.destination" type="text"
-                                placeholder="เช่น เชียงใหม่"
-                                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <!-- ไอคอนปักหมุด -->
-                            <button type="button" @click="openPlacePicker('destination')"
-                                class="absolute inset-y-0 my-auto text-gray-500 right-2 hover:text-blue-600"
-                                title="เลือกจากแผนที่">
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path
-                                        d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-                                </svg>
-                            </button>
-                        </div>
+                        <input ref="destinationInputEl" v-model="searchForm.destination" type="text"
+                            placeholder="เช่น เชียงใหม่"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-700">วันที่</label>
@@ -157,7 +131,7 @@
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
                                             <ul class="space-y-1 text-sm text-gray-600">
                                                 <li v-if="route.originArea">• จุดเริ่มต้น (พื้นที่): {{ route.originArea
-                                                    }}</li>
+                                                }}</li>
                                                 <li v-if="route.destinationArea">• จุดปลายทาง (พื้นที่): {{
                                                     route.destinationArea }}</li>
                                                 <li v-for="stop in route.stops" :key="stop">• {{ stop }}</li>
@@ -347,46 +321,8 @@
                 </div>
             </div>
         </transition>
-        <!-- Map Picker Modal -->
-        <transition name="modal-fade">
-            <div v-if="showPlacePicker" class="modal-overlay" @click.self="closePlacePicker">
-                <div class="modal-content">
-                    <div class="flex items-center justify-between p-4 border-b border-gray-300">
-                        <h3 class="text-lg font-semibold text-gray-900">เลือก{{ pickingField === 'origin' ?
-                            'จุดเริ่มต้น' : 'จุดปลายทาง' }}</h3>
-                        <button @click="closePlacePicker" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="p-4 space-y-3">
-                        <div ref="placePickerMapEl" class="w-full border border-gray-200 rounded-md h-80"></div>
-                        <div class="text-sm text-gray-700">
-                            <div class="font-medium">ตำแหน่งที่เลือก:</div>
-                            <div class="truncate">{{ pickedPlace.name || '— ยังไม่เลือก —' }}</div>
-                            <div v-if="pickedPlace.lat && pickedPlace.lng" class="text-gray-500">
-                                lat: {{ pickedPlace.lat.toFixed(6) }}, lng: {{ pickedPlace.lng.toFixed(6) }}
-                            </div>
-                        </div>
-                        <div class="flex gap-3 pt-2">
-                            <button @click="closePlacePicker"
-                                class="flex-1 px-4 py-2 font-semibold text-gray-800 bg-gray-200 rounded-md hover:bg-gray-300">
-                                ยกเลิก
-                            </button>
-                            <button :disabled="!pickedPlace.name" @click="applyPickedPlace"
-                                class="flex-1 px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                                ใช้ตำแหน่งนี้
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </transition>
     </div>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
@@ -411,14 +347,6 @@ const originInputEl = ref(null)
 const destinationInputEl = ref(null)
 let originAutocomplete = null
 let destinationAutocomplete = null
-
-// --- สำหรับ Map Picker ---
-const showPlacePicker = ref(false)
-const pickingField = ref(/** @type {'origin'|'destination'|null} */(null))
-const placePickerMapEl = ref(null)
-let placePickerMap = null
-let placePickerMarker = null
-const pickedPlace = ref({ name: '', lat: null, lng: null })
 
 const headScripts = []
 if (process.client && !window.google?.maps) {
@@ -859,124 +787,6 @@ function initAutocomplete() {
             lat: p.geometry?.location?.lat?.() ?? null,
             lng: p.geometry?.location?.lng?.() ?? null,
         }
-    })
-}
-
-function openPlacePicker(field) {
-    pickingField.value = field // 'origin' | 'destination'
-    pickedPlace.value = { name: '', lat: null, lng: null }
-    showPlacePicker.value = true
-
-    nextTick(() => {
-        // สร้างแผนที่ใน modal
-        const fallbackCenter = { lat: 13.7563, lng: 100.5018 } // กรุงเทพฯ
-        // ถ้ามี meta เก่า ให้ซูมไปตำแหน่งนั้น
-        const meta = field === 'origin' ? searchForm.value._originMeta : searchForm.value._destinationMeta
-        const center = (meta?.lat && meta?.lng) ? { lat: meta.lat, lng: meta.lng } : fallbackCenter
-
-        placePickerMap = new google.maps.Map(placePickerMapEl.value, {
-            center, zoom: meta?.lat ? 14 : 6,
-            mapTypeControl: false, streetViewControl: false, fullscreenControl: false
-        })
-
-        // คลิกเพื่อปักหมุด
-        placePickerMap.addListener('click', (e) => {
-            const pos = e.latLng
-            setPickerMarker(pos)
-            resolvePicked(pos)
-        })
-    })
-}
-
-function setPickerMarker(latlng) {
-    if (placePickerMarker) {
-        placePickerMarker.setPosition(latlng)
-        return
-    }
-    placePickerMarker = new google.maps.Marker({
-        position: latlng, map: placePickerMap, draggable: true
-    })
-    placePickerMarker.addListener('dragend', (e) => {
-        resolvePicked(e.latLng)
-    })
-}
-
-async function resolvePicked(latlng) {
-    const lat = latlng.lat(), lng = latlng.lng()
-
-    // 1) reverse geocode หาที่อยู่ก่อน
-    const geocodeRes = await new Promise((resolve) => {
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status === 'OK' && results?.length) resolve(results[0])
-            else resolve(null)
-        })
-    })
-
-    let name = ''
-    if (geocodeRes) {
-        const parts = await extractNameParts(geocodeRes)
-        name = parts.name || '' // พยายามใช้ชื่อสั้นตาม logic เดิมก่อน
-    }
-
-    // 2) ถ้าได้เป็น Plus Code หรือยังว่าง ให้ลองหา POI ใกล้เคียงมาใช้ชื่อแทน
-    if (!name || isPlusCode(name)) {
-        const poi = await findNearestPoi(lat, lng, 120)
-        if (poi?.name) {
-            name = poi.name
-        } else if (geocodeRes?.formatted_address) {
-            // fallback สุดท้าย: ใช้ formatted_address (ตัด "Thailand/ไทย" ออก)
-            name = geocodeRes.formatted_address.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-        }
-    }
-
-    pickedPlace.value = { name, lat, lng }
-}
-
-function applyPickedPlace() {
-    if (!pickingField.value || !pickedPlace.value.name) return
-    if (pickingField.value === 'origin') {
-        searchForm.value.origin = pickedPlace.value.name
-        searchForm.value._originMeta = {
-            placeId: null, fullAddress: null,
-            lat: pickedPlace.value.lat, lng: pickedPlace.value.lng
-        }
-    } else if (pickingField.value === 'destination') {
-        searchForm.value.destination = pickedPlace.value.name
-        searchForm.value._destinationMeta = {
-            placeId: null, fullAddress: null,
-            lat: pickedPlace.value.lat, lng: pickedPlace.value.lng
-        }
-    }
-    closePlacePicker()
-}
-function closePlacePicker() {
-    showPlacePicker.value = false
-    pickingField.value = null
-    // cleanup marker/map reference (ตัว DOM จะถูกทิ้งเมื่อ modal ปิด)
-    placePickerMarker = null
-    placePickerMap = null
-}
-
-function isPlusCode(text) {
-    if (!text) return false
-    // ครอบคลุมรูปแบบมาตรฐาน เช่น "FRGG+799" หรือ "FRGG+799, Khon Kaen"
-    return /^[A-Z0-9]{4,}\+[A-Z0-9]{2,}/i.test(text.trim())
-}
-
-// helper: หา POI ที่ใกล้ที่สุดจากพิกัด เพื่อเอาชื่อมาใช้
-function findNearestPoi(lat, lng, radius = 100) {
-    return new Promise((resolve) => {
-        if (!placesService) return resolve(null)
-        placesService.nearbySearch(
-            { location: { lat, lng }, radius }, // ใช้ radius เล็ก ๆ ให้ได้ชื่อที่เกี่ยวข้องจริง
-            (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-                    resolve(results[0])   // เอาตัวที่ใกล้ที่สุด
-                } else {
-                    resolve(null)
-                }
-            }
-        )
     })
 }
 
