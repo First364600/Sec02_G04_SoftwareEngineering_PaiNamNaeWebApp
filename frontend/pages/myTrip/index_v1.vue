@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div class="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">การเดินทางของฉัน</h2>
                 <p class="mt-2 text-gray-600">จัดการและติดตามการเดินทางทั้งหมดของคุณ</p>
             </div>
 
-            <div class="p-6 mb-8 bg-white border border-gray-300 rounded-lg shadow-md">
+            <div class="bg-white border border-gray-300 rounded-lg shadow-md p-6 mb-8">
                 <div class="flex flex-wrap gap-2">
                     <button v-for="tab in tabs" :key="tab.status" @click="activeTab = tab.status"
                         :class="['tab-button px-4 py-2 rounded-md font-medium', { 'active': activeTab === tab.status }]">
@@ -15,7 +15,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2">
                     <div class="bg-white border border-gray-300 rounded-lg shadow-md">
                         <div class="p-6 border-b border-gray-300">
@@ -32,13 +32,13 @@
                             </div>
 
                             <div v-for="trip in filteredTrips" :key="trip.id"
-                                class="p-6 transition-colors duration-200 cursor-pointer trip-card hover:bg-gray-50"
+                                class="trip-card p-6 cursor-pointer transition-colors duration-200 hover:bg-gray-50"
                                 @click="toggleTripDetails(trip.id)">
 
                                 <div class="flex items-start justify-between mb-4">
                                     <div class="flex-1">
                                         <div class="flex items-center justify-between">
-                                            <h4 class="text-lg font-semibold text-gray-900">{{ trip.origin }} → {{
+                                            <h4 class="font-semibold text-gray-900 text-lg">{{ trip.origin }} → {{
                                                 trip.destination }}</h4>
                                             <span v-if="trip.status === 'pending'"
                                                 class="status-badge status-pending">รอดำเนินการ</span>
@@ -49,18 +49,18 @@
                                             <span v-else-if="trip.status === 'cancelled'"
                                                 class="status-badge status-cancelled">ยกเลิก</span>
                                         </div>
-                                        <p class="mt-1 text-sm text-gray-600">จุดนัดพบ: {{ trip.pickupPoint }}</p>
+                                        <p class="text-sm text-gray-600 mt-1">จุดนัดพบ: {{ trip.pickupPoint }}</p>
                                         <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex items-center mb-4 space-x-4">
+                                <div class="flex items-center space-x-4 mb-4">
                                     <img :src="trip.driver.image" :alt="trip.driver.name"
-                                        class="object-cover w-12 h-12 rounded-full">
+                                        class="w-12 h-12 rounded-full object-cover">
                                     <div class="flex-1">
                                         <h5 class="font-medium text-gray-900">{{ trip.driver.name }}</h5>
                                         <div class="flex items-center">
-                                            <div class="flex text-sm text-yellow-400">
+                                            <div class="flex text-yellow-400 text-sm">
                                                 <span>{{ '★'.repeat(Math.round(trip.driver.rating)) }}{{ '☆'.repeat(5 -
                                                     Math.round(trip.driver.rating)) }}</span>
                                             </div>
@@ -75,35 +75,35 @@
                                 </div>
 
                                 <div v-if="selectedTripId === trip.id"
-                                    class="pt-4 mt-4 mb-5 duration-300 border-t border-gray-300 animate-in slide-in-from-top">
-                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    class="mt-4 mb-5 pt-4 border-t border-gray-300 animate-in slide-in-from-top duration-300">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
+                                            <h5 class="font-medium text-gray-900 mb-2">รายละเอียดเส้นทาง</h5>
+                                            <ul class="text-sm text-gray-600 space-y-1">
                                                 <li v-for="stop in trip.stops" :key="stop">• {{ stop }}</li>
                                             </ul>
                                         </div>
                                         <div>
-                                            <h5 class="mb-2 font-medium text-gray-900">รายละเอียดรถ</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
+                                            <h5 class="font-medium text-gray-900 mb-2">รายละเอียดรถ</h5>
+                                            <ul class="text-sm text-gray-600 space-y-1">
                                                 <li v-for="detail in trip.carDetails" :key="detail">• {{ detail }}</li>
                                             </ul>
                                         </div>
                                     </div>
                                     <div class="mt-4 space-y-4">
                                         <div v-if="trip.conditions">
-                                            <h5 class="mb-2 font-medium text-gray-900">เงื่อนไขการเดินทาง</h5>
+                                            <h5 class="font-medium text-gray-900 mb-2">เงื่อนไขการเดินทาง</h5>
                                             <p
-                                                class="p-3 text-sm text-gray-700 border border-gray-300 rounded-md bg-gray-50">
+                                                class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-300">
                                                 {{ trip.conditions }}
                                             </p>
                                         </div>
                                         <div v-if="trip.photos && trip.photos.length > 0">
-                                            <h5 class="mb-2 font-medium text-gray-900">รูปภาพรถยนต์</h5>
+                                            <h5 class="font-medium text-gray-900 mb-2">รูปภาพรถยนต์</h5>
                                             <div class="grid grid-cols-3 gap-2 mt-2">
                                                 <div v-for="(photo, index) in trip.photos.slice(0, 3)" :key="index">
                                                     <img :src="photo" alt="Vehicle photo"
-                                                        class="object-cover w-full transition-opacity rounded-lg shadow-sm cursor-pointer aspect-video hover:opacity-90">
+                                                        class="w-full aspect-video object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
                                                 </div>
                                             </div>
                                         </div>
@@ -114,16 +114,16 @@
                                     :class="{ 'mt-4': selectedTripId !== trip.id }">
                                     <button v-if="trip.status === 'pending'"
                                         @click.stop="openConfirmModal(trip, 'cancel')"
-                                        class="px-4 py-2 text-sm text-red-600 transition duration-200 border border-red-300 rounded-md hover:bg-red-50">
+                                        class="px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition duration-200 text-sm">
                                         ยกเลิกการจอง
                                     </button>
                                     <button v-if="trip.status === 'confirmed'"
-                                        class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700">
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 text-sm">
                                         แชทกับผู้ขับ
                                     </button>
                                     <button v-if="['rejected', 'cancelled'].includes(trip.status)"
                                         @click.stop="openConfirmModal(trip, 'delete')"
-                                        class="px-4 py-2 text-sm text-gray-600 transition duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
+                                        class="px-4 py-2 border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 transition duration-200 text-sm">
                                         ลบรายการ
                                     </button>
                                 </div>
@@ -133,10 +133,10 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div class="sticky overflow-hidden bg-white border border-gray-300 rounded-lg shadow-md top-8">
-                        <div class="p-3 border-gray-300">
+                    <div class="bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden sticky top-8">
+                        <div class="p-3  border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
-                            <p class="mt-1 text-sm text-gray-600">{{ selectedTrip ? selectedTrip.origin + ' → ' +
+                            <p class="text-sm text-gray-600 mt-1">{{ selectedTrip ? selectedTrip.origin + ' → ' +
                                 selectedTrip.destination : 'คลิกที่รายการเพื่อดูเส้นทาง' }}</p>
                         </div>
                         <div ref="mapContainer" id="map"></div>
