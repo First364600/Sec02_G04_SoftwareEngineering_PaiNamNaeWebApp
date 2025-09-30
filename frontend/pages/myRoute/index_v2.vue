@@ -51,19 +51,7 @@
                                                 class="status-badge status-cancelled">ยกเลิก</span>
                                         </div>
                                         <p class="mt-1 text-sm text-gray-600">จุดนัดพบ: {{ trip.pickupPoint }}</p>
-                                        <!-- <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
-                                        </p>
-                                        <p class="text-sm text-gray-600">
-                                            ระยะเวลา: {{ trip.durationText }} , ระยะทาง: {{ trip.distanceText }}
-                                        </p> -->
-                                        <p class="text-sm text-gray-600">
-                                            วันที่: {{ trip.date }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            เวลา: {{ trip.time }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            ระยะเวลา: {{ trip.durationText }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            ระยะทาง: {{ trip.distanceText }}
+                                        <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
                                         </p>
                                     </div>
                                 </div>
@@ -117,7 +105,7 @@
                                             <div class="flex text-sm text-yellow-400">
                                                 <span>
                                                     {{ '★'.repeat(Math.round(trip.passenger.rating)) }}{{ '☆'.repeat(5 -
-                                                        Math.round(trip.passenger.rating)) }}
+                                                    Math.round(trip.passenger.rating)) }}
                                                 </span>
                                             </div>
                                             <span class="ml-2 text-sm text-gray-600">
@@ -137,10 +125,6 @@
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
                                             <ul class="space-y-1 text-sm text-gray-600">
-                                                <li v-if="trip.originAddress">• จุดเริ่มต้น (ที่อยู่): {{
-                                                    trip.originAddress }}</li>
-                                                <li v-if="trip.destinationAddress">• จุดปลายทาง (ที่อยู่): {{
-                                                    trip.destinationAddress }}</li>
                                                 <li v-for="stop in trip.stops" :key="stop">• {{ stop }}</li>
                                             </ul>
                                         </div>
@@ -323,10 +307,6 @@ async function fetchMyRoutes() {
                     carDetails: carDetailsList,
                     conditions: r.conditions,
                     photos: r.vehicle?.photos || [],
-                    originAddress: start?.address || null,
-                    destinationAddress: end?.address || null,
-                    durationText: r.duration || (r.durationSeconds ? `${Math.round(r.durationSeconds / 60)} นาที` : '-'),
-                    distanceText: r.distance || (r.distanceMeters ? `${(r.distanceMeters / 1000).toFixed(1)} กม.` : '-'),
                 })
             }
         }
