@@ -218,44 +218,15 @@
         <transition name="modal-fade">
             <div v-if="showModal && bookingRoute" class="modal-overlay" @click.self="closeModal">
                 <div class="modal-content">
-                    <template v-if="!bookingPickingTarget">
-                        <div class="flex items-center justify-between p-6 border-b border-gray-300">
-                            <h3 class="text-xl font-semibold text-gray-900">ยืนยันการจอง</h3>
-                            <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="flex items-center justify-between p-4 border-b border-gray-300">
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                เลือก{{ bookingPickingTarget === 'pickup' ? 'จุดขึ้นรถ' : 'จุดลงรถ' }}
-                            </h3>
-                            <button @click="stopBookingPicker" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="p-0">
-                            <div ref="bookingPickerMapEl" class="w-full" style="height: 72vh;"></div>
-                            <div class="flex items-center justify-between p-4 border-t border-gray-200">
-                                <div class="text-sm text-gray-700 truncate">
-                                    <span class="font-medium">ตำแหน่ง:</span>
-                                    <span class="truncate">{{ bookingPicked.name || '— ยังไม่เลือก —' }}</span>
-                                </div>
-                                <button
-                                    class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                    :disabled="!bookingPicked.name" @click="applyBookingPicked">
-                                    ใช้ตำแหน่งนี้
-                                </button>
-                            </div>
-                        </div>
-                    </template>
+                    <div class="flex items-center justify-between p-6 border-b border-gray-300">
+                        <h3 class="text-xl font-semibold text-gray-900">ยืนยันการจอง</h3>
+                        <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
                     <div class="p-6">
                         <div class="mb-6">
                             <h4 class="mb-3 font-semibold text-gray-900">เดินทางกับ</h4>
@@ -337,35 +308,13 @@
                             </div>
                             <div>
                                 <label class="block mb-2 text-sm font-medium text-gray-700">เลือกจุดขึ้นรถ</label>
-                                <div class="relative">
-                                    <input ref="pickupInputEl" v-model="pickupPoint" type="text"
-                                        placeholder="พิมพ์ชื่อสถานที่..."
-                                        class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                    <button type="button" @click="startBookingPicker('pickup')"
-                                        class="absolute inset-y-0 my-auto text-gray-500 right-2 hover:text-blue-600"
-                                        title="เลือกจากแผนที่">
-                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                                            <path
-                                                d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                <input type="text" v-model="pickupPoint" placeholder="กรอกเพื่อค้นหาจุดขึ้นรถ..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
                             <div>
                                 <label class="block mb-2 text-sm font-medium text-gray-700">เลือกจุดลงรถ</label>
-                                <div class="relative">
-                                    <input ref="dropoffInputEl" v-model="dropoffPoint" type="text"
-                                        placeholder="พิมพ์ชื่อสถานที่..."
-                                        class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                                    <button type="button" @click="startBookingPicker('dropoff')"
-                                        class="absolute inset-y-0 my-auto text-gray-500 right-2 hover:text-blue-600"
-                                        title="เลือกจากแผนที่">
-                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                                            <path
-                                                d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                <input type="text" v-model="dropoffPoint" placeholder="กรอกเพื่อค้นหาจุดลงรถ..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                             </div>
                         </div>
                         <div class="p-4 mb-6 rounded-lg bg-blue-50">
@@ -456,23 +405,6 @@ const { toast } = useToast();
 const { token } = useAuth();
 const config = useRuntimeConfig()
 const GMAPS_CB = '__gmapsReady__'
-
-// --- Booking modal: Autocomplete + Picker ---
-const pickupInputEl = ref(null)
-const dropoffInputEl = ref(null)
-let pickupAutocomplete = null
-let dropoffAutocomplete = null
-
-// โครงสร้างเต็มที่จะส่งให้ API
-const pickupData = ref({ lat: null, lng: null, placeId: null, address: null, name: null })
-const dropoffData = ref({ lat: null, lng: null, placeId: null, address: null, name: null })
-
-// โหมดปักหมุดใน modal เดิม
-const bookingPickingTarget = ref(/** @type {'pickup'|'dropoff'|null} */(null))
-const bookingPickerMapEl = ref(null)
-let bookingPickerMap = null
-let bookingPickerMarker = null
-const bookingPicked = ref({ name: '', lat: null, lng: null, placeId: null, address: null })
 
 // ---- NEW: refs & state สำหรับ Autocomplete ----
 const originInputEl = ref(null)
@@ -803,17 +735,13 @@ function openModal(route) {
     if (!token.value) {
         return navigateTo('/login');
     }
+
     if (route && route.availableSeats > 0) {
         bookingRoute.value = route
         bookingSeats.value = 1
         pickupPoint.value = ''
         dropoffPoint.value = ''
-        pickupData.value = { lat: null, lng: null, placeId: null, address: null, name: null }
-        dropoffData.value = { lat: null, lng: null, placeId: null, address: null, name: null }
-        bookingPickingTarget.value = null
         showModal.value = true
-
-        nextTick(() => initBookingAutocomplete())
     }
 }
 
@@ -827,36 +755,50 @@ function closeModal() {
 async function confirmBooking() {
     if (!bookingRoute.value) return;
 
-    // ถ้าผู้ใช้พิมพ์เองแต่ยังไม่มีพิกัด ให้ geocode จากข้อความ
-    if (pickupPoint.value && !pickupData.value.lat) {
-        const g1 = await geocodeText(pickupPoint.value)
-        if (g1) pickupData.value = g1
-    }
-    if (dropoffPoint.value && !dropoffData.value.lat) {
-        const g2 = await geocodeText(dropoffPoint.value)
-        if (g2) dropoffData.value = g2
-    }
-
-    if (!pickupData.value.lat || !dropoffData.value.lat) {
-        toast.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกจุดขึ้นรถและจุดลงรถจากรายการหรือปักหมุดบนแผนที่');
+    if (!pickupPoint.value.trim() || !dropoffPoint.value.trim()) {
+        toast.warning('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลจุดรับและจุดส่งให้ครบถ้วน');
         return;
     }
 
     const payload = {
         routeId: bookingRoute.value.id,
         numberOfSeats: bookingSeats.value,
-        pickupLocation: pickupData.value,
-        dropoffLocation: dropoffData.value
+        pickupLocation: {
+            name: pickupPoint.value,
+            lat: 16.432, // TODO: Replace with actual Lat
+            lng: 102.833  // TODO: Replace with actual Lng
+        },
+        dropoffLocation: {
+            name: dropoffPoint.value,
+            lat: 16.456, // TODO: Replace with actual Lat
+            lng: 102.876  // TODO: Replace with actual Lng
+        }
     };
 
     try {
-        await $api('/bookings', { method: 'POST', body: payload });
+        await $api('/bookings', {
+            method: 'POST',
+            body: payload
+        });
+
         closeModal();
-        toast.success('ส่งคำขอจองสำเร็จ!', 'คำขอของคุณถูกส่งไปให้ผู้ขับแล้ว โปรดรอการยืนยัน');
-        setTimeout(() => navigateTo('/myTrip'), 1500);
+
+        toast.success(
+            'ส่งคำขอจองสำเร็จ!',
+            'คำขอของคุณถูกส่งไปให้ผู้ขับแล้ว โปรดรอการยืนยัน'
+        );
+
+        // Redirect to My Trips page after a short delay
+        setTimeout(() => {
+            navigateTo('/myTrip');
+        }, 1500);
+
     } catch (error) {
         console.error("Failed to create booking:", error);
-        toast.error('เกิดข้อผิดพลาดในการจอง', error.data?.message || 'โปรดลองใหม่อีกครั้งในภายหลัง');
+        toast.error(
+            'เกิดข้อผิดพลาดในการจอง',
+            error.data?.message || 'โปรดลองใหม่อีกครั้งในภายหลัง'
+        );
     }
 }
 
@@ -1035,145 +977,6 @@ function findNearestPoi(lat, lng, radius = 100) {
                 }
             }
         )
-    })
-}
-
-function initBookingAutocomplete() {
-    if (!window.google?.maps?.places) return
-    const opts = { fields: ['place_id', 'name', 'formatted_address', 'geometry'], types: ['geocode', 'establishment'] }
-
-    if (pickupInputEl.value) {
-        pickupAutocomplete?.unbindAll?.()
-        pickupAutocomplete = new google.maps.places.Autocomplete(pickupInputEl.value, opts)
-        pickupAutocomplete.addListener('place_changed', () => {
-            const p = pickupAutocomplete.getPlace()
-            if (!p) return
-            pickupPoint.value = p.name || p.formatted_address || pickupPoint.value
-            pickupData.value = {
-                lat: p.geometry?.location?.lat?.() ?? null,
-                lng: p.geometry?.location?.lng?.() ?? null,
-                placeId: p.place_id || null,
-                address: p.formatted_address || null,
-                name: p.name || null
-            }
-        })
-    }
-
-    if (dropoffInputEl.value) {
-        dropoffAutocomplete?.unbindAll?.()
-        dropoffAutocomplete = new google.maps.places.Autocomplete(dropoffInputEl.value, opts)
-        dropoffAutocomplete.addListener('place_changed', () => {
-            const p = dropoffAutocomplete.getPlace()
-            if (!p) return
-            dropoffPoint.value = p.name || p.formatted_address || dropoffPoint.value
-            dropoffData.value = {
-                lat: p.geometry?.location?.lat?.() ?? null,
-                lng: p.geometry?.location?.lng?.() ?? null,
-                placeId: p.place_id || null,
-                address: p.formatted_address || null,
-                name: p.name || null
-            }
-        })
-    }
-}
-
-function startBookingPicker(target) {
-    bookingPickingTarget.value = target // 'pickup' | 'dropoff'
-    bookingPicked.value = { name: '', lat: null, lng: null, placeId: null, address: null }
-
-    nextTick(() => {
-        const fallbackCenter = { lat: 13.7563, lng: 100.5018 }
-        const base = target === 'pickup' ? pickupData.value : dropoffData.value
-        const center = (base.lat && base.lng) ? { lat: base.lat, lng: base.lng } : fallbackCenter
-
-        bookingPickerMap = new google.maps.Map(bookingPickerMapEl.value, {
-            center, zoom: base.lat ? 15 : 6,
-            mapTypeControl: false, streetViewControl: false, fullscreenControl: false
-        })
-
-        bookingPickerMap.addListener('click', async (e) => {
-            const pos = e.latLng
-            setBookingPickerMarker(pos)
-            await resolveBookingPicked(pos)
-        })
-    })
-}
-function stopBookingPicker() {
-    bookingPickingTarget.value = null
-    bookingPickerMap = null
-    bookingPickerMarker = null
-}
-function setBookingPickerMarker(latlng) {
-    if (bookingPickerMarker) return bookingPickerMarker.setPosition(latlng)
-    bookingPickerMarker = new google.maps.Marker({ position: latlng, map: bookingPickerMap, draggable: true })
-    bookingPickerMarker.addListener('dragend', (e) => resolveBookingPicked(e.latLng))
-}
-async function resolveBookingPicked(latlng) {
-    const lat = latlng.lat(), lng = latlng.lng()
-    const geocodeRes = await new Promise((resolve) => {
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status === 'OK' && results?.length) resolve(results[0]); else resolve(null)
-        })
-    })
-
-    let name = '', placeId = geocodeRes?.place_id || null, address = geocodeRes?.formatted_address || null
-    if (geocodeRes) {
-        const parts = await extractNameParts(geocodeRes)
-        name = parts.name || ''
-    }
-
-    // ถ้ายังไม่มีชื่อสวย ๆ ลองดึง POI ใกล้ ๆ มาใช้
-    if (!name) {
-        const poi = await findNearestPoi(lat, lng, 120)
-        if (poi?.place_id) {
-            placeId = poi.place_id
-            const details = await new Promise((resolve) => {
-                placesService.getDetails({ placeId: poi.place_id, fields: ['name', 'formatted_address'] },
-                    (pl, status) => resolve(status === google.maps.places.PlacesServiceStatus.OK ? pl : null))
-            })
-            name = details?.name || poi.name || name
-            address = details?.formatted_address || address
-        }
-    }
-    if (address) address = address.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-
-    bookingPicked.value = { name, lat, lng, placeId, address }
-}
-function applyBookingPicked() {
-    if (!bookingPickingTarget.value || !bookingPicked.value.name) return
-    const data = {
-        lat: bookingPicked.value.lat,
-        lng: bookingPicked.value.lng,
-        placeId: bookingPicked.value.placeId,
-        address: bookingPicked.value.address,
-        name: bookingPicked.value.name
-    }
-    if (bookingPickingTarget.value === 'pickup') {
-        pickupPoint.value = data.name || data.address || ''
-        pickupData.value = data
-    } else {
-        dropoffPoint.value = data.name || data.address || ''
-        dropoffData.value = data
-    }
-    stopBookingPicker()
-}
-
-function geocodeText(text) {
-    return new Promise((resolve) => {
-        if (!text) return resolve(null)
-        geocoder.geocode({ address: text }, async (results, status) => {
-            if (status !== 'OK' || !results?.length) return resolve(null)
-            const r = results[0]
-            const lat = r.geometry?.location?.lat?.()
-            const lng = r.geometry?.location?.lng?.()
-            const parts = await extractNameParts(r)
-            resolve({
-                lat, lng,
-                placeId: r.place_id || null,
-                address: (r.formatted_address || '').replace(/,?\s*(Thailand|ไทย)\s*$/i, ''),
-                name: parts.name || null
-            })
-        })
     })
 }
 
