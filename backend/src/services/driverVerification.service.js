@@ -144,6 +144,31 @@ const updateVerificationByAdmin = async (id, data) => {
   });
 };
 
+const deleteVerificationByAdmin = async (id) => {
+  return prisma.$transaction(async (tx) => {
+    // หา record ก่อน ถ้าไม่เจอ ให้รีเทิร์น null ไปให้ controller ตัดสินใจ 404
+    const existing = await tx.driverVerification.findUnique({ where: { id } });
+    if (!existing) return null;
+
+    // ย้อนสถานะ user ให้กลับเป็นผู้โดยสารและไม่ verified
+    await tx.user.update({
+      where: { id: existing.userId },
+      data: { role: 'PASSENGER', isVerified: false },
+    });
+
+    // ยกเลิก route ที่ยัง AVAILABLE ของ user นี้ (ถ้ามี)
+    await tx.route.updateMany({
+      where: { driverId: existing.userId, status: 'AVAILABLE' },
+      data: { status: 'CANCELLED' },
+    });
+
+    // ลบ verification record
+    await tx.driverVerification.delete({ where: { id } });
+
+    return true;
+  });
+};
+
 const updateVerificationStatus = async (id, status) => {
   return prisma.$transaction(async (tx) => {
     const verification = await tx.driverVerification.update({
@@ -213,5 +238,6 @@ module.exports = {
   updateVerificationStatus,
   canCreateRoutes,
   updateVerificationByAdmin,
-  createVerificationByAdmin
+  createVerificationByAdmin,
+  deleteVerificationByAdmin,
 };

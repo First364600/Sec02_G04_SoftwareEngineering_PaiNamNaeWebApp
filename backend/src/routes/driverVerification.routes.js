@@ -47,6 +47,15 @@ router.post(
   driverVerifController.adminCreateVerification
 );
 
+// DELETE /driver-verifications/admin/:id
+router.delete(
+  '/admin/:id',
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  driverVerifController.adminDeleteVerification
+);
+
 // PUT /driver-verifications/admin/:id
 router.put(
   '/admin/:id',

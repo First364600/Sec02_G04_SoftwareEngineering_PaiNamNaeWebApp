@@ -244,6 +244,19 @@ const adminCreateVerification = asyncHandler(async (req, res) => {
   });
 });
 
+const adminDeleteVerification = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const existing = await verifService.getVerificationById(id);
+  if (!existing) throw new ApiError(404, "Verification not found");
+
+  await verifService.deleteVerificationByAdmin(id);
+
+  res.status(200).json({
+    success: true,
+    message: "Driver verification (by admin) deleted successfully",
+  });
+});
 
 const adminUpdateVerification = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -283,5 +296,6 @@ module.exports = {
   getVerificationById,
   updateVerificationStatus,
   adminCreateVerification,
-  adminUpdateVerification
+  adminUpdateVerification,
+  adminDeleteVerification,
 };
