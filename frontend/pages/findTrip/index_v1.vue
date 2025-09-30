@@ -54,9 +54,6 @@
                             <div v-for="route in routes" :key="route.id"
                                 class="p-6 transition-all duration-300 cursor-pointer route-card hover:shadow-lg"
                                 @click="toggleDetails(route)">
-                                <h1 class="text-center text-gray-900 mb-0.5">
-                                    {{ route.originName }} <span class="font-semibold text-gray-900">→</span> {{ route.destinationName }}
-                                </h1>
                                 <div class="flex items-start space-x-4">
                                     <img :src="route.driver.image" :alt="route.driver.name"
                                         class="object-cover w-12 h-12 rounded-full">
@@ -64,7 +61,9 @@
                                         <div class="flex items-start justify-between">
                                             <div>
 
-
+                                                <h3 class="font-semibold text-gray-900">
+                                                    {{ route.originName }} → {{ route.destinationName }}
+                                                </h3>
                                                 <div class="flex items-center">
                                                     <h4 class="font-semibold text-gray-900">{{ route.driver.name }}</h4>
 
@@ -129,13 +128,6 @@
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
-                                                <li v-if="route.originArea">• จุดเริ่มต้น (พื้นที่): {{ route.originArea
-                                                }}</li>
-                                                <li v-if="route.destinationArea">• จุดปลายทาง (พื้นที่): {{
-                                                    route.destinationArea }}</li>
-                                                <li v-for="stop in route.stops" :key="stop">• {{ stop }}</li>
-                                            </ul>
                                             <ul class="space-y-1 text-sm text-gray-600">
                                                 <li v-for="stop in route.stops" :key="stop">• {{ stop }}</li>
                                             </ul>
@@ -378,7 +370,6 @@ let activePolyline = null     // เส้นทางที่กำลัง�
 let startMarker = null
 let endMarker = null
 let geocoder = null
-let placesService = null
 const mapReady = ref(false)
 
 const showModal = ref(false)
@@ -437,15 +428,11 @@ async function handleSearch() {
                 reverseGeocode(r.start.lat, r.start.lng),
                 reverseGeocode(r.end.lat, r.end.lng)
             ])
-
-            const oParts = await extractNameParts(o)
-            const dParts = await extractNameParts(d)
-
-            routes.value[i].originName = oParts.name || routes.value[i].originName   // ชื่อหลัก (สั้น)
-            routes.value[i].destinationName = dParts.name || routes.value[i].destinationName
-            routes.value[i].originArea = oParts.area || null                          // เก็บพื้นที่ไว้แสดงในรายละเอียด
-            routes.value[i].destinationArea = dParts.area || null
+            // แปลงให้อ่านง่าย
+            routes.value[i].originName = formatShortAddress(o) || routes.value[i].originName
+            routes.value[i].destinationName = formatShortAddress(d) || routes.value[i].destinationName
         })
+        // ไม่จำเป็นต้อง await ตรงนี้ก็ได้ ถ้าอยากให้เด้งชื่อทีหลัง
         await Promise.allSettled(jobs)
 
     } catch (e) {
@@ -464,47 +451,6 @@ function reverseGeocode(lat, lng) {
             resolve(results[0]) // << คืน object เพื่อให้ formatShortAddress ใช้ address_components ได้
         })
     })
-}
-
-async function extractNameParts(geocodeResult) {
-    if (!geocodeResult) return { name: null, area: null }
-
-    const comps = geocodeResult.address_components || []
-    const byType = (t) => comps.find(c => c.types.includes(t))?.long_name
-    const byTypeShort = (t) => comps.find(c => c.types.includes(t))?.short_name
-
-    const types = geocodeResult.types || []
-    const isPoi = types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')
-
-    // ---- ชื่อหลัก (name) ----
-    let name = null
-    if (isPoi && geocodeResult.place_id) {
-        const poiName = await getPlaceName(geocodeResult.place_id)
-        if (poiName) name = poiName
-    }
-    if (!name) {
-        // ไม่ใช่ POI -> ใช้ถนน/ซอย (route) หรือเลขที่ + ถนน
-        const streetNumber = byType('street_number')
-        const route = byType('route')
-        name = (streetNumber && route) ? `${streetNumber} ${route}` : (route || geocodeResult.formatted_address || null)
-    }
-
-    // ---- พื้นที่ (area) -> ตำบล/ย่าน + จังหวัด ----
-    const sublocality =
-        byType('sublocality') ||
-        byType('neighborhood') ||
-        byType('locality') ||
-        byType('administrative_area_level_2')
-
-    const province = byType('administrative_area_level_1') || byTypeShort('administrative_area_level_1')
-    let area = null
-    if (sublocality && province) area = `${sublocality}, ${province}`
-    else if (province) area = province
-
-    // ตัดประเทศทิ้งถ้าเผลอหลุดมา
-    if (name) name = name.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-
-    return { name, area }
 }
 
 const toggleDetails = (route) => {
@@ -596,63 +542,6 @@ async function updateMapForRoute(route) {
     }
 }
 
-function getPlaceName(placeId) {
-    return new Promise((resolve) => {
-        if (!placesService || !placeId) return resolve(null)
-        placesService.getDetails(
-            { placeId, fields: ['name'] },
-            (place, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && place?.name) {
-                    resolve(place.name)
-                } else {
-                    resolve(null)
-                }
-            }
-        )
-    })
-}
-
-async function formatPrettyAddress(geocodeResult) {
-    if (!geocodeResult) return null
-
-    const comps = geocodeResult.address_components || []
-    const byType = (t) => comps.find(c => c.types.includes(t))?.long_name
-    const byTypeShort = (t) => comps.find(c => c.types.includes(t))?.short_name
-
-    // ถ้าเป็นสถานที่ (POI / landmark) ลองดึงชื่อจริงจาก Places
-    const types = geocodeResult.types || []
-    const isPoi = types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')
-
-    if (isPoi && geocodeResult.place_id) {
-        const poiName = await getPlaceName(geocodeResult.place_id)
-        if (poiName) {
-            // ใส่พื้นที่กว้างๆ ต่อท้ายให้พอรู้เมือง
-            const sublocality = byType('sublocality') || byType('neighborhood') || byType('locality') || byType('administrative_area_level_2')
-            const province = byType('administrative_area_level_1') || byTypeShort('administrative_area_level_1')
-            if (sublocality && province) return `${poiName}, ${sublocality}, ${province}`
-            if (province) return `${poiName}, ${province}`
-            return poiName
-        }
-    }
-
-    // ไม่ใช่ POI: สร้างชื่อจากถนน/ซอย + ย่าน/ตำบล + จังหวัด
-    const streetNumber = byType('street_number')
-    const route = byType('route') // ชื่อถนน/ซอย
-    const sublocality = byType('sublocality') || byType('neighborhood') || byType('locality') || byType('administrative_area_level_2')
-    const province = byType('administrative_area_level_1') || byTypeShort('administrative_area_level_1')
-
-    const street = (streetNumber && route) ? `${streetNumber} ${route}` : (route || null)
-
-    if (street && sublocality && province) return `${street}, ${sublocality}, ${province}`
-    if (street && province) return `${street}, ${province}`
-    if (sublocality && province) return `${sublocality}, ${province}`
-
-    // fallback: ใช้ formatted_address แต่พยายามตัดประเทศออก ให้สั้นลง
-    const fa = geocodeResult.formatted_address || ''
-    const trimmed = fa.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-    return trimmed || null
-}
-
 function openModal(route) {
     if (!token.value) {
         return navigateTo('/login');
@@ -734,7 +623,6 @@ const initializeMap = () => {
         fullscreenControl: true,
     })
     geocoder = new google.maps.Geocoder()
-    placesService = new google.maps.places.PlacesService(gmap) // ← เพิ่มบรรทัดนี้
     mapReady.value = true
 }
 
