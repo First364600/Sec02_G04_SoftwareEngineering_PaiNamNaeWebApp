@@ -50,16 +50,7 @@
                                                 class="status-badge status-cancelled">ยกเลิก</span>
                                         </div>
                                         <p class="mt-1 text-sm text-gray-600">จุดนัดพบ: {{ trip.pickupPoint }}</p>
-                                        <!-- <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
-                                        </p> -->
-                                        <p class="text-sm text-gray-600">
-                                            วันที่: {{ trip.date }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            เวลา: {{ trip.time }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            ระยะเวลา: {{ trip.durationText }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            ระยะทาง: {{ trip.distanceText }}
+                                        <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
                                         </p>
                                     </div>
                                 </div>
@@ -274,14 +265,6 @@ async function fetchMyTrips() {
                 carDetails,
                 conditions: b.route.conditions,
                 photos: b.route.vehicle?.photos || [],
-                durationText: b.route.duration
-                    || (typeof b.route.durationSeconds === 'number'
-                        ? `${Math.round(b.route.durationSeconds / 60)} นาที`
-                        : '-'),
-                distanceText: b.route.distance
-                    || (typeof b.route.distanceMeters === 'number'
-                        ? `${(b.route.distanceMeters / 1000).toFixed(1)} กม.`
-                        : '-'),
             };
         });
 
