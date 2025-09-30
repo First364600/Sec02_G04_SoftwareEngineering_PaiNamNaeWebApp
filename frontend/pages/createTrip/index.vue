@@ -10,10 +10,10 @@
                 </p>
             </div>
 
-            <div class="p-8 bg-white rounded-lg shadow-md">
+            <div class="p-8 bg-white border border-gray-300 rounded-lg shadow-md">
                 <form @submit.prevent="handleSubmit" id="postRouteForm" novalidate class="space-y-8">
                     <div>
-                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-200">
+                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-300">
                             ข้อมูลเส้นทาง
                         </h3>
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -58,7 +58,7 @@
                     </div>
 
                     <div>
-                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-200">
+                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-300 ">
                             รายละเอียดการเดินทาง
                         </h3>
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -100,7 +100,7 @@
                     </div>
 
                     <div>
-                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-200">
+                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-300">
                             ข้อมูลรถยนต์
                         </h3>
                         <div v-if="vehicles.length > 0" class="grid items-center grid-cols-1 gap-6 md:grid-cols-2">
@@ -139,7 +139,7 @@
                     <VehicleModal :show="isModalOpen" @close="closeAndRefresh" />
 
                     <div>
-                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-200">
+                        <h3 class="pb-2 mb-6 text-xl font-semibold text-gray-900 border-b border-gray-300">
                             เงื่อนไขและข้อตกลง
                         </h3>
                         <textarea v-model="form.conditions" id="terms" name="terms" rows="4"
