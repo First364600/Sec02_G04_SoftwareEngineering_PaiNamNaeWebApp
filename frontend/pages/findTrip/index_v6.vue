@@ -160,10 +160,6 @@
                                                     }}</li>
                                                 <li v-if="route.destinationArea">• จุดปลายทาง (พื้นที่): {{
                                                     route.destinationArea }}</li>
-                                                <li v-if="route.originAddress">• จุดเริ่มต้น (ที่อยู่): {{
-                                                    route.originAddress }}</li>
-                                                <li v-if="route.destinationAddress">• จุดปลายทาง (ที่อยู่): {{
-                                                    route.destinationAddress }}</li>
                                                 <li v-for="stop in route.stops" :key="stop">• {{ stop }}</li>
                                             </ul>
                                             <ul class="space-y-1 text-sm text-gray-600">
@@ -560,11 +556,8 @@ async function handleSearch() {
             start: route.startLocation,
             end: route.endLocation,
             // ตั้งชื่อเริ่มต้นเป็นพิกัดไว้ก่อน (กันหน้ากระพริบ)
-            originName: route.startLocation?.name || `(${route.startLocation.lat.toFixed(2)}, ${route.startLocation.lng.toFixed(2)})`,
-            destinationName: route.endLocation?.name || `(${route.endLocation.lat.toFixed(2)}, ${route.endLocation.lng.toFixed(2)})`,
-            // เก็บ address ไว้แสดงในรายละเอียด
-            originAddress: route.startLocation?.address || null,
-            destinationAddress: route.endLocation?.address || null,
+            originName: `(${route.startLocation.lat.toFixed(2)}, ${route.startLocation.lng.toFixed(2)})`,
+            destinationName: `(${route.endLocation.lat.toFixed(2)}, ${route.endLocation.lng.toFixed(2)})`,
             driver: {
                 name: `${route.driver?.firstName || ''} ${route.driver?.lastName || ''}`.trim() || 'ไม่ระบุชื่อ',
                 image: route.driver?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(route.driver?.firstName || 'U')}&background=random&size=64`,
@@ -594,14 +587,10 @@ async function handleSearch() {
             const oParts = await extractNameParts(o)
             const dParts = await extractNameParts(d)
 
-            //routes.value[i].originName = oParts.name || routes.value[i].originName   // ชื่อหลัก (สั้น)
-            //routes.value[i].destinationName = dParts.name || routes.value[i].destinationName
-            if (!r.start?.name && oParts.name) {
-                routes.value[i].originName = oParts.name
-            }
-            if (!r.end?.name && dParts.name) {
-                routes.value[i].destinationName = dParts.name
-            }
+            routes.value[i].originName = oParts.name || routes.value[i].originName   // ชื่อหลัก (สั้น)
+            routes.value[i].destinationName = dParts.name || routes.value[i].destinationName
+            routes.value[i].originArea = oParts.area || null                          // เก็บพื้นที่ไว้แสดงในรายละเอียด
+            routes.value[i].destinationArea = dParts.area || null
         })
         await Promise.allSettled(jobs)
 
