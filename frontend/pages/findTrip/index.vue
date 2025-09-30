@@ -54,7 +54,7 @@
                             <div v-for="route in routes" :key="route.id"
                                 class="p-6 transition-all duration-300 cursor-pointer route-card hover:shadow-lg"
                                 @click="toggleDetails(route)">
-                                <h1 class="text-center text-gray-900 mb-0.5">
+                                <h1 class="mb-6 text-center text-gray-900">
                                     {{ route.originName }} <span class="font-semibold text-gray-900">→</span> {{ route.destinationName }}
                                 </h1>
                                 <div class="flex items-start space-x-4">
