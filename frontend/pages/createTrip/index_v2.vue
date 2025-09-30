@@ -235,8 +235,8 @@ let startAutocomplete = null
 let endAutocomplete = null
 
 // meta สำหรับส่งไป backend
-const startMeta = ref({ lat: null, lng: null, name: null, address: null, placeId: null })
-const endMeta = ref({ lat: null, lng: null, name: null, address: null, placeId: null })
+const startMeta = ref({ lat: null, lng: null })
+const endMeta = ref({ lat: null, lng: null })
 
 // modal ปักหมุด
 const showPlacePicker = ref(false)
@@ -299,19 +299,10 @@ const handleSubmit = async () => {
 
     const payload = {
         vehicleId: form.vehicleId,
-        startLocation: {
-            lat: Number(startMeta.value.lat),
-            lng: Number(startMeta.value.lng),
-            name: startMeta.value.name || form.startPoint || null,
-            address: startMeta.value.address || form.startPoint || null
-        },
-        endLocation: {
-            lat: Number(endMeta.value.lat),
-            lng: Number(endMeta.value.lng),
-            name: endMeta.value.name || form.endPoint || null,
-            address: endMeta.value.address || form.endPoint || null
-        },
-        departureTime,
+        // Fix ค่าตามที่กำหนด
+        startLocation: { lat: Number(startMeta.value.lat), lng: Number(startMeta.value.lng) },
+        endLocation: { lat: Number(endMeta.value.lat), lng: Number(endMeta.value.lng) },
+        departureTime: departureTime,
         availableSeats: Number(form.availableSeats),
         pricePerSeat: Number(form.pricePerSeat),
         conditions: form.conditions
@@ -364,17 +355,9 @@ function initStartEndAutocomplete() {
         startAutocomplete.addListener('place_changed', () => {
             const p = startAutocomplete.getPlace()
             if (!p) return
-            const lat = p.geometry?.location?.lat?.() ?? null
-            const lng = p.geometry?.location?.lng?.() ?? null
-            const name = p.name || stripLeadingPlusCode(stripCountry(p.formatted_address || '')) || form.startPoint
-            const address = stripCountry(p.formatted_address || name || '')
-            form.startPoint = name
-            startMeta.value = {
-                lat, lng,
-                name,
-                address,
-                placeId: p.place_id || null
-            }
+            form.startPoint = p.name || p.formatted_address || form.startPoint
+            startMeta.value.lat = p.geometry?.location?.lat?.() ?? null
+            startMeta.value.lng = p.geometry?.location?.lng?.() ?? null
         })
     }
 
@@ -384,17 +367,9 @@ function initStartEndAutocomplete() {
         endAutocomplete.addListener('place_changed', () => {
             const p = endAutocomplete.getPlace()
             if (!p) return
-            const lat = p.geometry?.location?.lat?.() ?? null
-            const lng = p.geometry?.location?.lng?.() ?? null
-            const name = p.name || stripLeadingPlusCode(stripCountry(p.formatted_address || '')) || form.endPoint
-            const address = stripCountry(p.formatted_address || name || '')
-            form.endPoint = name
-            endMeta.value = {
-                lat, lng,
-                name,
-                address,
-                placeId: p.place_id || null
-            }
+            form.endPoint = p.name || p.formatted_address || form.endPoint
+            endMeta.value.lat = p.geometry?.location?.lat?.() ?? null
+            endMeta.value.lng = p.geometry?.location?.lng?.() ?? null
         })
     }
 }
@@ -453,10 +428,8 @@ async function resolvePicked(latlng) {
 
     // 2) สร้างชื่อที่อ่านง่าย (ตัด Plus Code/คำว่า Thailand ออก)
     let display = ''
-    let addr = ''
     if (geocodeRes?.formatted_address) {
-        addr = stripCountry(geocodeRes.formatted_address)
-        display = stripLeadingPlusCode(addr)
+        display = stripLeadingPlusCode(stripCountry(geocodeRes.formatted_address))
     }
 
     // ถ้ามี place_id ลองดึงชื่อ POI จาก details มาแทน (จะสั้นสวยกว่า)
@@ -479,42 +452,27 @@ async function resolvePicked(latlng) {
                 placesService.getDetails({ placeId: poi.place_id, fields: ['name', 'formatted_address'] },
                     (pl, st) => {
                         if (st === google.maps.places.PlacesServiceStatus.OK) {
-                            const fa = stripCountry(pl?.formatted_address || display)
-                            display = pl?.name || stripLeadingPlusCode(fa)
-                            addr = fa || addr
+                            display = pl?.name || stripLeadingPlusCode(stripCountry(pl?.formatted_address || display))
                         }
                         done()
                     })
             })
         } else if (geocodeRes?.formatted_address) {
-            addr = stripCountry(geocodeRes.formatted_address)
-            display = stripLeadingPlusCode(addr)
+            display = stripLeadingPlusCode(stripCountry(geocodeRes.formatted_address))
         }
     }
 
-    pickedPlace.value = { name: display, address: addr || display, lat, lng }
+    pickedPlace.value = { name: display, lat, lng }
 }
 
 function applyPickedPlace() {
     if (!pickingField.value || !pickedPlace.value.name) return
     if (pickingField.value === 'start') {
         form.startPoint = pickedPlace.value.name
-        startMeta.value = {
-            lat: pickedPlace.value.lat,
-            lng: pickedPlace.value.lng,
-            name: pickedPlace.value.name,
-            address: pickedPlace.value.address || pickedPlace.value.name,
-            placeId: null
-        }
+        startMeta.value = { lat: pickedPlace.value.lat, lng: pickedPlace.value.lng }
     } else {
         form.endPoint = pickedPlace.value.name
-        endMeta.value = {
-            lat: pickedPlace.value.lat,
-            lng: pickedPlace.value.lng,
-            name: pickedPlace.value.name,
-            address: pickedPlace.value.address || pickedPlace.value.name,
-            placeId: null
-        }
+        endMeta.value = { lat: pickedPlace.value.lat, lng: pickedPlace.value.lng }
     }
     closePlacePicker()
 }
