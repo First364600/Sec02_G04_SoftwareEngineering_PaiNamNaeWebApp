@@ -35,7 +35,7 @@
                         </div>
 
                         <!-- คนขับ: แสดงคำว่า การเดินทางทั้งหมด + ดรอปดาวน์ (การเดินทางของฉัน / คำขอจองเส้นทางของฉัน) -->
-                        <div v-else-if="user && (user.role === 'DRIVER' || user.role === 'ADMIN')">
+                        <div v-if="user && (user.role === 'DRIVER' || user.role === 'ADMIN')">
                             <div class="relative dropdown-trigger">
                                 <NuxtLink to="/myTrip"
                                     class="flex items-center text-gray-600 transition-colors duration-200 hover:text-blue-600"
