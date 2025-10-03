@@ -133,8 +133,12 @@
                                             {{ v.isDefault ? 'ใช่' : 'ไม่ใช่' }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3 text-gray-700">
+                                    <!-- <td class="px-4 py-3 text-gray-700">
                                         <div class="text-sm">{{ formatDate(v.createdAt) }}</div>
+                                    </td> -->
+                                    <td class="px-4 py-3 text-gray-700">
+                                        <div class="text-sm">{{ formatDate(v.createdAt, true) }}</div>
+                                        <div class="text-xs text-gray-500">อัปเดต {{ formatDate(v.updatedAt, true) }}</div>
                                     </td>
                                     <td class="px-4 py-3">
                                         <button @click="onViewVehicle(v)"
@@ -266,9 +270,9 @@ const pageButtons = computed(() => {
     return out
 })
 
-function formatDate(iso) {
+function formatDate(iso, withTime = false) {
   if (!iso) return '-'
-  return dayjs(iso).format('D MMM YYYY')
+  return withTime ? dayjs(iso).format('D MMMM YYYY HH:mm') : dayjs(iso).format('D MMMM YYYY')
 }
 
 function parseSort(s) {
