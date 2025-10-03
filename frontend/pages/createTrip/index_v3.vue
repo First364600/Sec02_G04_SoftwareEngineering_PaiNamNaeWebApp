@@ -286,17 +286,16 @@ const closeAndRefresh = async () => {
 
 const handleSubmit = async () => {
     if (isLoading.value) return
-
-    // Basic validation (ตามเดิม)
+    // Basic validation
     if (!form.vehicleId || !form.date || !form.time || !form.availableSeats || !form.pricePerSeat) {
-        toast.error('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน')
-        return
+        toast.error('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน');
+        return;
     }
 
-    isLoading.value = true
+    isLoading.value = true;
 
-    // รวมวันที่+เวลาเป็น ISO (ตามเดิม)
-    const departureTime = new Date(`${form.date}T${form.time}`).toISOString()
+    // รวมวันที่และเวลาเป็น ISO String
+    const departureTime = new Date(`${form.date}T${form.time}`).toISOString();
 
     const payload = {
         vehicleId: form.vehicleId,
@@ -316,77 +315,39 @@ const handleSubmit = async () => {
         availableSeats: Number(form.availableSeats),
         pricePerSeat: Number(form.pricePerSeat),
         conditions: form.conditions
-    }
+    };
 
-    // ===== รูปแบบ POST แบบเดียวกับหน้า create user (จัดการ error แบบเจาะจง) =====
     try {
-        const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
-
-        // ดึง token แบบไม่พึ่ง useCookie (เพื่อไม่ต้องแก้ import อื่น)
-        let token = ''
-        try {
-            const m = document.cookie.match(/(?:^|;\s*)token=([^;]+)/)
-            if (m) token = decodeURIComponent(m[1])
-        } catch { }
-        if (process.client && !token) {
-            try { token = localStorage.getItem('token') || '' } catch { }
-        }
-
-        const res = await fetch(`${apiBase}/routes`, {
+        await $api('/routes', {
             method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {})
-            },
-            body: JSON.stringify(payload),
-            credentials: 'include'
-        })
+            body: payload
+        });
 
-        let body
-        try {
-            body = await res.json() // คาดหวัง { success, message, data } หรือ error payload
-        } catch {
-            const text = await res.text()
-            const err = new Error(text || 'Unexpected response from server')
-            err.status = res.status
-            throw err
-        }
+        toast.success('สำเร็จ', 'สร้างเส้นทางการเดินทางเรียบร้อยแล้ว!');
 
-        if (!res.ok) {
-            const err = new Error(body?.message || `Request failed with status ${res.status}`)
-            err.status = res.status
-            err.payload = body
-            throw err
-        }
+        setTimeout(() => {
+            navigateTo('/findTrip');
+        }, 1500);
 
-        // success
-        toast.success('สำเร็จ', body?.message || 'สร้างเส้นทางการเดินทางเรียบร้อยแล้ว!')
-        setTimeout(() => { navigateTo('/findTrip') }, 1500)
+    } catch (error) {
+        console.error("Failed to create route:", error);
 
-    } catch (err) {
-        console.error('Failed to create route:', err)
-
-        const msg = String(err?.message || '')
-        const is403 = err?.status === 403
-        const needDriverVerify =
-            is403 ||
-            /ยืนยันตัวตนผู้ขับ/.test(msg) ||                         // จับข้อความไทยจาก API
-            /ApiError:.*ยืนยันตัวตนผู้ขับ/.test(msg)                // ครอบกรณีสแต็กเท็กซ์ที่ให้มา
-
-        if (needDriverVerify) {
-            toast.error('จำเป็นต้องยืนยันตัวตน', 'คุณต้องยืนยันตัวตนผู้ขับก่อนจึงจะสร้างเส้นทางได้')
-            // รีไดเรกต์ไปหน้าตามที่ระบุไว้
-            // window.location.href = 'http://localhost:3001/profile/driver-verification'
-            setTimeout(() => { navigateTo('/profile/driver-verification') },1500)
+        if (error.statusCode === 403 && error.data?.message.includes('ยืนยันตัวตนผู้ขับ')) {
+            toast.error(
+                'จำเป็นต้องยืนยันตัวตน',
+                'คุณต้องยืนยันตัวตนผู้ขับก่อนจึงจะสร้างเส้นทางได้'
+            );
+            setTimeout(() => {
+                navigateTo('/profile/driver-verification');
+            }, 2000);
         } else {
-            const fallback = msg || 'ไม่สามารถสร้างเส้นทางได้'
-            toast.error('เกิดข้อผิดพลาด', fallback)
+            // การจัดการ Error ทั่วไป
+            toast.error('เกิดข้อผิดพลาด', error.data?.message || 'ไม่สามารถสร้างเส้นทางได้');
         }
     } finally {
-        isLoading.value = false
+        isLoading.value = false;
     }
-}
+};
 
 function initStartEndAutocomplete() {
     if (!window.google?.maps?.places) return
