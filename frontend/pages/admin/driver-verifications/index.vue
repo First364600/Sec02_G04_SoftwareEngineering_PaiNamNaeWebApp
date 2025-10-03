@@ -112,8 +112,8 @@
                                         สถานะคำขอ</th>
                                     <th class="px-4 py-3 text-xs font-medium text-left text-gray-500 uppercase">
                                         สร้างเมื่อ</th>
-                                    <th class="px-4 py-3 text-xs font-medium text-left text-gray-500 uppercase">
-                                        อัปเดตล่าสุด</th>
+                                    <!-- <th class="px-4 py-3 text-xs font-medium text-left text-gray-500 uppercase">
+                                        อัปเดตล่าสุด</th> -->
                                     <th class="px-4 py-3 text-xs font-medium text-left text-gray-500 uppercase">การกระทำ
                                     </th>
                                 </tr>
@@ -145,7 +145,7 @@
 
                                     <td class="px-4 py-3 text-gray-700">
                                         <span
-                                            class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full">
                                             {{ mapLicenseType(r.typeOnLicense) }}
                                         </span>
                                     </td>
@@ -158,14 +158,17 @@
                                         </span>
                                     </td>
 
+                                    <!-- <td class="px-4 py-3 text-gray-700">
+                                        <div class="text-sm">{{ d(r.createdAt, true) }}</div>
+                                    </td> -->
+
+                                    <!-- <td class="px-4 py-3 text-gray-700">
+                                        <div class="text-sm">{{ d(r.updatedAt, true) }}</div>
+                                    </td> -->
                                     <td class="px-4 py-3 text-gray-700">
                                         <div class="text-sm">{{ d(r.createdAt, true) }}</div>
+                                        <div class="text-xs text-gray-500">อัปเดต {{ d(r.updatedAt, true) }}</div>
                                     </td>
-
-                                    <td class="px-4 py-3 text-gray-700">
-                                        <div class="text-sm">{{ d(r.updatedAt, true) }}</div>
-                                    </td>
-
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-1">
                                             <button @click="onView(r)" class="p-2 text-gray-500 hover:text-emerald-600"
@@ -185,7 +188,7 @@
                                 </tr>
 
                                 <tr v-if="!isLoading && rows.length === 0">
-                                    <td colspan="8" class="px-4 py-10 text-center text-gray-500">
+                                    <td colspan="7" class="px-4 py-10 text-center text-gray-500">
                                         ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td>
                                 </tr>
                             </tbody>
@@ -301,7 +304,7 @@ const pageButtons = computed(() => {
 
 function d(iso, withTime = false) {
     if (!iso) return '-'
-    return withTime ? dayjs(iso).format('D MMM YYYY HH:mm') : dayjs(iso).format('D MMM YYYY')
+    return withTime ? dayjs(iso).format('D MMMM YYYY HH:mm') : dayjs(iso).format('D MMMM YYYY')
 }
 
 function parseSort(s) {
