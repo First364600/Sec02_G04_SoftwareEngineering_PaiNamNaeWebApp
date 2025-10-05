@@ -55,6 +55,41 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="mt-6">
+                            <label class="block mb-2 text-sm font-medium text-gray-700">
+                                จุดแวะ (เพิ่มได้หลายจุด)
+                            </label>
+
+                            <div class="space-y-4">
+                                <div v-for="(wp, idx) in waypoints" :key="idx" class="relative">
+                                    <input :ref="el => waypointInputs[idx] = el" v-model="wp.text" type="text"
+                                        :placeholder="`เช่น จุดรับ-ส่ง ระหว่างทาง (#${idx + 1})`"
+                                        class="w-full px-4 py-3 pr-20 border border-gray-300 rounded-md focus:ring-blue-500" />
+                                    <div class="absolute inset-y-0 flex items-center gap-2 my-auto right-2">
+                                        <button type="button" class="text-gray-500 hover:text-blue-600"
+                                            @click="openPlacePicker(`wp-${idx}`)" title="เลือกจากแผนที่">
+                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                                <path
+                                                    d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" class="text-gray-500 hover:text-red-600"
+                                            @click="removeWaypoint(idx)" title="ลบจุดแวะนี้">
+                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="button" @click="addWaypoint"
+                                    class="inline-flex items-center gap-2 px-3 py-2 text-sm text-blue-700 rounded-md bg-blue-50 hover:bg-blue-100">
+                                    <i class="fa-solid fa-plus"></i>
+                                    เพิ่มจุดแวะ
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -164,7 +199,12 @@
                     <div class="modal-content">
                         <div class="flex items-center justify-between p-4 border-b border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">
-                                เลือก{{ pickingField === 'start' ? 'จุดเริ่มต้น' : 'จุดปลายทาง' }}
+                                เลือก
+                                {{ pickingField === 'start'
+                                    ? 'จุดเริ่มต้น'
+                                    : pickingField === 'end'
+                                        ? 'จุดปลายทาง'
+                                        : 'จุดแวะ' }}
                             </h3>
                             <button @click="closePlacePicker" class="text-gray-400 hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,6 +257,11 @@ const { toast } = useToast();
 const isModalOpen = ref(false);
 const isLoading = ref(false);
 const vehicles = ref([]);
+
+const waypoints = ref([])
+const waypointMetas = ref([])
+const waypointInputs = ref([])
+let waypointAutocompletes = []
 
 const form = reactive({
     vehicleId: '',
@@ -298,6 +343,17 @@ const handleSubmit = async () => {
     // รวมวันที่+เวลาเป็น ISO (ตามเดิม)
     const departureTime = new Date(`${form.date}T${form.time}`).toISOString()
 
+    const waypointsPayload = waypointMetas.value
+        .map((m, i) => {
+            const name = (m && m.name) || (waypoints.value[i] && waypoints.value[i].text) || null
+            const address = (m && m.address) || (waypoints.value[i] && waypoints.value[i].text) || null
+            const lat = m && m.lat != null ? Number(m.lat) : null
+            const lng = m && m.lng != null ? Number(m.lng) : null
+            if (!name && lat == null && lng == null) return null
+            return { lat, lng, name, address }
+        })
+        .filter(Boolean)
+
     const payload = {
         vehicleId: form.vehicleId,
         startLocation: {
@@ -312,6 +368,8 @@ const handleSubmit = async () => {
             name: endMeta.value.name || form.endPoint || null,
             address: endMeta.value.address || form.endPoint || null
         },
+        waypoints: waypointsPayload,    // << เพิ่ม
+        optimizeWaypoints: true,
         departureTime,
         availableSeats: Number(form.availableSeats),
         pricePerSeat: Number(form.pricePerSeat),
@@ -377,7 +435,7 @@ const handleSubmit = async () => {
         if (needDriverVerify) {
             toast.error('จำเป็นต้องยืนยันตัวตน', 'คุณต้องยืนยันตัวตนผู้ขับก่อนจึงจะสร้างเส้นทางได้')
             // window.location.href = 'http://localhost:3001/profile/driver-verification'
-            setTimeout(() => { navigateTo('/profile/driver-verification') },1500)
+            setTimeout(() => { navigateTo('/profile/driver-verification') }, 1500)
         } else {
             const fallback = msg || 'ไม่สามารถสร้างเส้นทางได้'
             toast.error('เกิดข้อผิดพลาด', fallback)
@@ -385,6 +443,43 @@ const handleSubmit = async () => {
     } finally {
         isLoading.value = false
     }
+}
+
+function addWaypoint() {
+    waypoints.value.push({ text: '' })
+    waypointMetas.value.push({ lat: null, lng: null, name: null, address: null, placeId: null })
+    nextTick(() => initWaypointAutocomplete(waypoints.value.length - 1))
+}
+
+function removeWaypoint(idx) {
+    waypoints.value.splice(idx, 1)
+    waypointMetas.value.splice(idx, 1)
+    const ac = waypointAutocompletes[idx]
+    if (ac && typeof ac.unbindAll === 'function') ac.unbindAll()
+    waypointAutocompletes.splice(idx, 1)
+    waypointInputs.value.splice(idx, 1)
+}
+
+function initWaypointAutocomplete(idx) {
+    if (!window.google?.maps?.places) return
+    const el = waypointInputs.value[idx]
+    if (!el) return
+
+    const opts = { fields: ['place_id', 'name', 'formatted_address', 'geometry'], types: ['geocode', 'establishment'] }
+    const ac = new google.maps.places.Autocomplete(el, opts)
+    waypointAutocompletes[idx] = ac
+
+    ac.addListener('place_changed', () => {
+        const p = ac.getPlace()
+        if (!p) return
+        const lat = p.geometry?.location?.lat?.() ?? null
+        const lng = p.geometry?.location?.lng?.() ?? null
+        const name = p.name || stripLeadingPlusCode(stripCountry(p.formatted_address || '')) || waypoints.value[idx].text
+        const address = stripCountry(p.formatted_address || name || '')
+
+        waypoints.value[idx].text = name
+        waypointMetas.value[idx] = { lat, lng, name, address, placeId: p.place_id || null }
+    })
 }
 
 function initStartEndAutocomplete() {
@@ -435,16 +530,26 @@ function initStartEndAutocomplete() {
             }
         })
     }
+    for (let i = 0; i < waypoints.value.length; i++) {
+        initWaypointAutocomplete(i)
+    }
 }
 
 function openPlacePicker(field) {
-    pickingField.value = field // 'start' | 'end'
+    pickingField.value = field // 'start' | 'end' | 'wp-<index>'
     pickedPlace.value = { name: '', lat: null, lng: null }
     showPlacePicker.value = true
 
     nextTick(() => {
-        const base = field === 'start' ? startMeta.value : endMeta.value
-        const hasMeta = base.lat != null && base.lng != null
+        let base
+        if (field === 'start') base = startMeta.value
+        else if (field === 'end') base = endMeta.value
+        else if (String(field).startsWith('wp-')) {
+            const idx = Number(String(field).split('-')[1] || -1)
+            base = waypointMetas.value[idx] || {}
+        }
+
+        const hasMeta = base && base.lat != null && base.lng != null
         const center = hasMeta ? { lat: base.lat, lng: base.lng } : { lat: 13.7563, lng: 100.5018 }
 
         placePickerMap = new google.maps.Map(placePickerMapEl.value, {
@@ -535,23 +640,25 @@ async function resolvePicked(latlng) {
 
 function applyPickedPlace() {
     if (!pickingField.value || !pickedPlace.value.name) return
+    const meta = {
+        lat: pickedPlace.value.lat,
+        lng: pickedPlace.value.lng,
+        name: pickedPlace.value.name,
+        address: pickedPlace.value.address || pickedPlace.value.name,
+        placeId: null
+    }
+
     if (pickingField.value === 'start') {
         form.startPoint = pickedPlace.value.name
-        startMeta.value = {
-            lat: pickedPlace.value.lat,
-            lng: pickedPlace.value.lng,
-            name: pickedPlace.value.name,
-            address: pickedPlace.value.address || pickedPlace.value.name,
-            placeId: null
-        }
-    } else {
+        startMeta.value = meta
+    } else if (pickingField.value === 'end') {
         form.endPoint = pickedPlace.value.name
-        endMeta.value = {
-            lat: pickedPlace.value.lat,
-            lng: pickedPlace.value.lng,
-            name: pickedPlace.value.name,
-            address: pickedPlace.value.address || pickedPlace.value.name,
-            placeId: null
+        endMeta.value = meta
+    } else if (String(pickingField.value).startsWith('wp-')) {
+        const idx = Number(String(pickingField.value).split('-')[1] || -1)
+        if (idx > -1) {
+            waypoints.value[idx].text = pickedPlace.value.name
+            waypointMetas.value[idx] = meta
         }
     }
     closePlacePicker()
@@ -591,10 +698,12 @@ onMounted(() => {
     fetchVehicles()
     if (window.google?.maps?.places) {
         initStartEndAutocomplete()
+        for (let i = 0; i < waypoints.value.length; i++) initWaypointAutocomplete(i)
     } else {
         window[GMAPS_CB] = () => {
             try { delete window[GMAPS_CB] } catch (e) { }
             initStartEndAutocomplete()
+            for (let i = 0; i < waypoints.value.length; i++) initWaypointAutocomplete(i)
         }
     }
 })
