@@ -156,31 +156,19 @@
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
                                             <ul class="space-y-1 text-sm text-gray-600">
-                                                <li>
-                                                    • จุดเริ่มต้น:
-                                                    <span class="font-medium text-gray-900">{{ route.originName
-                                                        }}</span>
-                                                    <span v-if="route.originAddress"> — {{ route.originAddress }}</span>
-                                                </li>
-
-                                                <template v-if="route.stops && route.stops.length">
-                                                    <li class="mt-2 text-gray-700">• จุดแวะระหว่างทาง ({{
-                                                        route.stops.length }} จุด):</li>
-                                                    <li v-for="(stop, idx) in route.stops" :key="idx">  - จุดแวะ {{ idx
-                                                        + 1 }}: {{ stop }}</li>
-                                                </template>
-
-                                                <li class="mt-1">
-                                                    • จุดปลายทาง:
-                                                    <span class="font-medium text-gray-900">{{ route.destinationName
-                                                        }}</span>
-                                                    <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                        }}</span>
-                                                </li>
-                                            </ul>
-                                            <!-- <ul class="space-y-1 text-sm text-gray-600">
+                                                <li v-if="route.originArea">• จุดเริ่มต้น (พื้นที่): {{ route.originArea
+                                                    }}</li>
+                                                <li v-if="route.destinationArea">• จุดปลายทาง (พื้นที่): {{
+                                                    route.destinationArea }}</li>
+                                                <li v-if="route.originAddress">• จุดเริ่มต้น (ที่อยู่): {{
+                                                    route.originAddress }}</li>
+                                                <li v-if="route.destinationAddress">• จุดปลายทาง (ที่อยู่): {{
+                                                    route.destinationAddress }}</li>
                                                 <li v-for="stop in route.stops" :key="stop">• {{ stop }}</li>
-                                            </ul> -->
+                                            </ul>
+                                            <ul class="space-y-1 text-sm text-gray-600">
+                                                <li v-for="stop in route.stops" :key="stop">• {{ stop }}</li>
+                                            </ul>
                                         </div>
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดรถ</h5>
@@ -331,8 +319,7 @@
                                 <div class="text-blue-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 5l7 7-7 7">
-                                        </path>
+                                            d="M9 5l7 7-7 7"></path>
                                     </svg>
                                 </div>
                                 <div class="flex-1 text-right">
@@ -555,13 +542,6 @@ const bookingTotalPrice = computed(() => {
     return bookingSeats.value * bookingRoute.value.price
 })
 
-function cleanAddr(a) {
-    return (a || '')
-        .replace(/,?\s*(Thailand|ไทย|ประเทศ)\s*$/i, '') // ตัดทั้ง Thailand/ไทย/ประเทศ ที่อยู่ท้ายสตริง
-        .replace(/\s{2,}/g, ' ')                         // เก็บช่องว่างซ้ำ
-        .trim();
-}
-
 async function handleSearch() {
     isLoading.value = true
     selectedRoute.value = null
@@ -571,60 +551,36 @@ async function handleSearch() {
         const raw = (apiRes?.data || apiRes || []).filter(r => r.status === 'AVAILABLE')
 
         // map ข้อมูลฐาน
-        routes.value = raw.map(route => {
-            // --- จัด waypoint → stops ---
-            const wp = route.waypoints || {};
-            const baseList = (Array.isArray(wp.used) && wp.used.length
-                ? wp.used
-                : Array.isArray(wp.requested) ? wp.requested : []);
-            const orderedList = (Array.isArray(wp.optimizedOrder) && wp.optimizedOrder.length === baseList.length)
-                ? wp.optimizedOrder.map(i => baseList[i])
-                : baseList;
-
-            const stops = orderedList.map(p => {
-                const name = p?.name || '';
-                // const address = (p?.address || '').replace(/,?\s*(Thailand|ไทย)\s*$/i, '');
-                const address = cleanAddr(p?.address || '');
-                const fallback = (p?.lat != null && p?.lng != null) ? `(${p.lat.toFixed(6)}, ${p.lng.toFixed(6)})` : '';
-                const title = name || fallback;
-                return address ? `${title} — ${address}` : title;
-            }).filter(Boolean);
-
-            // --- object ของ route ตามเดิม + เพิ่ม stops ---
-            return {
-                id: route.id,
-                availableSeats: route.availableSeats,
-                price: route.pricePerSeat,
-                departureTime: dayjs(route.departureTime).format('HH:mm น.'),
-                date: dayjs(route.departureTime).format('D MMMM BBBB'),
-                start: route.startLocation,
-                end: route.endLocation,
-                originName: route.startLocation?.name || `(${route.startLocation.lat.toFixed(2)}, ${route.startLocation.lng.toFixed(2)})`,
-                destinationName: route.endLocation?.name || `(${route.endLocation.lat.toFixed(2)}, ${route.endLocation.lng.toFixed(2)})`,
-                // originAddress: route.startLocation?.address || null,
-                // destinationAddress: route.endLocation?.address || null,
-                originAddress: route.startLocation?.address ? cleanAddr(route.startLocation.address) : null,
-                destinationAddress: route.endLocation?.address ? cleanAddr(route.endLocation.address) : null,
-                driver: {
-                    name: `${route.driver?.firstName || ''} ${route.driver?.lastName || ''}`.trim() || 'ไม่ระบุชื่อ',
-                    image: route.driver?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(route.driver?.firstName || 'U')}&background=random&size=64`,
-                    rating: 4.5,
-                    reviews: Math.floor(Math.random() * 50) + 5,
-                    isVerified: !!route.driver?.isVerified
-                },
-                carDetails: route.vehicle
-                    ? [`${route.vehicle.vehicleModel} (${route.vehicle.vehicleType})`, ...(route.vehicle.amenities || [])]
-                    : ['ไม่มีข้อมูลรถ'],
-                conditions: route.conditions,
-                photos: route.vehicle?.photos || [],
-                durationText: route.duration || '-',
-                distanceText: route.distance || '-',
-                polyline: route.routePolyline || null,
-
-                // เพิ่มเข้ามา
-                stops,
-            };
-        });
+        routes.value = raw.map(route => ({
+            id: route.id,
+            availableSeats: route.availableSeats,
+            price: route.pricePerSeat,
+            departureTime: dayjs(route.departureTime).format('HH:mm น.'),
+            date: dayjs(route.departureTime).format('D MMMM BBBB'),
+            start: route.startLocation,
+            end: route.endLocation,
+            // ตั้งชื่อเริ่มต้นเป็นพิกัดไว้ก่อน (กันหน้ากระพริบ)
+            originName: route.startLocation?.name || `(${route.startLocation.lat.toFixed(2)}, ${route.startLocation.lng.toFixed(2)})`,
+            destinationName: route.endLocation?.name || `(${route.endLocation.lat.toFixed(2)}, ${route.endLocation.lng.toFixed(2)})`,
+            // เก็บ address ไว้แสดงในรายละเอียด
+            originAddress: route.startLocation?.address || null,
+            destinationAddress: route.endLocation?.address || null,
+            driver: {
+                name: `${route.driver?.firstName || ''} ${route.driver?.lastName || ''}`.trim() || 'ไม่ระบุชื่อ',
+                image: route.driver?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(route.driver?.firstName || 'U')}&background=random&size=64`,
+                rating: 4.5,
+                reviews: Math.floor(Math.random() * 50) + 5,
+                isVerified: !!route.driver?.isVerified
+            },
+            carDetails: route.vehicle
+                ? [`${route.vehicle.vehicleModel} (${route.vehicle.vehicleType})`, ...(route.vehicle.amenities || [])]
+                : ['ไม่มีข้อมูลรถ'],
+            conditions: route.conditions,
+            photos: route.vehicle?.photos || [],
+            durationText: route.duration || '-',    // ใช้ค่าจาก backend ที่ส่งมาแล้ว (เช่น "9 ชั่วโมง 10 นาที")
+            distanceText: route.distance || '-',    // เช่น "687 กม."
+            polyline: route.routePolyline || null,
+        }))
 
         // รอให้ geocoder พร้อมก่อนค่อยทำ reverse geocode
         await waitMapReady()
@@ -703,8 +659,7 @@ async function extractNameParts(geocodeResult) {
     else if (province) area = province
 
     // ตัดประเทศทิ้งถ้าเผลอหลุดมา
-    // if (name) name = name.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-    if (name) name = name.replace(/,?\s*(Thailand|ไทย|ประเทศ)\s*$/i, '')
+    if (name) name = name.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
 
     return { name, area }
 }
@@ -851,8 +806,7 @@ async function formatPrettyAddress(geocodeResult) {
 
     // fallback: ใช้ formatted_address แต่พยายามตัดประเทศออก ให้สั้นลง
     const fa = geocodeResult.formatted_address || ''
-    // const trimmed = fa.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-    const trimmed = cleanAddr(fa)
+    const trimmed = fa.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
     return trimmed || null
 }
 
@@ -1192,8 +1146,7 @@ async function resolveBookingPicked(latlng) {
             address = details?.formatted_address || address
         }
     }
-    // if (address) address = address.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
-    if (address) address = cleanAddr(address)
+    if (address) address = address.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
 
     bookingPicked.value = { name, lat, lng, placeId, address }
 }
@@ -1228,8 +1181,7 @@ function geocodeText(text) {
             resolve({
                 lat, lng,
                 placeId: r.place_id || null,
-                // address: (r.formatted_address || '').replace(/,?\s*(Thailand|ไทย)\s*$/i, ''),
-                address: cleanAddr(r.formatted_address || ''),
+                address: (r.formatted_address || '').replace(/,?\s*(Thailand|ไทย)\s*$/i, ''),
                 name: parts.name || null
             })
         })
