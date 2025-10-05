@@ -376,7 +376,6 @@ const handleSubmit = async () => {
 
         if (needDriverVerify) {
             toast.error('จำเป็นต้องยืนยันตัวตน', 'คุณต้องยืนยันตัวตนผู้ขับก่อนจึงจะสร้างเส้นทางได้')
-            // รีไดเรกต์ไปหน้าตามที่ระบุไว้
             // window.location.href = 'http://localhost:3001/profile/driver-verification'
             setTimeout(() => { navigateTo('/profile/driver-verification') },1500)
         } else {

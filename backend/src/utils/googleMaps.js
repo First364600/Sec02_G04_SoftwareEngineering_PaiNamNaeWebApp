@@ -17,11 +17,11 @@ const normalizeLocation = (loc) => {
     return null;
 };
 
-const getDirections = async ({ origin, destination, waypoints = [], alternatives = true, departureTime }) => {
+const getDirections = async ({ origin, destination, waypoints = [], alternatives = true, departureTime, optimizeWaypoints }) => {
     const originStr = normalizeLocation(origin);
     const destStr = normalizeLocation(destination);
     if (!originStr || !destStr) {
-        throw new Error('Invalid origin/destination');
+        throw new Error("Invalid origin/destination")
     }
 
     const params = {
@@ -34,26 +34,41 @@ const getDirections = async ({ origin, destination, waypoints = [], alternatives
     };
 
     if (waypoints.length) {
-        const wp = waypoints.map(w => normalizeLocation(w)).filter(Boolean);
-        if (wp.length) params.waypoints = wp.join('|');
+        const wp = waypoints
+            .map(w => {
+                // ถ้าอยากให้เป็น “ผ่านจุด” (ไม่ถือว่าจอด) ใช้รูปแบบ `via:lat,lng`
+                // default: ถือเป็น stopover ปกติ
+                const s = normalizeLocation(w);
+                return w?.via ? `via:${s}` : s;
+            })
+            .filter(Boolean);
+
+        // เปิด optimize: Google จะจัดลำดับจุดแวะให้สั้นสุด
+        // if (optimizeWaypoints) {
+        //     params.waypoints = `optimize:true|${wp.join('|')}`;
+        // } else {
+        //     params.waypoints = wp.join('|');
+        // }
+        
+        // optimizeWaypoints: ให้ Google จัดลำดับ stopover (ไม่รวม via) ให้อัตโนมัติ
+        params.waypoints = (optimizeWaypoints ? 'optimize:true|' : '') + wp.join('|');
     }
 
     if (departureTime) {
-        // สำหรับ traffic-aware (ต้องเปิด Distance Matrix ด้วยในบางเคส)
         params.departure_time = Math.floor(new Date(departureTime).getTime() / 1000);
     }
 
     const url = 'https://maps.googleapis.com/maps/api/directions/json';
     const { data } = await axios.get(url, { params });
-
     if (data.status !== 'OK') {
         const msg = data.error_message || data.status;
         const err = new Error(`Google Directions error: ${msg}`);
         err.code = data.status;
         throw err;
     }
-    return data; // routes[], geocoded_waypoints, etc.
+    return data;
 };
+
 
 const geocode = async (address) => {
     const url = 'https://maps.googleapis.com/maps/api/geocode/json';

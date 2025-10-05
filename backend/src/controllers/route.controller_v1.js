@@ -66,7 +66,7 @@ const adminGetRoutesByDriver = asyncHandler(async (req, res) => {
 
 const createRoute = asyncHandler(async (req, res) => {
   const driverId = req.user.sub;
-  const { vehicleId, optimizeWaypoints, ...routeFields } = req.body;
+  const { vehicleId, ...routeFields } = req.body;
 
   await vehicleService.getVehicleById(vehicleId, driverId);
 
@@ -81,8 +81,8 @@ const createRoute = asyncHandler(async (req, res) => {
   const directions = await getDirections({
     origin: payload.startLocation,
     destination: payload.endLocation,
-    waypoints: routeFields.waypoints || [],
-    optimizeWaypoints,
+    waypoints: routeFields.waypoints || [],           // ✅
+    optimizeWaypoints: routeFields.optimizeWaypoints, // ✅
     alternatives: false,
     departureTime: payload.departureTime.toISOString()
   });
@@ -117,8 +117,7 @@ const createRoute = asyncHandler(async (req, res) => {
     payload.waypoints = {
       requested: routeFields.waypoints || [],
       optimizedOrder: primary.waypoint_order || [],
-      used: routeFields.waypoints ? (routeFields.waypoints.map((w, i) => w)) : [],
-      optimize: Boolean(routeFields.optimizeWaypoints)
+      used: routeFields.waypoints ? (routeFields.waypoints.map((w, i) => w)) : []
     };
 
     payload.landmarks = { overview_polyline: payload.routePolyline };
@@ -135,7 +134,7 @@ const createRoute = asyncHandler(async (req, res) => {
 const updateRoute = asyncHandler(async (req, res) => {
   const driverId = req.user.sub;
   const { id } = req.params;
-  const { vehicleId, optimizeWaypoints, ...routeFields } = req.body;
+  const { vehicleId, ...routeFields } = req.body;
 
   const existing = await routeService.getRouteById(id);
   if (!existing) throw new ApiError(404, "Route not found");
@@ -165,66 +164,40 @@ const updateRoute = asyncHandler(async (req, res) => {
   const endChanged = routeFields.endLocation !== undefined &&
     JSON.stringify(routeFields.endLocation) !== JSON.stringify(existing.endLocation);
   const timeChanged = routeFields.departureTime !== undefined;
-  const wpsChanged = routeFields.waypoints !== undefined &&
-    JSON.stringify(routeFields.waypoints) !== JSON.stringify(
-      Array.isArray(existing.waypoints) ? existing.waypoints : existing.waypoints?.requested || []
-    );
-  const optimizeChanged = routeFields.optimizeWaypoints !== undefined &&
-    optimizeWaypoints !== (existing.waypoints?.optimize ?? false)
 
-
-  if (startChanged || endChanged || timeChanged || wpsChanged || optimizeChanged) {
+  if (startChanged || endChanged || timeChanged) {
     const origin = payload.startLocation ?? existing.startLocation;
     const destination = payload.endLocation ?? existing.endLocation;
     const depTime = (payload.departureTime ?? existing.departureTime).toISOString();
-    const currentWps =
-      routeFields.waypoints !== undefined
-        ? (routeFields.waypoints || [])
-        : (Array.isArray(existing.waypoints) ? existing.waypoints : existing.waypoints?.requested || []);
-    const currentOptimize =
-      optimizeWaypoints !== undefined
-        ? optimizeWaypoints
-        : (existing.waypoints?.optimize ?? false);
 
     const directions = await getDirections({
       origin,
       destination,
-      waypoints: currentWps,
-      optimizeWaypoints: currentOptimize,
       alternatives: false,
       departureTime: depTime
     });
 
     const primary = directions.routes?.[0];
-    if (primary) {
-      const legs = primary.legs || [];
-      const sumMeters = legs.reduce((a, l) => a + (l.distance?.value || 0), 0);
-      const sumSeconds = legs.reduce((a, l) => a + (l.duration?.value || 0), 0);
+    const leg = primary?.legs?.[0];
 
-      payload.routeSummary = primary.summary || `${legs[0]?.start_address} → ${legs.at(-1)?.end_address}`;
-      payload.distance = legs.length ? legs.map(l => l.distance?.text).filter(Boolean).join(' + ') : null;
-      payload.duration = legs.length ? legs.map(l => l.duration?.text).filter(Boolean).join(' + ') : null;
-      payload.distanceMeters = sumMeters;
-      payload.durationSeconds = sumSeconds;
+    if (primary && leg) {
+      payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+      payload.distance = leg.distance?.text || null;
+      payload.duration = leg.duration?.text || null;
+      payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+      payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
       payload.routePolyline = primary.overview_polyline?.points || null;
 
-      payload.steps = legs.flatMap(leg =>
-        (leg.steps || []).map(s => ({
-          html_instructions: s.html_instructions,
-          distance: s.distance?.text,
-          duration: s.duration?.text,
-          start_location: s.start_location,
-          end_location: s.end_location,
-          travel_mode: s.travel_mode,
-          maneuver: s.maneuver || null,
-        }))
-      );
-      payload.waypoints = {
-        requested: currentWps,
-        optimizedOrder: primary.waypoint_order || [],
-        used: currentWps.map(w => w),
-        optimize: Boolean(currentOptimize)
-      };
+      payload.steps = leg.steps?.map(s => ({
+        html_instructions: s.html_instructions,
+        distance: s.distance?.text,
+        duration: s.duration?.text,
+        start_location: s.start_location,
+        end_location: s.end_location,
+        travel_mode: s.travel_mode,
+        maneuver: s.maneuver || null,
+      })) || [];
+      payload.waypoints = primary.waypoint_order || [];
       payload.landmarks = { overview_polyline: payload.routePolyline };
     }
   }
@@ -257,7 +230,7 @@ const deleteRoute = asyncHandler(async (req, res) => {
 });
 
 const adminCreateRoute = asyncHandler(async (req, res) => {
-  const { driverId, vehicleId, optimizeWaypoints, ...routeFields } = req.body;
+  const { driverId, vehicleId, ...routeFields } = req.body;
 
   const approved = await verifService.canCreateRoutes(driverId);
   if (!approved) {
@@ -273,47 +246,35 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
     departureTime: new Date(routeFields.departureTime),
   };
 
-  // Enrich แบบเดียวกับ createRoute (รองรับ waypoints/optimizeWaypoints)
+  // Enrich แบบเดียวกับ createRoute
   const directions = await getDirections({
     origin: payload.startLocation,
     destination: payload.endLocation,
-    waypoints: routeFields.waypoints || [],
-    optimizeWaypoints,
     alternatives: false,
     departureTime: payload.departureTime.toISOString()
   });
-  const primary = directions.routes?.[0];
-  if (primary) {
-    const legs = primary.legs || [];
-    const sumMeters = legs.reduce((a, l) => a + (l.distance?.value || 0), 0);
-    const sumSeconds = legs.reduce((a, l) => a + (l.duration?.value || 0), 0);
 
-    payload.routeSummary = primary.summary || `${legs[0]?.start_address} → ${legs.at(-1)?.end_address}`;
-    payload.distance = legs.length ? legs.map(l => l.distance?.text).filter(Boolean).join(' + ') : null;
-    payload.duration = legs.length ? legs.map(l => l.duration?.text).filter(Boolean).join(' + ') : null;
-    payload.distanceMeters = sumMeters;
-    payload.durationSeconds = sumSeconds;
+  const primary = directions.routes?.[0];
+  const leg = primary?.legs?.[0];
+
+  if (primary && leg) {
+    payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+    payload.distance = leg.distance?.text || null;
+    payload.duration = leg.duration?.text || null;
+    payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+    payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
     payload.routePolyline = primary.overview_polyline?.points || null;
 
-    // รวม steps ทุก leg
-    payload.steps = legs.flatMap(leg =>
-      (leg.steps || []).map(s => ({
-        html_instructions: s.html_instructions,
-        distance: s.distance?.text,
-        duration: s.duration?.text,
-        start_location: s.start_location,
-        end_location: s.end_location,
-        travel_mode: s.travel_mode,
-        maneuver: s.maneuver || null,
-      }))
-    );
-
-    payload.waypoints = {
-      requested: routeFields.waypoints || [],
-      optimizedOrder: primary.waypoint_order || [],
-      used: routeFields.waypoints ? routeFields.waypoints.map(w => w) : [],
-      optimize: Boolean(optimizeWaypoints)
-    };
+    payload.steps = leg.steps?.map(s => ({
+      html_instructions: s.html_instructions,
+      distance: s.distance?.text,
+      duration: s.duration?.text,
+      start_location: s.start_location,
+      end_location: s.end_location,
+      travel_mode: s.travel_mode,
+      maneuver: s.maneuver || null,
+    })) || [];
+    payload.waypoints = primary.waypoint_order || [];
     payload.landmarks = { overview_polyline: payload.routePolyline };
   }
 
@@ -327,7 +288,7 @@ const adminCreateRoute = asyncHandler(async (req, res) => {
 
 const adminUpdateRoute = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { driverId, vehicleId, optimizeWaypoints, ...routeFields } = req.body;
+  const { driverId, vehicleId, ...routeFields } = req.body;
 
   const existing = await routeService.getRouteById(id);
   if (!existing) throw new ApiError(404, "Route not found");
@@ -364,65 +325,48 @@ const adminUpdateRoute = asyncHandler(async (req, res) => {
   const endChanged = routeFields.endLocation !== undefined &&
     JSON.stringify(routeFields.endLocation) !== JSON.stringify(existing.endLocation);
   const timeChanged = routeFields.departureTime !== undefined;
-  const wpsChanged = routeFields.waypoints !== undefined &&
-    JSON.stringify(routeFields.waypoints) !== JSON.stringify(
-      Array.isArray(existing.waypoints) ? existing.waypoints : existing.waypoints?.requested || []
-    );
-  const optimizeChanged = routeFields.optimizeWaypoints !== undefined &&
-    optimizeWaypoints !== (existing.waypoints?.optimize ?? false)
 
-  if (startChanged || endChanged || timeChanged || wpsChanged || optimizeChanged) {
+  if (startChanged || endChanged || timeChanged) {
     const origin = payload.startLocation ?? existing.startLocation;
     const destination = payload.endLocation ?? existing.endLocation;
     const depTime = (payload.departureTime ?? existing.departureTime).toISOString();
 
-    const currentWps =
-      routeFields.waypoints !== undefined
-        ? (routeFields.waypoints || [])
-        : (Array.isArray(existing.waypoints) ? existing.waypoints : existing.waypoints?.requested || []);
-    const currentOptimize =
-      optimizeWaypoints !== undefined
-        ? optimizeWaypoints
-        : (existing.waypoints?.optimize ?? false);
-
     const directions = await getDirections({
       origin,
       destination,
-      waypoints: currentWps,
-      optimizeWaypoints: currentOptimize,
       alternatives: false,
       departureTime: depTime
     });
-    const primary = directions.routes?.[0];
-    if (primary) {
-      const legs = primary.legs || [];
-      const sumMeters = legs.reduce((a, l) => a + (l.distance?.value || 0), 0);
-      const sumSeconds = legs.reduce((a, l) => a + (l.duration?.value || 0), 0);
 
-      payload.routeSummary = primary.summary || `${legs[0]?.start_address} → ${legs.at(-1)?.end_address}`;
-      payload.distance = legs.length ? legs.map(l => l.distance?.text).filter(Boolean).join(' + ') : null;
-      payload.duration = legs.length ? legs.map(l => l.duration?.text).filter(Boolean).join(' + ') : null;
-      payload.distanceMeters = sumMeters;
-      payload.durationSeconds = sumSeconds;
+    const primary = directions.routes?.[0];
+    const leg = primary?.legs?.[0];
+
+    if (primary && leg) {
+      payload.routeSummary = primary.summary || (leg.start_address + ' → ' + leg.end_address);
+
+      // แสดงผลแบบข้อความ (คงไว้)
+      payload.distance = leg.distance?.text || null;
+      payload.duration = leg.duration?.text || null;
+
+      // หน่วยดิบใหม่
+      payload.distanceMeters = typeof leg.distance?.value === 'number' ? leg.distance.value : null;
+      payload.durationSeconds = typeof leg.duration?.value === 'number' ? leg.duration.value : null;
+
+      // polyline หลัก
       payload.routePolyline = primary.overview_polyline?.points || null;
 
-      payload.steps = legs.flatMap(leg =>
-        (leg.steps || []).map(s => ({
-          html_instructions: s.html_instructions,
-          distance: s.distance?.text,
-          duration: s.duration?.text,
-          start_location: s.start_location,
-          end_location: s.end_location,
-          travel_mode: s.travel_mode,
-          maneuver: s.maneuver || null,
-        }))
-      );
-      payload.waypoints = {
-        requested: currentWps,
-        optimizedOrder: primary.waypoint_order || [],
-        used: currentWps.map(w => w),
-        optimize: Boolean(currentOptimize)
-      };
+      // steps/waypoints
+      payload.steps = leg.steps?.map(s => ({
+        html_instructions: s.html_instructions,
+        distance: s.distance?.text,
+        duration: s.duration?.text,
+        start_location: s.start_location,
+        end_location: s.end_location,
+        travel_mode: s.travel_mode,
+        maneuver: s.maneuver || null,
+      })) || [];
+
+      payload.waypoints = primary.waypoint_order || [];
       payload.landmarks = { overview_polyline: payload.routePolyline };
     }
   }

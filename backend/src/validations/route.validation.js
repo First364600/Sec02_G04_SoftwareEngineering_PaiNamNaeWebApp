@@ -16,7 +16,16 @@ const createRouteSchema = z.object({
   routeSummary: z.string().optional(),
   distance: z.string().optional(),
   duration: z.string().optional(),
-  waypoints: z.any().optional(),
+  // waypoints: z.any().optional(),
+  waypoints: z.array(z.object({
+    lat: z.number(),
+    lng: z.number(),
+    name: z.string().optional(),
+    address: z.string().optional(),
+    placeId: z.string().optional(),
+    via: z.boolean().optional(),
+  })).optional(),
+  optimizeWaypoints: z.boolean().optional(),
   landmarks: z.any().optional(),
   steps: z.any().optional(),
 });

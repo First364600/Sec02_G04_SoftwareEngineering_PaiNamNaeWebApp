@@ -17,6 +17,7 @@ router.post(
             waypoints: z.array(z.any()).optional(),
             alternatives: z.boolean().optional(),
             departureTime: z.string().optional(),
+            optimizeWaypoints: z.boolean().optional(),
         })
     }),
     ctrl.directions
