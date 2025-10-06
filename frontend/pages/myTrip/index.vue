@@ -105,9 +105,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ trip.destination
-                                                    }}</span>
+                                                        }}</span>
                                                     <span v-if="trip.destinationAddress"> — {{ trip.destinationAddress
-                                                    }}</span>
+                                                        }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -319,11 +319,13 @@ async function fetchMyTrips() {
                 carDetails,
                 conditions: b.route.conditions,
                 photos: b.route.vehicle?.photos || [],
-                durationText: b.route.duration
+                durationText:
+                    (typeof b.route.duration === 'string' ? formatDuration(b.route.duration) : b.route.duration)
                     || (typeof b.route.durationSeconds === 'number'
                         ? `${Math.round(b.route.durationSeconds / 60)} นาที`
                         : '-'),
-                distanceText: b.route.distance
+                distanceText:
+                    (typeof b.route.distance === 'string' ? formatDistance(b.route.distance) : b.route.distance)
                     || (typeof b.route.distanceMeters === 'number'
                         ? `${(b.route.distanceMeters / 1000).toFixed(1)} กม.`
                         : '-'),
@@ -567,6 +569,45 @@ const handleConfirmAction = async () => {
         closeConfirmModal();
     }
 };
+
+function formatDistance(input) {
+    if (typeof input !== 'string') return input
+    const parts = input.split('+')
+    if (parts.length <= 1) return input
+
+    let meters = 0
+    for (const seg of parts) {
+        const n = parseFloat(seg.replace(/[^\d.]/g, ''))
+        if (Number.isNaN(n)) continue
+        if (/กม/.test(seg)) meters += n * 1000
+        else if (/เมตร|ม\./.test(seg)) meters += n
+        else meters += n // สมมติเป็นเมตรถ้าไม่พบหน่วย
+    }
+
+    if (meters >= 1000) {
+        const km = Math.round((meters / 1000) * 10) / 10 // ปัดทศนิยม 1 ตำแหน่ง
+        return `${(km % 1 === 0 ? km.toFixed(0) : km)} กม.`
+    }
+    return `${Math.round(meters)} ม.`
+}
+
+function formatDuration(input) {
+    if (typeof input !== 'string') return input
+    const parts = input.split('+')
+    if (parts.length <= 1) return input
+
+    let minutes = 0
+    for (const seg of parts) {
+        const n = parseFloat(seg.replace(/[^\d.]/g, ''))
+        if (Number.isNaN(n)) continue
+        if (/ชม/.test(seg)) minutes += n * 60
+        else minutes += n // นาที
+    }
+
+    const h = Math.floor(minutes / 60)
+    const m = Math.round(minutes % 60)
+    return h ? (m ? `${h} ชม. ${m} นาที` : `${h} ชม.`) : `${m} นาที`
+}
 
 // --- Lifecycle and Watchers ---
 useHead({

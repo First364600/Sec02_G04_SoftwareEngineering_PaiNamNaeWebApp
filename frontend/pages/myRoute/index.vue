@@ -112,7 +112,7 @@
                                             <div class="flex text-sm text-yellow-400">
                                                 <span>
                                                     {{ '★'.repeat(Math.round(trip.passenger.rating)) }}{{ '☆'.repeat(5 -
-                                                    Math.round(trip.passenger.rating)) }}
+                                                        Math.round(trip.passenger.rating)) }}
                                                 </span>
                                             </div>
                                             <span class="ml-2 text-sm text-gray-600">
@@ -372,8 +372,8 @@ async function fetchMyRoutes() {
                     photos: r.vehicle?.photos || [],
                     originAddress: start?.address ? cleanAddr(start.address) : null,
                     destinationAddress: end?.address ? cleanAddr(end.address) : null,
-                    durationText: r.duration || (r.durationSeconds ? `${Math.round(r.durationSeconds / 60)} นาที` : '-'),
-                    distanceText: r.distance || (r.distanceMeters ? `${(r.distanceMeters / 1000).toFixed(1)} กม.` : '-'),
+                    durationText: (typeof r.duration === 'string' ? formatDuration(r.duration) : r.duration) || (r.durationSeconds ? `${Math.round(r.durationSeconds / 60)} นาที` : '-'),
+                    distanceText: (typeof r.distance === 'string' ? formatDistance(r.distance) : r.distance) || (r.distanceMeters ? `${(r.distanceMeters / 1000).toFixed(1)} กม.` : '-'),
                 })
             }
         }
@@ -596,6 +596,45 @@ const copyEmail = async (email) => {
     } catch (e) {
         toast.error('คัดลอกไม่สำเร็จ', 'ลองใหม่อีกครั้ง')
     }
+}
+
+function formatDistance(input) {
+    if (typeof input !== 'string') return input
+    const parts = input.split('+')
+    if (parts.length <= 1) return input
+
+    let meters = 0
+    for (const seg of parts) {
+        const n = parseFloat(seg.replace(/[^\d.]/g, ''))
+        if (Number.isNaN(n)) continue
+        if (/กม/.test(seg)) meters += n * 1000
+        else if (/เมตร|ม\./.test(seg)) meters += n
+        else meters += n // สมมติเป็นเมตรถ้าไม่พบหน่วย
+    }
+
+    if (meters >= 1000) {
+        const km = Math.round((meters / 1000) * 10) / 10 // ปัดทศนิยม 1 ตำแหน่ง
+        return `${(km % 1 === 0 ? km.toFixed(0) : km)} กม.`
+    }
+    return `${Math.round(meters)} ม.`
+}
+
+function formatDuration(input) {
+    if (typeof input !== 'string') return input
+    const parts = input.split('+')
+    if (parts.length <= 1) return input
+
+    let minutes = 0
+    for (const seg of parts) {
+        const n = parseFloat(seg.replace(/[^\d.]/g, ''))
+        if (Number.isNaN(n)) continue
+        if (/ชม/.test(seg)) minutes += n * 60
+        else minutes += n // นาที
+    }
+
+    const h = Math.floor(minutes / 60)
+    const m = Math.round(minutes % 60)
+    return h ? (m ? `${h} ชม. ${m} นาที` : `${h} ชม.`) : `${m} นาที`
 }
 
 // --- Lifecycle ---

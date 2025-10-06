@@ -624,8 +624,8 @@ async function handleSearch() {
                     : ['ไม่มีข้อมูลรถ'],
                 conditions: route.conditions,
                 photos: route.vehicle?.photos || [],
-                durationText: route.duration || '-',
-                distanceText: route.distance || '-',
+                durationText: formatDuration(route.duration) || route.duration || '-',
+                distanceText: formatDistance(route.distance) || route.distance || '-',
                 polyline: route.routePolyline || null,
 
                 // เพิ่มเข้ามา
@@ -1258,6 +1258,45 @@ function geocodeText(text) {
             })
         })
     })
+}
+
+function formatDistance(input) {
+    if (typeof input !== 'string') return input
+    const parts = input.split('+')
+    if (parts.length <= 1) return input
+
+    let meters = 0
+    for (const seg of parts) {
+        const n = parseFloat(seg.replace(/[^\d.]/g, ''))
+        if (Number.isNaN(n)) continue
+        if (/กม/.test(seg)) meters += n * 1000
+        else if (/เมตร|ม\./.test(seg)) meters += n
+        else meters += n // สมมติเป็นเมตรถ้าไม่พบหน่วย
+    }
+
+    if (meters >= 1000) {
+        const km = Math.round((meters / 1000) * 10) / 10 // ปัดทศนิยม 1 ตำแหน่ง
+        return `${(km % 1 === 0 ? km.toFixed(0) : km)} กม.`
+    }
+    return `${Math.round(meters)} ม.`
+}
+
+function formatDuration(input) {
+    if (typeof input !== 'string') return input
+    const parts = input.split('+')
+    if (parts.length <= 1) return input
+
+    let minutes = 0
+    for (const seg of parts) {
+        const n = parseFloat(seg.replace(/[^\d.]/g, ''))
+        if (Number.isNaN(n)) continue
+        if (/ชม/.test(seg)) minutes += n * 60
+        else minutes += n // นาที
+    }
+
+    const h = Math.floor(minutes / 60)
+    const m = Math.round(minutes % 60)
+    return h ? (m ? `${h} ชม. ${m} นาที` : `${h} ชม.`) : `${m} นาที`
 }
 
 onMounted(() => {
