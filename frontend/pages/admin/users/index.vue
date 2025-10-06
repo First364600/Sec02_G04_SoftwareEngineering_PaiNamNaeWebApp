@@ -11,7 +11,7 @@
                 <div class="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
                     <!-- Left: Title + Create Button -->
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl font-semibold text-gray-800">Users (Admin)</h1>
+                        <h1 class="text-2xl font-semibold text-gray-800">User Management</h1>
                         <button @click="onCreateUser"
                             class="inline-flex items-center gap-2 px-3 py-2 text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700">
                             <i class="fa-solid fa-plus"></i>
