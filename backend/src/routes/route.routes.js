@@ -34,6 +34,16 @@ router.get(
   routeController.adminGetRoutesByDriver
 )
 
+
+// GET /routes/admin/:id
+router.get(
+  "/admin/:id",
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  routeController.getRouteById
+);
+
 // POST /routes/admin
 router.post(
   "/admin",
