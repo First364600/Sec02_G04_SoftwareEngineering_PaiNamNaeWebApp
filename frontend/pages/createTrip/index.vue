@@ -84,7 +84,7 @@
                                 </div>
 
                                 <button type="button" @click="addWaypoint"
-                                    class="inline-flex items-center gap-2 px-3 py-2 text-sm text-blue-700 rounded-md bg-blue-50 hover:bg-blue-100">
+                                    class="inline-flex items-center gap-2 px-3 py-2 text-sm text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700">
                                     <i class="fa-solid fa-plus"></i>
                                     เพิ่มจุดแวะ
                                 </button>
@@ -153,7 +153,7 @@
                             </div>
                             <div class="self-end">
                                 <button type="button" @click="isModalOpen = true"
-                                    class="w-full px-4 py-3 text-sm text-gray-800 transition-colors bg-gray-100 rounded-md md:w-auto hover:bg-gray-200">
+                                    class="w-full px-4 py-3 text-sm text-gray-800 transition-colors bg-gray-100 rounded-md cursor-pointer md:w-auto hover:bg-gray-200">
                                     เพิ่ม / จัดการข้อมูลรถยนต์
                                 </button>
                             </div>
@@ -184,11 +184,11 @@
 
                     <div class="flex justify-end gap-4 pt-6">
                         <button type="button"
-                            class="px-6 py-3 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="px-6 py-3 text-gray-700 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             ยกเลิก
                         </button>
                         <button type="submit" :disabled="isLoading"
-                            class="px-6 py-3 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            class="px-6 py-3 font-medium text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
                             {{ isLoading ? 'กำลังสร้าง...' : 'สร้างการเดินทาง' }}
                         </button>
                     </div>

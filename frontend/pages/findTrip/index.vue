@@ -159,7 +159,7 @@
                                                 <li>
                                                     • จุดเริ่มต้น:
                                                     <span class="font-medium text-gray-900">{{ route.originName
-                                                        }}</span>
+                                                    }}</span>
                                                     <span v-if="route.originAddress"> — {{ route.originAddress }}</span>
                                                 </li>
 
@@ -173,9 +173,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ route.destinationName
-                                                        }}</span>
+                                                    }}</span>
                                                     <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                        }}</span>
+                                                    }}</span>
                                                 </li>
                                             </ul>
                                             <!-- <ul class="space-y-1 text-sm text-gray-600">
@@ -210,7 +210,7 @@
                                     </div>
                                     <div class="flex justify-end mt-4">
                                         <button @click.stop="openModal(route)" :disabled="route.availableSeats === 0"
-                                            class="px-6 py-2 text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                            class="px-6 py-2 text-white transition duration-200 bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                             จองที่นั่ง
                                         </button>
                                     </div>
@@ -543,6 +543,7 @@ let endMarker = null
 let geocoder = null
 let placesService = null
 const mapReady = ref(false)
+let stopMarkers = []
 
 const showModal = ref(false)
 const bookingRoute = ref(null)
@@ -590,6 +591,12 @@ async function handleSearch() {
                 return address ? `${title} — ${address}` : title;
             }).filter(Boolean);
 
+            const stopsCoords = orderedList
+                .map(p => (p && typeof p.lat === 'number' && typeof p.lng === 'number')
+                    ? { lat: p.lat, lng: p.lng, name: p.name || '', address: p.address || '' }
+                    : null
+                )
+                .filter(Boolean)
             // --- object ของ route ตามเดิม + เพิ่ม stops ---
             return {
                 id: route.id,
@@ -623,6 +630,7 @@ async function handleSearch() {
 
                 // เพิ่มเข้ามา
                 stops,
+                stopsCoords,
             };
         });
 
@@ -754,6 +762,11 @@ function clearMapDrawing() {
     if (activePolyline) { activePolyline.setMap(null); activePolyline = null }
     if (startMarker) { startMarker.setMap(null); startMarker = null }
     if (endMarker) { endMarker.setMap(null); endMarker = null }
+
+    if (stopMarkers.length) {
+        stopMarkers.forEach(m => m.setMap(null))
+        stopMarkers = []
+    }
 }
 
 async function updateMapForRoute(route) {
@@ -774,6 +787,15 @@ async function updateMapForRoute(route) {
         map: gmap, label: 'B'
     })
 
+    if (Array.isArray(route.stopsCoords) && route.stopsCoords.length) {
+        stopMarkers = route.stopsCoords.map((s, idx) => new google.maps.Marker({
+            position: { lat: s.lat, lng: s.lng },
+            map: gmap,
+            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            title: s.name || s.address || `จุดแวะ ${idx + 1}`
+        }))
+    }
+
     // วาดเส้นจาก polyline ถ้ามี
     if (route.polyline && google.maps.geometry?.encoding) {
         const path = google.maps.geometry.encoding.decodePath(route.polyline)
@@ -782,19 +804,21 @@ async function updateMapForRoute(route) {
         })
         const bounds = new google.maps.LatLngBounds()
         path.forEach(p => bounds.extend(p))
+
+        if (route.stopsCoords?.length) {
+            route.stopsCoords.forEach(s => bounds.extend(new google.maps.LatLng(s.lat, s.lng)))
+        }
+
         gmap.fitBounds(bounds) // << ตัด arg ที่ 2 ออก ป้องกัน overload เพี้ยน
     } else {
-        // ไม่มี polyline: fit จาก A-B
-        const sw = new google.maps.LatLng(
-            Math.min(route.start.lat, route.end.lat),
-            Math.min(route.start.lng, route.end.lng)
-        )
-        const ne = new google.maps.LatLng(
-            Math.max(route.start.lat, route.end.lat),
-            Math.max(route.start.lng, route.end.lng)
-        )
-        const bounds = new google.maps.LatLngBounds(sw, ne)
-        gmap.fitBounds(bounds) // << ไม่ส่ง padding
+        // ไม่มี polyline -> fit จาก A-B + จุดแวะ
+        const bounds = new google.maps.LatLngBounds()
+        bounds.extend(new google.maps.LatLng(route.start.lat, route.start.lng))
+        bounds.extend(new google.maps.LatLng(route.end.lat, route.end.lng))
+        if (route.stopsCoords?.length) {
+            route.stopsCoords.forEach(s => bounds.extend(new google.maps.LatLng(s.lat, s.lng)))
+        }
+        gmap.fitBounds(bounds)
     }
 }
 

@@ -51,6 +51,11 @@
                                                 class="status-badge status-cancelled">ยกเลิก</span>
                                         </div>
                                         <p class="mt-1 text-sm text-gray-600">จุดนัดพบ: {{ trip.pickupPoint }}</p>
+                                        <!-- <p class="text-sm text-gray-600">วันที่: {{ trip.date }} เวลา: {{ trip.time }}
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            ระยะเวลา: {{ trip.durationText }} , ระยะทาง: {{ trip.distanceText }}
+                                        </p> -->
                                         <p class="text-sm text-gray-600">
                                             วันที่: {{ trip.date }}
                                             <span class="mx-2 text-gray-300">|</span>
@@ -112,7 +117,7 @@
                                             <div class="flex text-sm text-yellow-400">
                                                 <span>
                                                     {{ '★'.repeat(Math.round(trip.passenger.rating)) }}{{ '☆'.repeat(5 -
-                                                    Math.round(trip.passenger.rating)) }}
+                                                        Math.round(trip.passenger.rating)) }}
                                                 </span>
                                             </div>
                                             <span class="ml-2 text-sm text-gray-600">
@@ -126,33 +131,17 @@
                                     </div>
                                 </div>
 
-                                <!-- รายละเอียดเส้นทาง + จุดแวะ (รูปแบบเหมือนหน้า findTrip) -->
                                 <div v-if="selectedTripId === trip.id"
                                     class="pt-4 mt-4 mb-5 duration-300 border-t border-gray-300 animate-in slide-in-from-top">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
                                             <ul class="space-y-1 text-sm text-gray-600">
-                                                <li>
-                                                    • จุดเริ่มต้น:
-                                                    <span class="font-medium text-gray-900">{{ trip.origin }}</span>
-                                                    <span v-if="trip.originAddress"> — {{ trip.originAddress }}</span>
-                                                </li>
-
-                                                <template v-if="trip.stops && trip.stops.length">
-                                                    <li class="mt-2 text-gray-700">• จุดแวะระหว่างทาง ({{
-                                                        trip.stops.length }} จุด):</li>
-                                                    <li v-for="(stop, idx) in trip.stops" :key="idx">  - จุดแวะ {{ idx +
-                                                        1 }}: {{ stop }}</li>
-                                                </template>
-
-                                                <li class="mt-1">
-                                                    • จุดปลายทาง:
-                                                    <span class="font-medium text-gray-900">{{ trip.destination
-                                                        }}</span>
-                                                    <span v-if="trip.destinationAddress"> — {{ trip.destinationAddress
-                                                        }}</span>
-                                                </li>
+                                                <li v-if="trip.originAddress">• จุดเริ่มต้น (ที่อยู่): {{
+                                                    trip.originAddress }}</li>
+                                                <li v-if="trip.destinationAddress">• จุดปลายทาง (ที่อยู่): {{
+                                                    trip.destinationAddress }}</li>
+                                                <li v-for="stop in trip.stops" :key="stop">• {{ stop }}</li>
                                             </ul>
                                         </div>
                                         <div>
@@ -253,7 +242,7 @@ const isLoading = ref(false)
 const mapContainer = ref(null)
 const allTrips = ref([])
 
-// ---------- Google Maps states ----------
+// ---------- Google Maps states (เหมือนหน้า myTrip) ----------
 let gmap = null
 let activePolyline = null
 let startMarker = null
@@ -262,8 +251,6 @@ let geocoder = null
 let placesService = null
 const mapReady = ref(false)
 const GMAPS_CB = '__gmapsReady__'
-// NEW: เก็บหมุดจุดแวะ
-let stopMarkers = []
 
 const tabs = [
     { status: 'pending', label: 'รอดำเนินการ' },
@@ -274,14 +261,6 @@ const tabs = [
 ]
 
 definePageMeta({ middleware: 'auth' })
-
-// --- Helpers ---
-function cleanAddr(a) {
-    return (a || '')
-        .replace(/,?\s*(Thailand|ไทย|ประเทศ)\s*$/i, '')
-        .replace(/\s{2,}/g, ' ')
-        .trim()
-}
 
 // --- Computed ---
 const filteredTrips = computed(() => {
@@ -314,36 +293,14 @@ async function fetchMyRoutes() {
             const end = r.endLocation
             const coords = [[start.lat, start.lng], [end.lat, end.lng]]
 
-            // NEW: สร้าง stops และ stopsCoords จาก waypoints (เหมือนหน้า findTrip)
-            const wp = r.waypoints || {}
-            const baseList = (Array.isArray(wp.used) && wp.used.length
-                ? wp.used
-                : Array.isArray(wp.requested) ? wp.requested : [])
-            const orderedList = (Array.isArray(wp.optimizedOrder) && wp.optimizedOrder.length === baseList.length)
-                ? wp.optimizedOrder.map(i => baseList[i])
-                : baseList
-
-            const stops = orderedList.map(p => {
-                const name = p?.name || ''
-                const address = cleanAddr(p?.address || '')
-                const fallback = (p?.lat != null && p?.lng != null) ? `(${p.lat.toFixed(6)}, ${p.lng.toFixed(6)})` : ''
-                const title = name || fallback
-                return address ? `${title} — ${address}` : title
-            }).filter(Boolean)
-
-            const stopsCoords = orderedList
-                .map(p => (p && typeof p.lat === 'number' && typeof p.lng === 'number')
-                    ? { lat: p.lat, lng: p.lng, name: p.name || '', address: p.address || '' }
-                    : null
-                )
-                .filter(Boolean)
-
             for (const b of (r.bookings || [])) {
                 formatted.push({
                     id: b.id,
                     status: (b.status || '').toLowerCase(),
+                    // ชื่อจุดเริ่ม/ปลายทาง: ใช้ name จาก backend ก่อน ถ้าไม่มีค่อยไป reverse ภายหลัง
                     origin: start?.name || `(${Number(start.lat).toFixed(2)}, ${Number(start.lng).toFixed(2)})`,
                     destination: end?.name || `(${Number(end.lat).toFixed(2)}, ${Number(end.lng).toFixed(2)})`,
+                    // เก็บ flag ว่ามี name มาอยู่แล้ว กัน reverse ไปทับโดยไม่จำเป็น
                     originHasName: !!start?.name,
                     destinationHasName: !!end?.name,
 
@@ -362,16 +319,12 @@ async function fetchMyRoutes() {
                     },
                     coords,
                     polyline: r.routePolyline || null,
-
-                    // NEW:
-                    stops,
-                    stopsCoords,
-
+                    stops: ['ไม่มีข้อมูลจุดแวะพัก'],
                     carDetails: carDetailsList,
                     conditions: r.conditions,
                     photos: r.vehicle?.photos || [],
-                    originAddress: start?.address ? cleanAddr(start.address) : null,
-                    destinationAddress: end?.address ? cleanAddr(end.address) : null,
+                    originAddress: start?.address || null,
+                    destinationAddress: end?.address || null,
                     durationText: r.duration || (r.durationSeconds ? `${Math.round(r.durationSeconds / 60)} นาที` : '-'),
                     distanceText: r.distance || (r.distanceMeters ? `${(r.distanceMeters / 1000).toFixed(1)} กม.` : '-'),
                 })
@@ -379,7 +332,7 @@ async function fetchMyRoutes() {
         }
         allTrips.value = formatted
 
-        // รอแผนที่พร้อม แล้ว reverse เฉพาะกรณีที่ backend ไม่มี name
+        // รอให้แผนที่พร้อม แล้วจึง reverse geocode สำหรับรายการที่ยังไม่มี name
         await waitMapReady()
         const jobs = allTrips.value.map(async (t, idx) => {
             const [o, d] = await Promise.all([
@@ -441,6 +394,7 @@ async function extractNameParts(geocodeResult) {
     if (!geocodeResult) return { name: null, area: null }
     const comps = geocodeResult.address_components || []
     const byType = (t) => comps.find(c => c.types.includes(t))?.long_name
+    const byTypeShort = (t) => comps.find(c => c.types.includes(t))?.short_name
 
     const types = geocodeResult.types || []
     const isPoi = types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')
@@ -451,8 +405,8 @@ async function extractNameParts(geocodeResult) {
         if (poiName) name = poiName
     }
     if (!name) {
-        const streetNumber = comps.find(c => c.types.includes('street_number'))?.long_name
-        const route = comps.find(c => c.types.includes('route'))?.long_name
+        const streetNumber = byType('street_number')
+        const route = byType('route')
         name = (streetNumber && route) ? `${streetNumber} ${route}` : (route || geocodeResult.formatted_address || null)
     }
     if (name) name = name.replace(/,?\s*(Thailand|ไทย)\s*$/i, '')
@@ -478,10 +432,6 @@ async function updateMap(trip) {
     if (activePolyline) { activePolyline.setMap(null); activePolyline = null }
     if (startMarker) { startMarker.setMap(null); startMarker = null }
     if (endMarker) { endMarker.setMap(null); endMarker = null }
-    if (stopMarkers.length) {
-        stopMarkers.forEach(m => m.setMap(null))
-        stopMarkers = []
-    }
 
     const start = { lat: Number(trip.coords[0][0]), lng: Number(trip.coords[0][1]) }
     const end = { lat: Number(trip.coords[1][0]), lng: Number(trip.coords[1][1]) }
@@ -489,17 +439,6 @@ async function updateMap(trip) {
     startMarker = new google.maps.Marker({ position: start, map: gmap, label: 'A' })
     endMarker = new google.maps.Marker({ position: end, map: gmap, label: 'B' })
 
-    // NEW: วางหมุดจุดแวะสีเขียว (ถ้ามี)
-    if (Array.isArray(trip.stopsCoords) && trip.stopsCoords.length) {
-        stopMarkers = trip.stopsCoords.map((s, idx) => new google.maps.Marker({
-            position: { lat: s.lat, lng: s.lng },
-            map: gmap,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            title: s.name || s.address || `จุดแวะ ${idx + 1}`
-        }))
-    }
-
-    // polyline
     if (trip.polyline && google.maps.geometry?.encoding) {
         const path = google.maps.geometry.encoding.decodePath(trip.polyline)
         activePolyline = new google.maps.Polyline({
@@ -511,17 +450,11 @@ async function updateMap(trip) {
         })
         const bounds = new google.maps.LatLngBounds()
         path.forEach(p => bounds.extend(p))
-        if (trip.stopsCoords?.length) {
-            trip.stopsCoords.forEach(s => bounds.extend(new google.maps.LatLng(s.lat, s.lng)))
-        }
         gmap.fitBounds(bounds)
     } else {
         const bounds = new google.maps.LatLngBounds()
         bounds.extend(start)
         bounds.extend(end)
-        if (trip.stopsCoords?.length) {
-            trip.stopsCoords.forEach(s => bounds.extend(new google.maps.LatLng(s.lat, s.lng)))
-        }
         gmap.fitBounds(bounds)
     }
 }
@@ -601,6 +534,7 @@ const copyEmail = async (email) => {
 // --- Lifecycle ---
 useHead({
     title: 'คำขอจองเส้นทางของฉัน - ไปนำแหน่',
+    // โหลด Google Maps + libraries ที่ต้องใช้ (maps, places, geometry สำหรับ decode polyline)
     script: process.client && !window.google?.maps ? [{
         key: 'gmaps',
         src: `https://maps.googleapis.com/maps/api/js?key=${useRuntimeConfig().public.googleMapsApiKey}&libraries=places,geometry&callback=${GMAPS_CB}`,
@@ -618,6 +552,7 @@ onMounted(() => {
         return
     }
 
+    // callback เมื่อโหลดสคริปต์เสร็จ
     window[GMAPS_CB] = () => {
         try { delete window[GMAPS_CB] } catch { }
         initializeMap()
