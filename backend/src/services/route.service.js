@@ -49,6 +49,8 @@ const searchRoutes = async (opts) => {
     dateTo,
     sortBy = 'createdAt',
     sortOrder = 'desc',
+
+    seatsRequired,
   } = opts || {};
 
   const where = {
@@ -61,6 +63,7 @@ const searchRoutes = async (opts) => {
         ...(dateTo ? { lte: new Date(dateTo) } : {}),
       }
     } : {}),
+    ...(typeof seatsRequired === 'number' ? { availableSeats: seatsRequired } : {}),
     ...(q ? {
       OR: [
         { routeSummary: { contains: q, mode: 'insensitive' } },
