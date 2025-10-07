@@ -50,10 +50,13 @@
                         <label class="block mb-2 text-sm font-medium text-gray-700">จำนวนที่นั่ง</label>
                         <select v-model="searchForm.seats"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">ค่าเริ่มต้น</option>
                             <option value="1">1 ที่นั่ง</option>
                             <option value="2">2 ที่นั่ง</option>
                             <option value="3">3 ที่นั่ง</option>
                             <option value="4">4 ที่นั่ง</option>
+                            <option value="5">5 ที่นั่ง</option>
+                            <!-- <option value="6">6 ที่นั่ง</option> -->
                         </select>
                     </div>
                     <div class="flex items-end">
@@ -165,7 +168,7 @@
                                                 <li>
                                                     • จุดเริ่มต้น:
                                                     <span class="font-medium text-gray-900">{{ route.originName
-                                                    }}</span>
+                                                        }}</span>
                                                     <span v-if="route.originAddress"> — {{ route.originAddress }}</span>
                                                 </li>
 
@@ -179,9 +182,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ route.destinationName
-                                                    }}</span>
+                                                        }}</span>
                                                     <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                    }}</span>
+                                                        }}</span>
                                                 </li>
                                             </ul>
                                             <!-- <ul class="space-y-1 text-sm text-gray-600">
@@ -534,7 +537,7 @@ const searchForm = ref({
     origin: '',
     destination: '',
     date: '',
-    seats: '1'
+    seats: ''
 })
 const RADIUS_METERS = 500
 
@@ -605,7 +608,9 @@ async function handleSearch() {
             q.dateFrom = d.startOf('day').toISOString()
             q.dateTo = d.endOf('day').toISOString()
         }
-
+        if (searchForm.value.seats) {
+            q.seatsRequired = Number(searchForm.value.seats)
+        }
         // --- จุดเริ่มต้น / ปลายทาง (ใส่ทีละอันได้) ---
         let usedRadius = false
 
@@ -1313,7 +1318,7 @@ function resetSearch() {
     searchForm.value.origin = ''
     searchForm.value.destination = ''
     searchForm.value.date = ''
-    searchForm.value.seats = '1'
+    searchForm.value.seats = ''
     // ล้างเมตาพิกัดที่เก็บไว้จาก autocomplete / picker
     delete searchForm.value._originMeta
     delete searchForm.value._destinationMeta
