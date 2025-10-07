@@ -62,6 +62,12 @@ const listRoutesQuerySchema = z.object({
 
   sortBy: z.enum(["createdAt", "departureTime", "pricePerSeat", "availableSeats"]).default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
+
+  startNearLat: z.coerce.number().optional(),
+  startNearLng: z.coerce.number().optional(),
+  endNearLat: z.coerce.number().optional(),
+  endNearLng: z.coerce.number().optional(),
+  radiusMeters: z.coerce.number().int().min(1).max(50000).default(500),
 });
 
 module.exports = {

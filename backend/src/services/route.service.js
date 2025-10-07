@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const { Prisma } = require('@prisma/client');
 
 const baseInclude = {
   driver: {
@@ -29,6 +30,14 @@ const getAllRoutes = async () => {
 };
 
 const searchRoutes = async (opts) => {
+  const { startNearLat, startNearLng, endNearLat, endNearLng } = opts || {};
+  const hasStart = typeof startNearLat === 'number' && typeof startNearLng === 'number';
+  const hasEnd = typeof endNearLat === 'number' && typeof endNearLng === 'number';
+
+  if (hasStart || hasEnd) {
+    return searchRoutesByEndpointProximity(opts);
+  }
+
   const {
     page = 1,
     limit = 20,
@@ -104,6 +113,122 @@ const searchRoutes = async (opts) => {
       total,
       totalPages: Math.ceil(total / limit),
     }
+  };
+};
+
+const searchRoutesByEndpointProximity = async (opts = {}) => {
+
+  const {
+    page = 1, limit = 20,
+    startNearLat, startNearLng,
+    endNearLat, endNearLng,
+    radiusMeters = 500,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = opts;
+
+  const offset = (page - 1) * limit;
+
+  // ป้องกัน SQLi: อนุญาตเฉพาะฟิลด์ที่กำหนด
+  const allowedSortFields = ['createdAt', 'departureTime', 'pricePerSeat', 'availableSeats'];
+  const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+  const sortDir = (sortOrder || '').toLowerCase() === 'asc' ? 'asc' : 'desc';
+
+  // แปลง undefined -> null เพื่อให้ bind เป็น NULL (ใช้ใน CTE params)
+  const sLat = startNearLat ?? null;
+  const sLng = startNearLng ?? null;
+  const eLat = endNearLat ?? null;
+  const eLng = endNearLng ?? null;
+
+  // เลือกเฉพาะ id ก่อน เพื่อทำ include รอบสอง
+  // ใช้ Haversine (เป็นเมตร) กับ lat/lng ที่ดึงจาก JSON
+  const idsRows = await prisma.$queryRaw(
+    Prisma.sql`
+      WITH params AS (
+        SELECT
+          ${sLat}::float AS s_lat,
+          ${sLng}::float AS s_lng,
+          ${eLat}::float AS e_lat,
+          ${eLng}::float AS e_lng,
+          ${radiusMeters}::int AS rad
+      )
+      SELECT r.id
+      FROM "Route" r, params p
+      WHERE
+        -- start within radius (ถ้ามีค่า)
+        (
+          p.s_lat IS NULL OR p.s_lng IS NULL OR
+          6371000 * acos(least(1,
+            cos(radians(p.s_lat)) * cos(radians((r."startLocation"->>'lat')::float)) *
+            cos(radians((r."startLocation"->>'lng')::float) - radians(p.s_lng)) +
+            sin(radians(p.s_lat)) * sin(radians((r."startLocation"->>'lat')::float))
+          )) <= p.rad
+        )
+        AND
+        -- end within radius (ถ้ามีค่า)
+        (
+          p.e_lat IS NULL OR p.e_lng IS NULL OR
+          6371000 * acos(least(1,
+            cos(radians(p.e_lat)) * cos(radians((r."endLocation"->>'lat')::float)) *
+            cos(radians((r."endLocation"->>'lng')::float) - radians(p.e_lng)) +
+            sin(radians(p.e_lat)) * sin(radians((r."endLocation"->>'lat')::float))
+          )) <= p.rad
+        )
+      ORDER BY ${Prisma.raw(`r."${sortField}"`)} ${Prisma.raw(sortDir)}
+      OFFSET ${offset} LIMIT ${limit};
+    `
+  );
+
+  const idList = idsRows.map(r => r.id);
+
+  const totalRows = await prisma.$queryRaw(
+    Prisma.sql`
+      WITH params AS (
+        SELECT
+          ${sLat}::float AS s_lat,
+          ${sLng}::float AS s_lng,
+          ${eLat}::float AS e_lat,
+          ${eLng}::float AS e_lng,
+          ${radiusMeters}::int AS rad
+      )
+      SELECT count(*)::int AS cnt
+      FROM "Route" r, params p
+      WHERE
+        (p.s_lat IS NULL OR p.s_lng IS NULL OR
+          6371000 * acos(least(1,
+            cos(radians(p.s_lat)) * cos(radians((r."startLocation"->>'lat')::float)) *
+            cos(radians((r."startLocation"->>'lng')::float) - radians(p.s_lng)) +
+            sin(radians(p.s_lat)) * sin(radians((r."startLocation"->>'lat')::float))
+          )) <= p.rad)
+        AND
+        (p.e_lat IS NULL OR p.e_lng IS NULL OR
+          6371000 * acos(least(1,
+            cos(radians(p.e_lat)) * cos(radians((r."endLocation"->>'lat')::float)) *
+            cos(radians((r."endLocation"->>'lng')::float) - radians(p.e_lng)) +
+            sin(radians(p.e_lat)) * sin(radians((r."endLocation"->>'lat')::float))
+          )) <= p.rad);
+    `
+  );
+  const total = totalRows?.[0]?.cnt || 0;
+
+  // ดึงรายละเอียดพร้อม include ตาม id ที่คัดแล้ว
+  const data = idList.length
+    ? await prisma.route.findMany({
+      where: { id: { in: idList } },
+      include: {
+        driver: { select: { id: true, firstName: true, lastName: true, gender: true, profilePicture: true, isVerified: true } },
+        vehicle: { select: { vehicleModel: true, vehicleType: true, photos: true, amenities: true } },
+      },
+    })
+    : [];
+
+  // รักษา order ให้ตรงกับ idList
+  const orderMap = new Map(idList.map((id, i) => [id, i]));
+  data.sort((a, b) => orderMap.get(a.id) - orderMap.get(b.id));
+
+  return {
+    data,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 };
 
