@@ -22,12 +22,18 @@
                     <span class="sidebar-text">Vehicle Management</span>
                 </NuxtLink>
 
-                <!-- ✅ New: Route Management -->
                 <NuxtLink to="/admin/routes"
                     class="sidebar-item flex items-center gap-3 px-3 py-2.5 text-gray-700 rounded-lg hover:bg-blue-50"
                     active-class="font-semibold text-blue-600 bg-blue-50">
                     <i class="w-6 text-lg text-center text-gray-500 fas fa-route"></i>
                     <span class="sidebar-text">Route Management</span>
+                </NuxtLink>
+
+                <NuxtLink to="/admin/bookings"
+                    class="sidebar-item flex items-center gap-3 px-3 py-2.5 text-gray-700 rounded-lg hover:bg-blue-50"
+                    active-class="font-semibold text-blue-600 bg-blue-50">
+                    <i class="w-6 text-lg text-center text-gray-500 fas fa-calendar-check"></i>
+                    <span class="sidebar-text">Booking Management</span>
                 </NuxtLink>
 
                 <NuxtLink to="/admin/driver-verifications"
