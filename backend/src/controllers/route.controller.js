@@ -118,7 +118,7 @@ const createRoute = asyncHandler(async (req, res) => {
       requested: routeFields.waypoints || [],
       optimizedOrder: primary.waypoint_order || [],
       used: routeFields.waypoints ? (routeFields.waypoints.map((w, i) => w)) : [],
-      optimize: Boolean(routeFields.optimizeWaypoints)
+      optimize: Boolean(optimizeWaypoints)
     };
 
     payload.landmarks = { overview_polyline: payload.routePolyline };

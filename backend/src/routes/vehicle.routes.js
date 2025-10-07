@@ -32,7 +32,7 @@ router.get(
   protect,
   requireAdmin,
   validate({ params: idParamSchema }),
-  vehicleController.getVehicleByIdadmin
+  vehicleController.getVehicleByIdAdmin
 );
 
 // GET /api/vehicles/admin/user/:userId

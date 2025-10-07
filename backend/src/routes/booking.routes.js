@@ -1,16 +1,66 @@
 const express = require('express');
 const validate = require('../middlewares/validate');
-const { protect } = require('../middlewares/auth');
+const { protect, requireAdmin } = require('../middlewares/auth');
 const requireDriverVerified = require('../middlewares/driverVerified');
 const bookingController = require('../controllers/booking.controller');
 const {
   createBookingSchema,
   idParamSchema,
   updateBookingStatusSchema,
+  listBookingsQuerySchema,
+  createBookingByAdminSchema,
+  updateBookingByAdminSchema,
 } = require('../validations/booking.validation');
 
 const router = express.Router();
 
+// --- Admin Routes ---
+// GET /bookings/admin (list + query)
+router.get(
+  "/admin",
+  protect,
+  requireAdmin,
+  validate({ query: listBookingsQuerySchema }),
+  bookingController.adminListBookings
+)
+
+// GET /bookings/admin/:id
+router.get(
+  "/admin/:id",
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  bookingController.adminGetBookingById
+)
+
+// POST /bookings/admin  (แอดมินสร้างการจองแทนผู้ใช้)
+router.post(
+  "/admin",
+  protect,
+  requireAdmin,
+  validate({ body: createBookingByAdminSchema }),
+  bookingController.adminCreateBooking
+)
+
+// PUT /bookings/admin/:id  (แอดมินแก้ไขการจอง)
+router.put(
+  "/admin/:id",
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema, body: updateBookingByAdminSchema }),
+  bookingController.adminUpdateBooking
+)
+
+// DELETE /bookings/admin/:id
+router.delete(
+  "/admin/:id",
+  protect,
+  requireAdmin,
+  validate({ params: idParamSchema }),
+  bookingController.adminDeleteBooking
+);
+
+// --- Public Routes ---
 // GET /bookings/me
 router.get(
   '/me',

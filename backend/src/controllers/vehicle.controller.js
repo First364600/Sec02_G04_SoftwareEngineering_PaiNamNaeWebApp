@@ -41,7 +41,7 @@ const getVehicleById = asyncHandler(async (req, res) => {
   });
 });
 
-const getVehicleByIdadmin = asyncHandler(async (req, res) => {
+const getVehicleByIdAdmin = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const vehicle = await vehicleService.getVehicleByIdAdmin(id);
 
@@ -214,5 +214,5 @@ module.exports = {
   adminDeleteVehicle,
   adminListVehiclesByUser,
   adminListVehicles,
-  getVehicleByIdadmin,
+  getVehicleByIdAdmin,
 };
