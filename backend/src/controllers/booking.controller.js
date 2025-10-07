@@ -78,7 +78,9 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
 const cancelBooking = asyncHandler(async (req, res) => {
   const passengerId = req.user.sub;
   const { id } = req.params;
-  const cancelled = await bookingService.cancelBooking(id, passengerId);
+  const { reason } = req.body;
+
+  const cancelled = await bookingService.cancelBooking(id, passengerId, { reason });
   res.status(200).json({ success: true, data: cancelled });
 });
 

@@ -10,7 +10,10 @@ const {
   listBookingsQuerySchema,
   createBookingByAdminSchema,
   updateBookingByAdminSchema,
+  cancelBookingSchema,
 } = require('../validations/booking.validation');
+
+const { requirePassengerNotSuspended } = require('../middlewares/suspension');
 
 const router = express.Router();
 
@@ -80,6 +83,7 @@ router.get(
 router.post(
   '/',
   protect,
+  requirePassengerNotSuspended,
   validate({ body: createBookingSchema }),
   bookingController.createBooking
 );
@@ -97,7 +101,7 @@ router.patch(
 router.patch(
   '/:id/cancel',
   protect,
-  validate({ params: idParamSchema }),
+  validate({ params: idParamSchema, body: cancelBookingSchema }),
   bookingController.cancelBooking
 );
 

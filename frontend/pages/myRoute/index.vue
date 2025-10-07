@@ -60,6 +60,13 @@
                                             <span class="mx-2 text-gray-300">|</span>
                                             ระยะทาง: {{ trip.distanceText }}
                                         </p>
+                                        <div v-if="activeTab === 'cancelled' && trip.status === 'cancelled' && trip.cancelReason"
+                                            class="mt-2 p-2 rounded-md border border-gray-200 bg-gray-50">
+                                            <span class="text-sm text-gray-700">
+                                                เหตุผลการยกเลิกของผู้โดยสาร: <span class="font-medium">{{
+                                                    reasonLabel(trip.cancelReason) }}</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -283,6 +290,20 @@ function cleanAddr(a) {
         .trim()
 }
 
+const reasonLabelMap = {
+    CHANGE_OF_PLAN: 'เปลี่ยนแผน/มีธุระกะทันหัน',
+    FOUND_ALTERNATIVE: 'พบวิธีเดินทางอื่นแล้ว',
+    DRIVER_DELAY: 'คนขับล่าช้าหรือเลื่อนเวลา',
+    PRICE_ISSUE: 'ราคาหรือค่าใช้จ่ายไม่เหมาะสม',
+    WRONG_LOCATION: 'เลือกจุดรับ–ส่งผิด',
+    DUPLICATE_OR_WRONG_DATE: 'จองซ้ำหรือจองผิดวัน',
+    SAFETY_CONCERN: 'กังวลด้านความปลอดภัย',
+    WEATHER_OR_FORCE_MAJEURE: 'สภาพอากาศ/เหตุสุดวิสัย',
+    COMMUNICATION_ISSUE: 'สื่อสารไม่สะดวก/ติดต่อไม่ได้',
+}
+
+function reasonLabel(v) { return reasonLabelMap[v] || v }
+
 // --- Computed ---
 const filteredTrips = computed(() => {
     if (activeTab.value === 'all') return allTrips.value
@@ -366,7 +387,7 @@ async function fetchMyRoutes() {
                     // NEW:
                     stops,
                     stopsCoords,
-
+                    cancelReason: b.cancelReason || null,
                     carDetails: carDetailsList,
                     conditions: r.conditions,
                     photos: r.vehicle?.photos || [],
@@ -578,7 +599,8 @@ const handleConfirmAction = async () => {
             await $api(`/bookings/${bookingId}/status`, { method: 'PATCH', body: { status: 'REJECTED' } })
             toast.success('สำเร็จ', 'ปฏิเสธคำขอแล้ว')
         } else if (action === 'delete') {
-            console.log(`Delete booking ${bookingId} (TODO)`)
+            await $api(`/bookings/${bookingId}`, { method: 'DELETE' })
+            toast.success('ลบรายการสำเร็จ', 'ลบคำขอออกจากรายการแล้ว')
         }
         closeConfirmModal()
         await fetchMyRoutes()

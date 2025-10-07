@@ -1,6 +1,7 @@
 const prisma = require('../utils/prisma');
 const ApiError = require('../utils/ApiError');
 const { RouteStatus, BookingStatus } = require('@prisma/client');
+const { checkAndApplyPassengerSuspension } = require('./penalty.service');
 
 const ACTIVE_STATUSES = [BookingStatus.PENDING, BookingStatus.CONFIRMED];
 
@@ -336,26 +337,34 @@ const updateBookingStatus = async (id, status, userId) => {
   });
 };
 
-const cancelBooking = async (id, passengerId) => {
+const cancelBooking = async (id, passengerId, opts = {}) => {
+  const { reason } = opts;
+
   const booking = await prisma.booking.findUnique({
     where: { id },
     include: { route: true },
   });
   if (!booking) throw new ApiError(404, 'Booking not found');
-  if (booking.passengerId !== passengerId) {
-    throw new ApiError(403, 'Forbidden');
-  }
+  if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
   if (![BookingStatus.PENDING, BookingStatus.CONFIRMED].includes(booking.status)) {
     throw new ApiError(400, 'Cannot cancel at this stage');
   }
 
-  return prisma.$transaction(async (tx) => {
-    const updated = await tx.booking.update({
+  // 👇 เพิ่มบรรทัดนี้
+  const wasConfirmed = booking.status === BookingStatus.CONFIRMED;
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const updatedBooking = await tx.booking.update({
       where: { id },
-      data: { status: BookingStatus.CANCELLED },
+      data: {
+        status: BookingStatus.CANCELLED,
+        cancelledAt: new Date(),
+        cancelledBy: 'PASSENGER',
+        cancelReason: reason || null,
+      },
     });
 
-    // คืนที่นั่งให้ route
+    // คืนที่นั่งให้เส้นทาง (เดิม)
     const refunded = booking.numberOfSeats;
     const newSeats = booking.route.availableSeats + refunded;
     const routeUpdates = { availableSeats: newSeats };
@@ -367,8 +376,28 @@ const cancelBooking = async (id, passengerId) => {
       data: routeUpdates,
     });
 
-    return updated;
+    // 👇 บันทึกเหตุการณ์ยกเลิกหลังยืนยัน (เฉพาะกรณีเคย CONFIRMED)
+    if (wasConfirmed) {
+      await tx.notification.create({
+        data: {
+          userId: passengerId,
+          type: 'SYSTEM',
+          title: 'บันทึกการยกเลิกหลังยืนยัน',
+          body: 'คุณได้ยกเลิกการจองที่เคยได้รับการยืนยันแล้ว',
+          metadata: { kind: 'PASSENGER_CONFIRMED_CANCEL', bookingId: id },
+        },
+      });
+    }
+
+    return updatedBooking;
   });
+
+  // 👇 นับโทษเฉพาะเคสยกเลิกที่ "เคย CONFIRMED"
+  if (wasConfirmed) {
+    await checkAndApplyPassengerSuspension(passengerId, { confirmedOnly: true });
+  }
+
+  return updated;
 };
 
 const deleteBooking = async (id, userId) => {
@@ -429,7 +458,7 @@ module.exports = {
   adminCreateBooking,
   createBooking,
   adminUpdateBooking,
-  adminUpdateBooking,
+  adminCreateBooking,
   getMyBookings,
   getBookingById,
   updateBookingStatus,
