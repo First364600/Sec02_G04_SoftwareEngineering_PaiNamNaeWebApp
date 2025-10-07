@@ -426,6 +426,7 @@ const adminDeleteBooking = async (id) => {
 
 module.exports = {
   searchBookingsAdmin,
+  adminCreateBooking,
   createBooking,
   adminUpdateBooking,
   adminUpdateBooking,
