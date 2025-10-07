@@ -57,10 +57,16 @@
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button type="submit"
-                            class="w-full px-4 py-2 text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            ค้นหา
-                        </button>
+                        <div class="flex items-end gap-2">
+                            <button type="submit"
+                                class="w-full px-5 py-3 text-white transition duration-200 bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                ค้นหา
+                            </button>
+                            <button type="button" @click="resetSearch"
+                                class="flex-1 px-5 py-3 font-medium text-gray-800 transition duration-200 bg-gray-200 rounded-md cursor-pointer hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
+                                รีเซ็ต
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -530,6 +536,7 @@ const searchForm = ref({
     date: '',
     seats: '1'
 })
+const RADIUS_METERS = 500
 
 const routes = ref([])
 const selectedRoute = ref(null)
@@ -563,41 +570,95 @@ function cleanAddr(a) {
         .trim();
 }
 
+async function ensureLatLng(field /* 'origin' | 'destination' */) {
+    const metaKey = field === 'origin' ? '_originMeta' : '_destinationMeta'
+    const meta = searchForm.value[metaKey]
+    if (meta?.lat && meta?.lng) return { lat: meta.lat, lng: meta.lng }
+
+    const text = searchForm.value[field]
+    if (!text) return { lat: null, lng: null }
+
+    const g = await geocodeText(text) // มีอยู่แล้วในไฟล์
+    if (g?.lat && g?.lng) {
+        searchForm.value[metaKey] = {
+            ...(meta || {}),
+            lat: g.lat,
+            lng: g.lng,
+            placeId: g.placeId || null,
+            fullAddress: g.address || null
+        }
+        return { lat: g.lat, lng: g.lng }
+    }
+    return { lat: null, lng: null }
+}
+
 async function handleSearch() {
     isLoading.value = true
     selectedRoute.value = null
 
     try {
-        const apiRes = await $api('/routes')
+        const q = { page: 1, limit: 20 }
+
+        // --- วันที่ (optional) ---
+        if (searchForm.value.date) {
+            const d = dayjs(searchForm.value.date)
+            q.dateFrom = d.startOf('day').toISOString()
+            q.dateTo = d.endOf('day').toISOString()
+        }
+
+        // --- จุดเริ่มต้น / ปลายทาง (ใส่ทีละอันได้) ---
+        let usedRadius = false
+
+        // origin (ถ้าพิมพ์หรือปักหมุดไว้)
+        if (searchForm.value.origin || searchForm.value._originMeta?.lat) {
+            const { lat: startLat, lng: startLng } = await ensureLatLng('origin')
+            if (startLat != null && startLng != null) {
+                q.startNearLat = startLat
+                q.startNearLng = startLng
+                usedRadius = true
+            }
+        }
+
+        // destination (ถ้าพิมพ์หรือปักหมุดไว้)
+        if (searchForm.value.destination || searchForm.value._destinationMeta?.lat) {
+            const { lat: endLat, lng: endLng } = await ensureLatLng('destination')
+            if (endLat != null && endLng != null) {
+                q.endNearLat = endLat
+                q.endNearLng = endLng
+                usedRadius = true
+            }
+        }
+
+        // ใช้ radiusMeters ก็ต่อเมื่อมีตัวกรองพิกัดอย่างน้อยหนึ่งฝั่ง
+        if (usedRadius) q.radiusMeters = RADIUS_METERS
+
+        // 🔎 ถ้าไม่ใส่ตัวกรองอะไรเลย จะเรียก /routes ปกติ (q มีแค่ page/limit)
+        const apiRes = await $api('/routes', { query: q })
+
         const raw = (apiRes?.data || apiRes || []).filter(r => r.status === 'AVAILABLE')
 
-        // map ข้อมูลฐาน
+        // ----- ด้านล่างเหมือนเดิม (map ข้อมูล) -----
         routes.value = raw.map(route => {
-            // --- จัด waypoint → stops ---
-            const wp = route.waypoints || {};
-            const baseList = (Array.isArray(wp.used) && wp.used.length
-                ? wp.used
-                : Array.isArray(wp.requested) ? wp.requested : []);
+            const wp = route.waypoints || {}
+            const baseList = (Array.isArray(wp.used) && wp.used.length ? wp.used
+                : Array.isArray(wp.requested) ? wp.requested : [])
             const orderedList = (Array.isArray(wp.optimizedOrder) && wp.optimizedOrder.length === baseList.length)
-                ? wp.optimizedOrder.map(i => baseList[i])
-                : baseList;
+                ? wp.optimizedOrder.map(i => baseList[i]) : baseList
 
             const stops = orderedList.map(p => {
-                const name = p?.name || '';
-                // const address = (p?.address || '').replace(/,?\s*(Thailand|ไทย)\s*$/i, '');
-                const address = cleanAddr(p?.address || '');
-                const fallback = (p?.lat != null && p?.lng != null) ? `(${p.lat.toFixed(6)}, ${p.lng.toFixed(6)})` : '';
-                const title = name || fallback;
-                return address ? `${title} — ${address}` : title;
-            }).filter(Boolean);
+                const name = p?.name || ''
+                const address = cleanAddr(p?.address || '')
+                const fallback = (p?.lat != null && p?.lng != null) ? `(${p.lat.toFixed(6)}, ${p.lng.toFixed(6)})` : ''
+                const title = name || fallback
+                return address ? `${title} — ${address}` : title
+            }).filter(Boolean)
 
             const stopsCoords = orderedList
                 .map(p => (p && typeof p.lat === 'number' && typeof p.lng === 'number')
                     ? { lat: p.lat, lng: p.lng, name: p.name || '', address: p.address || '' }
                     : null
-                )
-                .filter(Boolean)
-            // --- object ของ route ตามเดิม + เพิ่ม stops ---
+                ).filter(Boolean)
+
             return {
                 id: route.id,
                 availableSeats: route.availableSeats,
@@ -608,8 +669,6 @@ async function handleSearch() {
                 end: route.endLocation,
                 originName: route.startLocation?.name || `(${route.startLocation.lat.toFixed(2)}, ${route.startLocation.lng.toFixed(2)})`,
                 destinationName: route.endLocation?.name || `(${route.endLocation.lat.toFixed(2)}, ${route.endLocation.lng.toFixed(2)})`,
-                // originAddress: route.startLocation?.address || null,
-                // destinationAddress: route.endLocation?.address || null,
                 originAddress: route.startLocation?.address ? cleanAddr(route.startLocation.address) : null,
                 destinationAddress: route.endLocation?.address ? cleanAddr(route.endLocation.address) : null,
                 driver: {
@@ -627,33 +686,21 @@ async function handleSearch() {
                 durationText: formatDuration(route.duration) || route.duration || '-',
                 distanceText: formatDistance(route.distance) || route.distance || '-',
                 polyline: route.routePolyline || null,
-
-                // เพิ่มเข้ามา
                 stops,
                 stopsCoords,
-            };
-        });
+            }
+        })
 
-        // รอให้ geocoder พร้อมก่อนค่อยทำ reverse geocode
         await waitMapReady()
-
         const jobs = routes.value.map(async (r, i) => {
             const [o, d] = await Promise.all([
                 reverseGeocode(r.start.lat, r.start.lng),
                 reverseGeocode(r.end.lat, r.end.lng)
             ])
-
             const oParts = await extractNameParts(o)
             const dParts = await extractNameParts(d)
-
-            //routes.value[i].originName = oParts.name || routes.value[i].originName   // ชื่อหลัก (สั้น)
-            //routes.value[i].destinationName = dParts.name || routes.value[i].destinationName
-            if (!r.start?.name && oParts.name) {
-                routes.value[i].originName = oParts.name
-            }
-            if (!r.end?.name && dParts.name) {
-                routes.value[i].destinationName = dParts.name
-            }
+            if (!r.start?.name && oParts.name) routes.value[i].originName = oParts.name
+            if (!r.end?.name && dParts.name) routes.value[i].destinationName = dParts.name
         })
         await Promise.allSettled(jobs)
 
@@ -664,6 +711,7 @@ async function handleSearch() {
         isLoading.value = false
     }
 }
+
 
 function reverseGeocode(lat, lng) {
     return new Promise((resolve) => {
@@ -1258,6 +1306,21 @@ function geocodeText(text) {
             })
         })
     })
+}
+
+function resetSearch() {
+    // ล้างค่าฟิลเตอร์ทั้งหมด
+    searchForm.value.origin = ''
+    searchForm.value.destination = ''
+    searchForm.value.date = ''
+    searchForm.value.seats = '1'
+    // ล้างเมตาพิกัดที่เก็บไว้จาก autocomplete / picker
+    delete searchForm.value._originMeta
+    delete searchForm.value._destinationMeta
+
+    selectedRoute.value = null
+    // ดึงรายการทั้งหมด (API ปกติ)
+    handleSearch()
 }
 
 function formatDistance(input) {
