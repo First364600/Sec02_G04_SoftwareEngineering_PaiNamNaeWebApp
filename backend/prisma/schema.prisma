@@ -34,6 +34,18 @@ enum BookingStatus {
   CANCELLED
 }
 
+enum CancelReason {
+  CHANGE_OF_PLAN               // เปลี่ยนแผน/มีธุระกะทันหัน
+  FOUND_ALTERNATIVE            // พบวิธีเดินทางอื่นแล้ว
+  DRIVER_DELAY                 // คนขับล่าช้าหรือเลื่อนเวลา
+  PRICE_ISSUE                  // ราคาหรือค่าใช้จ่ายไม่เหมาะสม
+  WRONG_LOCATION               // เลือกจุดรับ–ส่งผิด
+  DUPLICATE_OR_WRONG_DATE      // จองซ้ำหรือจองผิดวัน
+  SAFETY_CONCERN               // กังวลด้านความปลอดภัย
+  WEATHER_OR_FORCE_MAJEURE     // สภาพอากาศ/เหตุสุดวิสัย
+  COMMUNICATION_ISSUE          // สื่อสารไม่สะดวก/ติดต่อไม่ได้
+}
+
 enum LicenseType {
   PRIVATE_CAR_TEMPORARY // รถยนต์ส่วนบุคคลชั่วคราว (2 ปี)
   PRIVATE_CAR          // รถยนต์ส่วนบุคคล (5 ปี)
@@ -69,7 +81,8 @@ model User {
   lastLogin             DateTime?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
-
+  passengerSuspendedUntil DateTime?
+  driverSuspendedUntil    DateTime?
   driverVerification    DriverVerification?
   vehicles              Vehicle[]
   notification          Notification[]
@@ -160,6 +173,8 @@ model Route {
   pricePerSeat    Float
   conditions      String?
   status          RouteStatus @default(AVAILABLE)
+  cancelledAt     DateTime?
+  cancelledBy     String?     // 'DRIVER' | 'ADMIN'
   routePolyline String?
   distanceMeters Int?
   durationSeconds Int?
@@ -189,6 +204,9 @@ model Booking {
   passenger       User          @relation("PassengerBookings", fields: [passengerId], references: [id], onDelete: Cascade)
   numberOfSeats   Int
   status          BookingStatus @default(PENDING)
+  cancelledAt     DateTime?
+  cancelledBy     String?       // 'PASSENGER' | 'DRIVER' | 'ADMIN'
+  cancelReason    CancelReason?
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())

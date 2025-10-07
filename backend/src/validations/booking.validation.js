@@ -53,6 +53,20 @@ const updateBookingByAdminSchema = z.object({
   status: z.nativeEnum(BookingStatus).optional(),
 }).refine(obj => Object.keys(obj).length > 0, { message: 'No fields to update' });
 
+const cancelBookingSchema = z.object({
+  reason: z.enum([
+    'CHANGE_OF_PLAN',
+    'FOUND_ALTERNATIVE',
+    'DRIVER_DELAY',
+    'PRICE_ISSUE',
+    'WRONG_LOCATION',
+    'DUPLICATE_OR_WRONG_DATE',
+    'SAFETY_CONCERN',
+    'WEATHER_OR_FORCE_MAJEURE',
+    'COMMUNICATION_ISSUE'
+  ], { required_error: 'กรุณาเลือกเหตุผลในการยกเลิก' })
+});
+
 module.exports = {
   listBookingsQuerySchema,
   createBookingByAdminSchema,
@@ -60,4 +74,5 @@ module.exports = {
   createBookingSchema,
   idParamSchema,
   updateBookingStatusSchema,
+  cancelBookingSchema,
 };
