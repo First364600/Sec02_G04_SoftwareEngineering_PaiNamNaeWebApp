@@ -775,7 +775,7 @@ function initializeMap() {
 }
 
 .trip-card:hover {
-    transform: translateY(-2px);
+    /* transform: translateY(-2px); */
     box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
 }
 
