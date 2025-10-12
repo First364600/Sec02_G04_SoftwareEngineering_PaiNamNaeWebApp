@@ -19,161 +19,13 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white border border-gray-300 rounded-lg shadow-md">
                         <div class="p-6 border-b border-gray-300">
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                {{ activeTab === 'myRoutes' ? 'เส้นทางของฉัน' : 'รายการคำขอจอง' }}
-                            </h3>
+                            <h3 class="text-lg font-semibold text-gray-900">รายการคำขอจอง</h3>
                         </div>
 
                         <div v-if="isLoading" class="p-12 text-center text-gray-500">
                             <p>กำลังโหลดข้อมูล...</p>
                         </div>
 
-                        <!-- ===== แท็บ: เส้นทางของฉัน ===== -->
-                        <div v-else-if="activeTab === 'myRoutes'" class="divide-y divide-gray-200">
-                            <div v-if="myRoutes.length === 0" class="p-12 text-center text-gray-500">
-                                <p>ยังไม่มีเส้นทางที่คุณสร้าง</p>
-                            </div>
-
-                            <div v-for="route in myRoutes" :key="route.id"
-                                class="p-6 transition-colors duration-200 cursor-pointer trip-card hover:bg-gray-50"
-                                @click="toggleTripDetails(route.id)">
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <h4 class="text-lg font-semibold text-gray-900">
-                                                {{ route.origin }} → {{ route.destination }}
-                                            </h4>
-                                            <span class="status-badge" :class="{
-                                                'status-confirmed': route.status === 'available',
-                                                'status-pending': route.status === 'full',
-                                            }">
-                                                {{ route.status === 'available' ? 'เปิดรับผู้โดยสาร' : 'เต็ม' }}
-                                            </span>
-                                        </div>
-                                        <p class="mt-1 text-sm text-gray-600">
-                                            วันที่: {{ route.date }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            เวลา: {{ route.time }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            ระยะเวลา: {{ route.durationText }}
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            ระยะทาง: {{ route.distanceText }}
-                                        </p>
-                                        <div class="mt-1 text-sm text-gray-600">
-                                            <span class="font-medium">ที่นั่งว่าง:</span>
-                                            <span class="ml-1">{{ route.availableSeats }}</span>
-                                            <span class="mx-2 text-gray-300">|</span>
-                                            <span class="font-medium">ราคาต่อที่นั่ง:</span>
-                                            <span class="ml-1">{{ route.pricePerSeat }} บาท</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- รายละเอียดเมื่อเปิด -->
-                                <div v-if="selectedTripId === route.id"
-                                    class="pt-4 mt-4 mb-5 duration-300 border-t border-gray-300 animate-in slide-in-from-top">
-                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                        <div>
-                                            <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
-                                                <li>
-                                                    • จุดเริ่มต้น:
-                                                    <span class="font-medium text-gray-900">{{ route.origin }}</span>
-                                                    <span v-if="route.originAddress"> — {{ route.originAddress }}</span>
-                                                </li>
-
-                                                <template v-if="route.stops && route.stops.length">
-                                                    <li class="mt-2 text-gray-700">• จุดแวะระหว่างทาง ({{
-                                                        route.stops.length }} จุด):</li>
-                                                    <li v-for="(stop, idx) in route.stops" :key="idx">  - จุดแวะ {{ idx
-                                                        + 1 }}: {{ stop }}</li>
-                                                </template>
-
-                                                <li class="mt-1">
-                                                    • จุดปลายทาง:
-                                                    <span class="font-medium text-gray-900">{{ route.destination
-                                                        }}</span>
-                                                    <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                        }}</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div>
-                                            <h5 class="mb-2 font-medium text-gray-900">รายละเอียดรถ</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
-                                                <li v-for="detail in route.carDetails" :key="detail">• {{ detail }}</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-4 space-y-4">
-                                        <div v-if="route.conditions">
-                                            <h5 class="mb-2 font-medium text-gray-900">เงื่อนไขการเดินทาง</h5>
-                                            <p
-                                                class="p-3 text-sm text-gray-700 border border-gray-300 rounded-md bg-gray-50">
-                                                {{ route.conditions }}
-                                            </p>
-                                        </div>
-
-                                        <div v-if="route.photos && route.photos.length > 0">
-                                            <h5 class="mb-2 font-medium text-gray-900">รูปภาพรถยนต์</h5>
-                                            <div class="grid grid-cols-3 gap-2 mt-2">
-                                                <div v-for="(photo, index) in route.photos.slice(0, 3)" :key="index">
-                                                    <img :src="photo" alt="Vehicle photo"
-                                                        class="object-cover w-full transition-opacity rounded-lg shadow-sm cursor-pointer aspect-video hover:opacity-90" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- ผู้โดยสารของเส้นทางนี้ -->
-                                        <div v-if="route.passengers && route.passengers.length">
-                                            <h5 class="mb-2 font-medium text-gray-900">ผู้โดยสาร ({{
-                                                route.passengers.length }} คน)</h5>
-                                            <div class="space-y-3">
-                                                <div v-for="p in route.passengers" :key="p.id"
-                                                    class="flex items-center space-x-3">
-                                                    <img :src="p.image" :alt="p.name"
-                                                        class="object-cover w-12 h-12 rounded-full" />
-                                                    <div class="flex-1">
-                                                        <div class="flex items-center">
-                                                            <span class="font-medium text-gray-900">{{ p.name }}</span>
-                                                            <div v-if="p.isVerified"
-                                                                class="relative group ml-1.5 flex items-center">
-                                                                <svg class="w-4 h-4 text-blue-600" viewBox="0 0 24 24"
-                                                                    fill="currentColor">
-                                                                    <path fill-rule="evenodd"
-                                                                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12c0 1.357-.6 2.573-1.549 3.397a4.49 4.49 0 01-1.307 3.498 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.07-.01l3.5-4.875z"
-                                                                        clip-rule="evenodd" />
-                                                                </svg>
-                                                            </div>
-                                                        </div>
-                                                        <div class="text-sm text-gray-600">
-                                                            ที่นั่ง: {{ p.seats }}
-                                                            <span v-if="p.email" class="mx-2 text-gray-300">|</span>
-                                                            <a v-if="p.email" :href="`mailto:${p.email}`"
-                                                                class="text-blue-600 hover:underline" @click.stop>
-                                                                {{ p.email }}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ปุ่มขวาล่าง -->
-                                <div class="flex justify-end" :class="{ 'mt-4': selectedTripId !== route.id }">
-                                    <button
-                                        class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700"
-                                        @click.stop="updateMap(route)">
-                                        ดูเส้นทางบนแผนที่
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ===== แท็บ: คำขอจอง (เดิม) ===== -->
                         <div v-else class="divide-y divide-gray-200">
                             <div v-if="filteredTrips.length === 0" class="p-12 text-center text-gray-500">
                                 <p>ไม่พบรายการในหมวดหมู่นี้</p>
@@ -210,8 +62,8 @@
                                         <div v-if="activeTab === 'cancelled' && trip.status === 'cancelled' && trip.cancelReason"
                                             class="p-2 mt-2 border border-gray-200 rounded-md bg-gray-50">
                                             <span class="text-sm text-gray-700">
-                                                เหตุผลการยกเลิกของผู้โดยสาร:
-                                                <span class="font-medium">{{ reasonLabel(trip.cancelReason) }}</span>
+                                                เหตุผลการยกเลิกของผู้โดยสาร: <span class="font-medium">{{
+                                                    reasonLabel(trip.cancelReason) }}</span>
                                             </span>
                                         </div>
                                     </div>
@@ -266,7 +118,7 @@
                                             <div class="flex text-sm text-yellow-400">
                                                 <span>
                                                     {{ '★'.repeat(Math.round(trip.passenger.rating)) }}{{ '☆'.repeat(5 -
-                                                    Math.round(trip.passenger.rating)) }}
+                                                        Math.round(trip.passenger.rating)) }}
                                                 </span>
                                             </div>
                                             <span class="ml-2 text-sm text-gray-600">
@@ -280,7 +132,7 @@
                                     </div>
                                 </div>
 
-                                <!-- รายละเอียดเส้นทาง + จุดแวะ -->
+                                <!-- รายละเอียดเส้นทาง + จุดแวะ (รูปแบบเหมือนหน้า findTrip) -->
                                 <div v-if="selectedTripId === trip.id"
                                     class="pt-4 mt-4 mb-5 duration-300 border-t border-gray-300 animate-in slide-in-from-top">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -364,13 +216,14 @@
                     </div>
                 </div>
 
-                <!-- แผนที่ -->
                 <div class="lg:col-span-1">
                     <div class="sticky overflow-hidden bg-white border border-gray-300 rounded-lg shadow-md top-8">
                         <div class="p-3 border-gray-300">
                             <h3 class="text-lg font-semibold text-gray-900">แผนที่เส้นทาง</h3>
                             <p class="mt-1 text-sm text-gray-600">
-                                {{ selectedLabel ? selectedLabel : 'คลิกที่รายการเพื่อดูเส้นทาง' }}
+                                {{ selectedTrip ? selectedTrip.origin + ' → ' + selectedTrip.destination :
+                                    'คลิกที่รายการเพื่อดูเส้นทาง'
+                                }}
                             </p>
                         </div>
                         <div ref="mapContainer" id="map"></div>
@@ -386,7 +239,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
@@ -405,7 +258,6 @@ const selectedTripId = ref(null)
 const isLoading = ref(false)
 const mapContainer = ref(null)
 const allTrips = ref([])
-const myRoutes = ref([])
 
 // ---------- Google Maps states ----------
 let gmap = null
@@ -425,7 +277,6 @@ const tabs = [
     { status: 'rejected', label: 'ปฏิเสธ' },
     { status: 'cancelled', label: 'ยกเลิก' },
     { status: 'all', label: 'ทั้งหมด' },
-    { status: 'myRoutes', label: 'เส้นทางของฉัน' },
 ]
 
 definePageMeta({ middleware: 'auth' })
@@ -449,6 +300,7 @@ const reasonLabelMap = {
     WEATHER_OR_FORCE_MAJEURE: 'สภาพอากาศ/เหตุสุดวิสัย',
     COMMUNICATION_ISSUE: 'สื่อสารไม่สะดวก/ติดต่อไม่ได้',
 }
+
 function reasonLabel(v) { return reasonLabelMap[v] || v }
 
 // --- Computed ---
@@ -456,15 +308,8 @@ const filteredTrips = computed(() => {
     if (activeTab.value === 'all') return allTrips.value
     return allTrips.value.filter(trip => trip.status === activeTab.value)
 })
-
-// สำหรับหัวข้อบนแผนที่
-const selectedLabel = computed(() => {
-    if (activeTab.value === 'myRoutes') {
-        const r = myRoutes.value.find(x => x.id === selectedTripId.value)
-        return r ? `${r.origin} → ${r.destination}` : null
-    }
-    const t = allTrips.value.find(x => x.id === selectedTripId.value)
-    return t ? `${t.origin} → ${t.destination}` : null
+const selectedTrip = computed(() => {
+    return allTrips.value.find(trip => trip.id === selectedTripId.value) || null
 })
 
 // --- Methods ---
@@ -474,8 +319,6 @@ async function fetchMyRoutes() {
         const routes = await $api('/routes/me')
 
         const formatted = []
-        const ownRoutes = []
-
         for (const r of routes) {
             const carDetailsList = []
             if (r.vehicle) {
@@ -491,7 +334,7 @@ async function fetchMyRoutes() {
             const end = r.endLocation
             const coords = [[start.lat, start.lng], [end.lat, end.lng]]
 
-            // stops / stopsCoords จาก waypoints
+            // NEW: สร้าง stops และ stopsCoords จาก waypoints (เหมือนหน้า findTrip)
             const wp = r.waypoints || {}
             const baseList = (Array.isArray(wp.used) && wp.used.length
                 ? wp.used
@@ -515,7 +358,6 @@ async function fetchMyRoutes() {
                 )
                 .filter(Boolean)
 
-            // แปลงเป็น "คำขอจอง" ต่อ booking
             for (const b of (r.bookings || [])) {
                 formatted.push({
                     id: b.id,
@@ -524,6 +366,7 @@ async function fetchMyRoutes() {
                     destination: end?.name || `(${Number(end.lat).toFixed(2)}, ${Number(end.lng).toFixed(2)})`,
                     originHasName: !!start?.name,
                     destinationHasName: !!end?.name,
+
                     pickupPoint: b.pickupLocation?.name || '-',
                     date: dayjs(r.departureTime).format('D MMMM BBBB'),
                     time: dayjs(r.departureTime).format('HH:mm น.'),
@@ -539,6 +382,8 @@ async function fetchMyRoutes() {
                     },
                     coords,
                     polyline: r.routePolyline || null,
+
+                    // NEW:
                     stops,
                     stopsCoords,
                     cancelReason: b.cancelReason || null,
@@ -551,48 +396,10 @@ async function fetchMyRoutes() {
                     distanceText: (typeof r.distance === 'string' ? formatDistance(r.distance) : r.distance) || (r.distanceMeters ? `${(r.distanceMeters / 1000).toFixed(1)} กม.` : '-'),
                 })
             }
-
-            // เก็บ “เส้นทางของฉัน”
-            ownRoutes.push({
-                id: r.id,
-                status: (r.status || '').toLowerCase(),
-                origin: start?.name || `(${Number(start.lat).toFixed(2)}, ${Number(start.lng).toFixed(2)})`,
-                destination: end?.name || `(${Number(end.lat).toFixed(2)}, ${Number(end.lng).toFixed(2)})`,
-                originAddress: start?.address ? cleanAddr(start.address) : null,
-                destinationAddress: end?.address ? cleanAddr(end.address) : null,
-                date: dayjs(r.departureTime).format('D MMMM BBBB'),
-                time: dayjs(r.departureTime).format('HH:mm น.'),
-                pricePerSeat: r.pricePerSeat || 0,
-                availableSeats: r.availableSeats ?? 0,
-                coords: [[start.lat, start.lng], [end.lat, end.lng]],
-                polyline: r.routePolyline || null,
-                stops,
-                stopsCoords,
-                carDetails: (r.vehicle
-                    ? [`${r.vehicle.vehicleModel} (${r.vehicle.vehicleType})`, ...(r.vehicle.amenities || [])]
-                    : ['ไม่มีข้อมูลรถ']),
-                photos: r.vehicle?.photos || [],
-                conditions: r.conditions || '',
-                passengers: (r.bookings || []).map(b => ({
-                    id: b.id,
-                    seats: b.numberOfSeats || 0,
-                    status: (b.status || '').toLowerCase(),
-                    name: `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร',
-                    image: b.passenger?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.passenger?.firstName || 'P')}&background=random&size=64`,
-                    email: b.passenger?.email || '',
-                    isVerified: !!b.passenger?.isVerified,
-                    rating: 4.5,
-                    reviews: Math.floor(Math.random() * 50) + 5,
-                })),
-                durationText: (typeof r.duration === 'string' ? formatDuration(r.duration) : r.duration) || (r.durationSeconds ? `${Math.round(r.durationSeconds / 60)} นาที` : '-'),
-                distanceText: (typeof r.distance === 'string' ? formatDistance(r.distance) : r.distance) || (r.distanceMeters ? `${(r.distanceMeters / 1000).toFixed(1)} กม.` : '-'),
-            })
         }
-
         allTrips.value = formatted
-        myRoutes.value = ownRoutes
 
-        // รอแผนที่พร้อม แล้ว reverse เฉพาะกรณีที่ backend ไม่มี name (เฉพาะ list คำขอจอง)
+        // รอแผนที่พร้อม แล้ว reverse เฉพาะกรณีที่ backend ไม่มี name
         await waitMapReady()
         const jobs = allTrips.value.map(async (t, idx) => {
             const [o, d] = await Promise.all([
@@ -613,7 +420,6 @@ async function fetchMyRoutes() {
     } catch (error) {
         console.error('Failed to fetch routes:', error)
         allTrips.value = []
-        myRoutes.value = []
         toast.error('เกิดข้อผิดพลาด', error?.data?.message || 'ไม่สามารถโหลดข้อมูลได้')
     } finally {
         isLoading.value = false
@@ -622,18 +428,13 @@ async function fetchMyRoutes() {
 
 const getTripCount = (status) => {
     if (status === 'all') return allTrips.value.length
-    if (status === 'myRoutes') return myRoutes.value.length
     return allTrips.value.filter(trip => trip.status === status).length
 }
 
-const toggleTripDetails = (id) => {
-    // หา item ตามแท็บที่เปิดอยู่ เพื่ออัปเดตแผนที่
-    const item = activeTab.value === 'myRoutes'
-        ? myRoutes.value.find(r => r.id === id)
-        : allTrips.value.find(t => t.id === id)
-    if (item) updateMap(item)
-
-    selectedTripId.value = (selectedTripId.value === id) ? null : id
+const toggleTripDetails = (tripId) => {
+    const tripForMap = allTrips.value.find(trip => trip.id === tripId)
+    if (tripForMap) updateMap(tripForMap)
+    selectedTripId.value = selectedTripId.value === tripId ? null : tripId
 }
 
 // ---------- Google Maps helpers ----------
@@ -659,6 +460,8 @@ function reverseGeocode(lat, lng) {
 async function extractNameParts(geocodeResult) {
     if (!geocodeResult) return { name: null, area: null }
     const comps = geocodeResult.address_components || []
+    const byType = (t) => comps.find(c => c.types.includes(t))?.long_name
+
     const types = geocodeResult.types || []
     const isPoi = types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')
 
@@ -706,7 +509,7 @@ async function updateMap(trip) {
     startMarker = new google.maps.Marker({ position: start, map: gmap, label: 'A' })
     endMarker = new google.maps.Marker({ position: end, map: gmap, label: 'B' })
 
-    // หมุดจุดแวะ
+    // NEW: วางหมุดจุดแวะสีเขียว (ถ้ามี)
     if (Array.isArray(trip.stopsCoords) && trip.stopsCoords.length) {
         stopMarkers = trip.stopsCoords.map((s, idx) => new google.maps.Marker({
             position: { lat: s.lat, lng: s.lng },
@@ -827,11 +630,11 @@ function formatDistance(input) {
         if (Number.isNaN(n)) continue
         if (/กม/.test(seg)) meters += n * 1000
         else if (/เมตร|ม\./.test(seg)) meters += n
-        else meters += n
+        else meters += n // สมมติเป็นเมตรถ้าไม่พบหน่วย
     }
 
     if (meters >= 1000) {
-        const km = Math.round((meters / 1000) * 10) / 10
+        const km = Math.round((meters / 1000) * 10) / 10 // ปัดทศนิยม 1 ตำแหน่ง
         return `${(km % 1 === 0 ? km.toFixed(0) : km)} กม.`
     }
     return `${Math.round(meters)} ม.`
@@ -847,7 +650,7 @@ function formatDuration(input) {
         const n = parseFloat(seg.replace(/[^\d.]/g, ''))
         if (Number.isNaN(n)) continue
         if (/ชม/.test(seg)) minutes += n * 60
-        else minutes += n
+        else minutes += n // นาที
     }
 
     const h = Math.floor(minutes / 60)
@@ -870,11 +673,7 @@ onMounted(() => {
     if (window.google?.maps) {
         initializeMap()
         fetchMyRoutes().then(() => {
-            if (activeTab.value === 'myRoutes') {
-                if (myRoutes.value.length) updateMap(myRoutes.value[0])
-            } else {
-                if (filteredTrips.value.length) updateMap(filteredTrips.value[0])
-            }
+            if (filteredTrips.value.length) updateMap(filteredTrips.value[0])
         })
         return
     }
@@ -883,11 +682,7 @@ onMounted(() => {
         try { delete window[GMAPS_CB] } catch { }
         initializeMap()
         fetchMyRoutes().then(() => {
-            if (activeTab.value === 'myRoutes') {
-                if (myRoutes.value.length) updateMap(myRoutes.value[0])
-            } else {
-                if (filteredTrips.value.length) updateMap(filteredTrips.value[0])
-            }
+            if (filteredTrips.value.length) updateMap(filteredTrips.value[0])
         })
     }
 })
@@ -908,11 +703,7 @@ function initializeMap() {
 
 watch(activeTab, () => {
     selectedTripId.value = null
-    if (activeTab.value === 'myRoutes') {
-        if (myRoutes.value.length > 0) updateMap(myRoutes.value[0])
-    } else {
-        if (filteredTrips.value.length > 0) updateMap(filteredTrips.value[0])
-    }
+    if (filteredTrips.value.length > 0) updateMap(filteredTrips.value[0])
 })
 </script>
 
