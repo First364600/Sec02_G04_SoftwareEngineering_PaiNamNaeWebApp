@@ -128,64 +128,112 @@ Visit [**http://localhost:3000/documentation**](http://localhost:3000/documentat
 
 ### Authentication
 
-- `POST /api/auth/login` – Login with email/username & password
-- `PUT /api/auth/change-password` – Change current user's password
+- `POST /api/auth/login` – Login with email/username & password.
+- `PUT /api/auth/change-password` – Change current user's password.
 
 ### Users
 
-- `POST /api/users` – Register a new user with identity verification photos
-- `GET /api/users/admin` – List all active users (Admin only)
-- `GET /api/users/{id}` – Get user by ID
-- `PUT /api/users/me` – Update current user's profile
-- `PUT /api/users/admin/users/{id}` – Update user by ID (Admin only)
-- `DELETE /api/users/admin/{id}` – Delete user by ID (Admin only)
-- `PATCH /api/users/admin/{id}/status` – Set user's active status (Admin only)
+- `POST /api/users` – Register a new user.
+- `GET /api/users/me` – Get current user's profile.
+- `PUT /api/users/me` – Update current user's profile.
+- `GET /api/users/:id` – Get user's public profile by ID.
+- `GET /api/users/admin` – List all users (Admin only).
+- `GET /api/users/admin/:id` – Get a user's full details by ID (Admin only).
+- `PUT /api/users/admin/:id` – Update user by ID (Admin only).
+- `DELETE /api/users/admin/:id` – Delete user by ID (Admin only).
+- `PATCH /api/users/admin/:id/status` – Set user's status (Admin only).
 
-### Vehicles (Authenticated users)
+### Vehicles
 
-- `GET /api/vehicles` – List all vehicles for the current user
-- `GET /api/vehicles/{id}` – Get vehicle by ID
-- `POST /api/vehicles` – Create a new vehicle
-- `PUT /api/vehicles/{id}` – Update a vehicle
-- `DELETE /api/vehicles/{id}` – Delete a vehicle
-- `PUT /api/vehicles/{id}/default` – Set a vehicle as the default
+- `GET /api/vehicles` – List all vehicles for the current user.
+- `POST /api/vehicles` – Create a new vehicle.
+- `GET /api/vehicles/:id` – Get vehicle by ID.
+- `PUT /api/vehicles/:id` – Update a vehicle.
+- `DELETE /api/vehicles/:id` – Delete a vehicle.
+- `PUT /api/vehicles/:id/default` – Set a vehicle as the default.
+- `GET /api/vehicles/admin` - List all vehicles in the system (Admin only).
+- `GET /api/vehicles/admin/:id` - Get a vehicle by ID (Admin only).
+- `GET /api/vehicles/admin/user/:userId` - List all vehicles for a specific user (Admin only).
+- `POST /api/vehicles/admin` - Create a vehicle for a user (Admin only).
+- `PUT /api/vehicles/admin/:id` - Update a vehicle (Admin only).
+- `DELETE /api/vehicles/admin/:id` - Delete a vehicle (Admin only).
 
 ### Driver Verifications
 
-- `GET /api/driver-verifications/me` – View your own verification record  
-- `POST /api/driver-verifications` – Submit a new driver verification (upload license)  
-- `PUT /api/driver-verifications/{id}` – Update your verification details
-- `GET /api/driver-verifications` – List all verifications (Admin only)  
-- `GET /api/driver-verifications/{id}` – Get a specific verification record (Admin only)  
-- `PATCH /api/driver-verifications/{id}/status` – Approve or reject a driver verification (Admin only)
+- `GET /api/driver-verifications/me` – View your own verification record.
+- `POST /api/driver-verifications` – Submit a new driver verification request.
+- `PUT /api/driver-verifications/:id` – Update your verification request.
+- `GET /api/driver-verifications/admin` – List all verification requests (Admin only).
+- `GET /api/driver-verifications/admin/:id` – Get a specific verification record (Admin only).
+- `POST /api/driver-verifications/admin` - Create a verification record for a user (Admin only).
+- `PUT /api/driver-verifications/admin/:id` - Update a verification record (Admin only).
+- `DELETE /api/driver-verifications/admin/:id` - Delete a verification record (Admin only).
+- `PATCH /api/driver-verifications/:id/status` – Approve or reject a driver verification (Admin only).
 
 ### Routes
 
-- `GET /api/routes` – List all routes (public)  
-- `GET /api/routes/{id}` – Get route by ID (public)
-- `GET /api/routes/me` - List all routes created by the current logged-in driver (Driver only)
-- `POST /api/routes` – Create a new route (Driver only, must be pending/approved)  
-- `PUT /api/routes/{id}` – Update your route (Driver only)  
-- `DELETE /api/routes/{id}` – Delete your route (Driver only)
+- `GET /api/routes` – List all available routes (Public).
+- `GET /api/routes/:id` – Get route by ID (Public).
+- `GET /api/routes/me` - List all routes created by the current logged-in driver.
+- `POST /api/routes` – Create a new route (Driver only).
+- `PUT /api/routes/:id` – Update your route (Driver only).
+- `DELETE /api/routes/:id` – Delete your route (Driver only).
+- `GET /api/routes/admin` - List all routes in the system (Admin only).
+- `GET /api/routes/admin/driver/:driverId` - Get all routes for a specific driver (Admin only).
+- `POST /api/routes/admin` - Create a route for a driver (Admin only).
+- `PUT /api/routes/admin/:id` - Update a route (Admin only).
+- `DELETE /api/routes/admin/:id` - Delete a route (Admin only).
 
 ### Bookings
 
-- `GET /api/bookings/me` - List all bookings made by the current user (Passenger only)
-- `GET /api/bookings/{id}` - Get a booking by its ID (Related Passenger or Driver only)
-- `POST /api/bookings` - Create a new booking for a route (Passenger only)
-- `PATCH /api/bookings/{id}/status` - Update a booking's status, e.g., confirm/reject (Driver only)
-- `PATCH /api/bookings/{id}/cancel` - Cancel a booking (Passenger only)
-- `DELETE /api/bookings/{id}` - Delete a cancelled/rejected booking (Related Passenger or Driver only)
+- `GET /api/bookings/me` - List all bookings made by the current user.
+- `GET /api/bookings/:id` - Get a booking by its ID.
+- `POST /api/bookings` - Create a new booking for a route.
+- `PATCH /api/bookings/:id/status` - Update a booking's status (e.g., confirm/reject) (Driver only).
+- `PATCH /api/bookings/:id/cancel` - Cancel a booking.
+- `DELETE /api/bookings/:id` - Delete a booking.
+- `GET /api/bookings/admin` - List all bookings in the system (Admin only).
+- `GET /api/bookings/admin/:id` - Get a booking by ID (Admin only).
+- `POST /api/bookings/admin` - Create a booking for a user (Admin only).
+- `PUT /api/bookings/admin/:id` - Update a booking (Admin only).
+- `DELETE /api/bookings/admin/:id` - Delete a booking (Admin only).
+
+### Notifications
+
+- `GET /api/notifications` - List all notifications for the current user.
+- `GET /api/notifications/unread-count` - Get the count of unread notifications.
+- `PATCH /api/notifications/read-all` - Mark all notifications as read.
+- `GET /api/notifications/:id` - Get a notification by ID.
+- `PATCH /api/notifications/:id/read` - Mark a notification as read.
+- `PATCH /api/notifications/:id/unread` - Mark a notification as unread.
+- `DELETE /api/notifications/:id` - Delete a notification.
+- `GET /api/notifications/admin` - List all notifications in the system (Admin only).
+- `POST /api/notifications/admin` - Create a new notification (Admin only).
+- `DELETE /api/notifications/admin/:id` - Delete a notification (Admin only).
+
+### Maps
+
+- `POST /api/maps/directions` – Get directions between locations.
+- `GET /api/maps/geocode` – Convert an address to coordinates.
+- `GET /api/maps/reverse-geocode` – Convert coordinates to an address.
 
 ### Health-check & Metrics
 
-- `GET /health` – Check application & database health (200 OK or 503)
-- `GET /metrics` – Expose Prometheus-compatible metrics (CPU, memory, HTTP latency, request counts, etc.)
-- `GET /documentation` - Access the Swagger UI API documentation page
+- `GET /health` – Check application & database health.
+- `GET /metrics` – Expose Prometheus-compatible metrics.
+- `GET /documentation` - Access the Swagger UI API documentation page.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 ## Contact
 
 For questions or feedback, reach out to:
 
-**Email:** [jonathandoillon2002@gmail.com](mailto\:jonathandoillon2002@gmail.com)
-**Email:** [seth.s@kkumail.com](mailto\:seth.s@kkumail.com)
+**Email:**
+- [jonathandoillon2002@gmail.com](mailto:jonathandoillon2002@gmail.com)
+- [seth.s@kkumail.com](mailto:seth.s@kkumail.com)
