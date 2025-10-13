@@ -16,18 +16,18 @@ const {
 const router = express.Router();
 
 // --- Admin routes ---
-// GET /driver-verifications
+// GET /driver-verifications/admin
 router.get(
-  '/',
+  '/admin',
   protect,
   requireAdmin,
   validate({ query: listDriverVerifsQuerySchema }),
   driverVerifController.adminListVerifications
 );
 
-// GET /driver-verifications/:id
+// GET /driver-verifications/admin/:id
 router.get(
-  '/:id',
+  '/admin/:id',
   protect,
   requireAdmin,
   validate({ params: idParamSchema }),
