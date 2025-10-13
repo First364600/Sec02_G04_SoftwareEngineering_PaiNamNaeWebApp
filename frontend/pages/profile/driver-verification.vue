@@ -1,51 +1,127 @@
 <template>
     <div class="bg-gray-50">
-        <div class="min-h-screen flex items-center justify-center py-8">
+        <div class="flex items-center justify-center min-h-screen py-8">
             <div
-                class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4 border border-gray-300">
+                class="flex w-full max-w-6xl mx-4 overflow-hidden bg-white border border-gray-300 rounded-lg shadow-lg">
 
                 <ProfileSidebar />
 
                 <main class="flex-1 p-8 ">
-                    <div class="text-center mb-8">
-                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+
+                    <div class="mb-8">
+                        <div class="p-6 bg-white border border-gray-300 shadow rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-lg font-semibold text-gray-900">
+                                    ข้อมูลการยืนยันผู้ขับขี่ของฉัน
+                                </h2>
+
+                                <!-- แสดงเฉพาะเมื่อมีข้อมูล meVerification -->
+                                <span v-if="meVerification"
+                                    class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full"
+                                    :class="statusBadgeClass(meVerification.status)">
+                                    {{ statusLabel(meVerification.status) }}
+                                </span>
+                            </div>
+
+                            <div v-if="isLoadingMe" class="text-gray-500">กำลังโหลดข้อมูล...</div>
+
+                            <div v-else-if="meVerification" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <div class="text-sm text-gray-500">ชื่อบนบัตร</div>
+                                    <div class="font-medium text-gray-900">{{ meVerification.firstNameOnLicense }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">นามสกุลบนบัตร</div>
+                                    <div class="font-medium text-gray-900">{{ meVerification.lastNameOnLicense }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">เลขที่ใบขับขี่</div>
+                                    <div class="flex items-center font-medium text-gray-900 break-all">
+                                        <span>{{ showLicense ? meVerification.licenseNumber :
+                                            maskedLicense(meVerification.licenseNumber) }}</span>
+                                        <button type="button" @click="showLicense = !showLicense"
+                                            class="p-1 ml-2 text-gray-500 rounded hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            :aria-label="showLicense ? 'ซ่อนเลขที่ใบขับขี่' : 'แสดงเลขที่ใบขับขี่'"
+                                            title="สลับการแสดงเลขที่ใบขับขี่">
+                                            <!-- eye (show) -->
+                                            <svg v-if="!showLicense" class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            <!-- eye-off (hide) -->
+                                            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.053 10.053 0 012.227-3.592M6.223 6.223A10.05 10.05 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.05 10.05 0 01-2.042 3.33M15 12a3 3 0 00-3-3M3 3l18 18" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">ชนิดของบัตรขับขี่</div>
+                                    <div class="font-medium text-gray-900">{{ typeLabel(meVerification.typeOnLicense) }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">วันออกใบขับขี่</div>
+                                    <div class="font-medium text-gray-900">{{
+                                        formatDate(meVerification.licenseIssueDate) }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">วันหมดอายุใบขับขี่</div>
+                                    <div class="font-medium text-gray-900">{{
+                                        formatDate(meVerification.licenseExpiryDate) }}</div>
+                                </div>
+                            </div>
+
+                            <div v-else class="text-gray-500">
+                                ยังไม่มีประวัติการยืนยันผู้ขับขี่
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-blue-600 rounded-full">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
                         </div>
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">การยืนยันตัวตนสำหรับผู้ขับขี่</h1>
-                        <p class="text-gray-600 max-w-md mx-auto">
+                        <h1 class="mb-2 text-3xl font-bold text-gray-800">การยืนยันตัวตนสำหรับผู้ขับขี่</h1>
+                        <p class="max-w-md mx-auto text-gray-600">
                             อัปโหลดภาพบัตรขับขี่ประจำตัวและรูปถ่าย เพื่อยืนยันตัวตนของคุณ
                         </p>
                     </div>
 
-                    <div class="bg-white rounded-xl p-8 ">
+                    <div class="p-8 bg-white rounded-xl ">
                         <form @submit.prevent="handleSubmit" novalidate class="space-y-8">
 
                             <div class="relative">
                                 <div class="flex items-center mb-6">
-                                    <div class="step-indicator mr-4">1</div>
+                                    <div class="mr-4 step-indicator">1</div>
                                     <label class="text-xl font-semibold text-gray-800">
                                         รูปบัตรขับขี่ประจำตัว (ด้านหน้า) <span class="text-red-500">*</span>
                                     </label>
                                 </div>
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">ตัวอย่างที่ถูกต้อง:</h4>
-                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                <h4 class="mb-2 text-sm font-medium text-gray-700">ตัวอย่างที่ถูกต้อง:</h4>
+                                <div class="grid gap-6 mb-6 md:grid-cols-2">
                                     <div class="space-y-4">
-                                        <div class="license-card p-6 h-40 relative">
-                                            <div class="relative z-10 h-full flex flex-col justify-between">
-                                                <div class="flex justify-between items-start">
+                                        <div class="relative h-40 p-6 license-card">
+                                            <div class="relative z-10 flex flex-col justify-between h-full">
+                                                <div class="flex items-start justify-between">
                                                     <div>
                                                         <div class="thai-text">ใบอนุญาติขับรถยนต์</div>
-                                                        <div class="text-xs text-blue-800 font-bold">DRIVING LICENSE
+                                                        <div class="text-xs font-bold text-blue-800">DRIVING LICENSE
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center space-x-3">
                                                     <div
-                                                        class="w-12 h-12 bg-blue-300 rounded-md flex items-center justify-center">
+                                                        class="flex items-center justify-center w-12 h-12 bg-blue-300 rounded-md">
                                                         <svg class="w-6 h-6 text-blue-700" fill="currentColor"
                                                             viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd"
@@ -54,7 +130,7 @@
                                                         </svg>
                                                     </div>
                                                     <div>
-                                                        <div class="text-xs text-blue-800 font-semibold">นาย สมชาย ใจดี
+                                                        <div class="text-xs font-semibold text-blue-800">นาย สมชาย ใจดี
                                                         </div>
                                                         <div class="text-xs text-blue-700">เลขที่ 12345678</div>
                                                         <div class="text-xs text-blue-600">หมดอายุ 01/01/2027</div>
@@ -62,24 +138,24 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="text-xs text-gray-600 text-center">วางบัตรบนพื้นผิวเรียบ ถ่ายให้ชัดเจน
+                                        <p class="text-xs text-center text-gray-600">วางบัตรบนพื้นผิวเรียบ ถ่ายให้ชัดเจน
                                         </p>
                                     </div>
                                     <div @click="triggerFileInput('licensePhoto')"
-                                        class="upload-zone h-40 border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 hover:border-blue-400 relative flex items-center justify-center">
+                                        class="relative flex items-center justify-center h-40 p-8 border-2 border-gray-300 border-dashed rounded-lg upload-zone bg-gray-50 hover:bg-gray-100 hover:border-blue-400">
                                         <div v-if="!previews.licensePhoto" class="text-center">
-                                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none"
+                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
-                                            <p class="text-lg text-gray-600 mb-2">คลิกเพื่ออัปโหลด</p>
+                                            <p class="mb-2 text-lg text-gray-600">คลิกเพื่ออัปโหลด</p>
                                             <p class="text-sm text-gray-500">JPG, PNG (ไม่เกิน 10MB)</p>
                                         </div>
                                         <img v-else :src="previews.licensePhoto"
-                                            class="w-full h-full object-cover rounded-md" />
+                                            class="object-cover w-full h-full rounded-md" />
                                         <input type="file" ref="licensePhotoInput"
                                             @change="handleFileChange($event, 'licensePhoto')" class="hidden"
                                             accept="image/png, image/jpeg" />
@@ -89,19 +165,19 @@
 
                             <div class="relative">
                                 <div class="flex items-center mb-6">
-                                    <div class="step-indicator mr-4">2</div>
+                                    <div class="mr-4 step-indicator">2</div>
                                     <label class="text-xl font-semibold text-gray-800">
                                         รูปถ่าย (Selfie) <span class="text-red-500">*</span>
                                     </label>
                                 </div>
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">ตัวอย่างที่ถูกต้อง:</h4>
-                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                <h4 class="mb-2 text-sm font-medium text-gray-700">ตัวอย่างที่ถูกต้อง:</h4>
+                                <div class="grid gap-6 mb-6 md:grid-cols-2">
                                     <div class="space-y-4">
-                                        <div class="selfie-frame p-6 h-40 relative">
-                                            <div class="relative z-10 h-full flex items-center justify-center">
+                                        <div class="relative h-40 p-6 selfie-frame">
+                                            <div class="relative z-10 flex items-center justify-center h-full">
                                                 <div class="flex items-center space-x-4">
                                                     <div
-                                                        class="person-silhouette w-20 h-20 flex items-center justify-center">
+                                                        class="flex items-center justify-center w-20 h-20 person-silhouette">
                                                         <svg class="w-12 h-12 text-gray-200" fill="currentColor"
                                                             viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd"
@@ -112,24 +188,24 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="text-xs text-gray-600 text-center">ถือบัตรชิดข้างใบหน้า
+                                        <p class="text-xs text-center text-gray-600">ถือบัตรชิดข้างใบหน้า
                                             ให้เห็นทั้งสองอย่างชัดเจน</p>
                                     </div>
                                     <div @click="triggerFileInput('selfiePhoto')"
-                                        class="upload-zone h-40 border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 hover:border-blue-400 relative flex items-center justify-center">
+                                        class="relative flex items-center justify-center h-40 p-8 border-2 border-gray-300 border-dashed rounded-lg upload-zone bg-gray-50 hover:bg-gray-100 hover:border-blue-400">
                                         <div v-if="!previews.selfiePhoto" class="text-center">
-                                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none"
+                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
-                                            <p class="text-lg text-gray-600 mb-2">คลิกเพื่ออัปโหลด</p>
+                                            <p class="mb-2 text-lg text-gray-600">คลิกเพื่ออัปโหลด</p>
                                             <p class="text-sm text-gray-500">JPG, PNG (ไม่เกิน 10MB)</p>
                                         </div>
                                         <img v-else :src="previews.selfiePhoto"
-                                            class="w-full h-full object-cover rounded-md" />
+                                            class="object-cover w-full h-full rounded-md" />
                                         <input type="file" ref="selfiePhotoInput"
                                             @change="handleFileChange($event, 'selfiePhoto')" class="hidden"
                                             accept="image/png, image/jpeg" />
@@ -139,40 +215,40 @@
 
                             <div class="relative">
                                 <div class="flex items-center mb-4">
-                                    <div class="step-indicator mr-4">3</div>
+                                    <div class="mr-4 step-indicator">3</div>
                                     <h2 class="text-xl font-semibold text-gray-800">ข้อมูลในบัตรขับขี่ประจำตัว</h2>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
                                     <div>
                                         <label for="firstNameOnLicense"
-                                            class="block text-sm font-medium text-gray-700 mb-2">ชื่อ (บนบัตร) <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">ชื่อ (บนบัตร) <span
                                                 class="text-red-500">*</span></label>
                                         <input v-model="form.firstNameOnLicense" id="firstNameOnLicense" type="text"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                     <div>
                                         <label for="lastNameOnLicense"
-                                            class="block text-sm font-medium text-gray-700 mb-2">นามสกุล (บนบัตร) <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">นามสกุล (บนบัตร) <span
                                                 class="text-red-500">*</span></label>
                                         <input v-model="form.lastNameOnLicense" id="lastNameOnLicense" type="text"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                     <div>
                                         <label for="licenseNumber"
-                                            class="block text-sm font-medium text-gray-700 mb-2">เลขที่ใบขับขี่ <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">เลขที่ใบขับขี่ <span
                                                 class="text-red-500">*</span></label>
                                         <input v-model="form.licenseNumber" id="licenseNumber" type="text"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                     <div>
                                         <label for="typeOnLicense"
-                                            class="block text-sm font-medium text-gray-700 mb-2">ชนิดของบัตรขับขี่ <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">ชนิดของบัตรขับขี่ <span
                                                 class="text-red-500">*</span></label>
                                         <select v-model="form.typeOnLicense" id="typeOnLicense"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required>
                                             <option disabled value="">กรุณาเลือกชนิดของบัตร</option>
                                             <option value="PRIVATE_CAR_TEMPORARY">รถยนต์ส่วนบุคคลชั่วคราว (2 ปี)
@@ -184,34 +260,34 @@
                                     </div>
                                     <div>
                                         <label for="licenseIssueDate"
-                                            class="block text-sm font-medium text-gray-700 mb-2">วันออกใบขับขี่ <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">วันออกใบขับขี่ <span
                                                 class="text-red-500">*</span></label>
                                         <input v-model="form.licenseIssueDate" id="licenseIssueDate" type="date"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                     <div>
                                         <label for="licenseExpiryDate"
-                                            class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุใบขับขี่
+                                            class="block mb-2 text-sm font-medium text-gray-700">วันหมดอายุใบขับขี่
                                             <span class="text-red-500">*</span></label>
                                         <input v-model="form.licenseExpiryDate" id="licenseExpiryDate" type="date"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                 </div>
                             </div>
 
-                            <p class="text-sm text-gray-500 text-center mt-4">
+                            <p class="mt-4 text-sm text-center text-gray-500">
                                 ข้อมูลของคุณจะได้รับการตรวจสอบโดยเจ้าหน้าที่ระบบโดยเร็วที่สุด
                             </p>
-                            <div class="pt-6 flex justify-end gap-4">
+                            <div class="flex justify-end gap-4 pt-6">
                                 <button type="button" @click="resetForm" :disabled="isLoading"
-                                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50">
+                                    class="px-6 py-3 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50">
                                     ยกเลิก
                                 </button>
                                 <button type="submit" :disabled="!isFormValid || isLoading"
-                                    class="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center">
-                                    <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                    class="flex items-center px-6 py-3 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed">
+                                    <svg v-if="isLoading" class="w-5 h-5 mr-3 -ml-1 text-white animate-spin"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                             stroke-width="4"></circle>
@@ -232,7 +308,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import ProfileSidebar from '~/components/ProfileSidebar.vue';
 import { useToast } from '~/composables/useToast';
 
@@ -262,6 +338,67 @@ const previews = reactive({
     licensePhoto: '',
     selfiePhoto: ''
 });
+
+const meVerification = ref(null)
+const isLoadingMe = ref(false)
+const showLicense = ref(false)
+
+const typeLabelMap = {
+    PRIVATE_CAR_TEMPORARY: 'รถยนต์ส่วนบุคคลชั่วคราว (2 ปี)',
+    PRIVATE_CAR: 'รถยนต์ส่วนบุคคล (5 ปี)',
+    PUBLIC_CAR: 'รถยนต์สาธารณะ',
+    LIFETIME: 'ตลอดชีพ',
+}
+const statusLabelMap = {
+    PENDING: 'กำลังตรวจสอบ',
+    APPROVED: 'อนุมัติแล้ว',
+    REJECTED: 'ถูกปฏิเสธ',
+}
+
+const typeLabel = (v) => typeLabelMap[v] || v
+
+const formatDate = (iso) => {
+    if (!iso) return '-'
+    try {
+        return new Date(iso).toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' })
+    } catch { return '-' }
+}
+
+const statusLabel = (v) => statusLabelMap[v] || v || '-'
+
+const statusBadgeClass = (v) => {
+    switch (v) {
+        case 'APPROVED':
+            return 'bg-green-100 text-green-700 border border-green-200'
+        case 'REJECTED':
+            return 'bg-red-100 text-red-700 border border-red-200'
+        case 'PENDING':
+        default:
+            return 'bg-amber-100 text-amber-700 border border-amber-200'
+    }
+}
+
+const fetchMyDriverVerification = async () => {
+    isLoadingMe.value = true
+    try {
+        const res = await $api('/driver-verifications/me')
+        // รองรับทั้ง { success, data } หรือ array safety
+        const record = (res && typeof res === 'object' && 'data' in res) ? res.data : res
+        meVerification.value = record || null
+    } catch (e) {
+        // ถ้าไม่มีข้อมูล/404 จะไม่ขึ้น error toast ตามที่ขอ — แค่ไม่แสดงบล็อก
+        meVerification.value = null
+    } finally {
+        isLoadingMe.value = false
+    }
+}
+
+const maskedLicense = (value) => {
+    if (!value) return '-'
+    const s = String(value)
+    const last4 = s.slice(-4)
+    return '•'.repeat(Math.max(0, s.length - 4)) + last4
+}
 
 const isFormValid = computed(() => {
     return form.licenseNumber && form.firstNameOnLicense && form.lastNameOnLicense &&
@@ -342,6 +479,11 @@ const handleSubmit = async () => {
         isLoading.value = false;
     }
 };
+
+onMounted(() => {
+    fetchMyDriverVerification()
+})
+
 </script>
 
 <style scoped>

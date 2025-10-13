@@ -1,50 +1,140 @@
 <template>
     <div class="bg-gray-50">
-        <div class="min-h-screen flex items-center justify-center py-8">
+        <div class="flex items-center justify-center min-h-screen py-8">
             <div
-                class="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-6xl w-full mx-4 border border-gray-300">
+                class="flex w-full max-w-6xl mx-4 overflow-hidden bg-white border border-gray-300 rounded-lg shadow-lg">
 
                 <ProfileSidebar />
 
                 <main class="flex-1 p-8 ">
-                    <div class="text-center mb-8">
-                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+
+                    <div class="mb-8">
+                        <div class="p-6 bg-white border border-gray-300 shadow rounded-xl">
+                            <div class="flex items-center mb-4">
+                                <h2 class="text-lg font-semibold text-gray-900">
+                                    ข้อมูลการยืนยันขั้นพื้นฐานของฉัน
+                                </h2>
+
+                                <!-- แสดงสถานะ isVerified ชิดขวา -->
+                                <div class="ml-auto" v-if="meBasic">
+                                    <!-- VERIFIED -->
+                                    <span v-if="meBasic.isVerified"
+                                        class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                                        <!-- check icon -->
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        ยืนยันแล้ว
+                                    </span>
+
+                                    <!-- NOT VERIFIED -->
+                                    <span v-else
+                                        class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200">
+                                        <!-- clock icon -->
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        ยังไม่ยืนยัน
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div v-if="isLoadingMeBasic" class="text-gray-500">กำลังโหลดข้อมูล...</div>
+
+                            <div v-else-if="meBasic" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <div class="text-sm text-gray-500">ชื่อ</div>
+                                    <div class="font-medium text-gray-900">{{ meBasic.firstName || '-' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">นามสกุล</div>
+                                    <div class="font-medium text-gray-900">{{ meBasic.lastName || '-' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">เลขประจำตัว</div>
+                                    <div class="flex items-center font-medium text-gray-900 break-all">
+                                        <span>
+                                            {{ showNationalId ? formatNationalId(meBasic.nationalIdNumber) :
+                                                maskedNationalId(meBasic.nationalIdNumber) }}
+                                        </span>
+                                        <button type="button" @click="showNationalId = !showNationalId"
+                                            class="p-1 ml-2 text-gray-500 rounded hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            :aria-label="showNationalId ? 'ซ่อนเลขประจำตัว' : 'แสดงเลขประจำตัว'"
+                                            title="สลับการแสดงเลขประจำตัว">
+                                            <!-- eye (show) -->
+                                            <svg v-if="!showNationalId" class="w-5 h-5" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            <!-- eye-off (hide) -->
+                                            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.053 10.053 0 012.227-3.592M6.223 6.223A10.05 10.05 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.05 10.05 0 01-2.042 3.33M15 12a3 3 0 00-3-3M3 3l18 18" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">วันหมดอายุบัตรประชาชน</div>
+                                    <div class="font-medium text-gray-900">{{ formatDate(meBasic.nationalIdExpiryDate)
+                                        }}</div>
+                                </div>
+                            </div>
+
+                            <div v-else class="text-gray-500">
+                                ยังไม่มีประวัติการยืนยันขั้นพื้นฐาน
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /โซนข้อมูลการยืนยันที่เคยยื่นไว้ (ใหม่) -->
+
+
+                    <div class="mb-8 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-blue-600 rounded-full">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
                         </div>
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">การยืนยันตัวตนขั้นพื้นฐาน</h1>
-                        <p class="text-gray-600 max-w-md mx-auto">
+                        <h1 class="mb-2 text-3xl font-bold text-gray-800">การยืนยันตัวตนขั้นพื้นฐาน</h1>
+                        <p class="max-w-md mx-auto text-gray-600">
                             อัปโหลดภาพบัตรประชาชนและรูปถ่าย เพื่อยืนยันตัวตนของคุณ
                         </p>
                     </div>
 
-                    <div class="bg-white rounded-xl p-8 ">
+                    <div class="p-8 bg-white rounded-xl ">
                         <form @submit.prevent="handleSubmit" novalidate class="space-y-8">
 
                             <div class="relative">
                                 <div class="flex items-center mb-6">
-                                    <div class="step-indicator mr-4">1</div>
+                                    <div class="mr-4 step-indicator">1</div>
                                     <label class="text-xl font-semibold text-gray-800">
                                         รูปบัตรประชาชน (ด้านหน้า) <span class="text-red-500">*</span>
                                     </label>
                                 </div>
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">ตัวอย่างที่ถูกต้อง:</h4>
-                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                <h4 class="mb-2 text-sm font-medium text-gray-700">ตัวอย่างที่ถูกต้อง:</h4>
+                                <div class="grid gap-6 mb-6 md:grid-cols-2">
                                     <div class="space-y-4">
-                                        <div class="license-card p-6 h-40 relative">
-                                            <div class="relative z-10 h-full flex flex-col justify-between">
-                                                <div class="flex justify-between items-start">
+                                        <div class="relative h-40 p-6 license-card">
+                                            <div class="relative z-10 flex flex-col justify-between h-full">
+                                                <div class="flex items-start justify-between">
                                                     <div>
                                                         <div class="thai-text">ใบบัตรประชาชน</div>
-                                                        <div class="text-xs text-blue-800 font-bold">ID CARD</div>
+                                                        <div class="text-xs font-bold text-blue-800">ID CARD</div>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center space-x-3">
                                                     <div
-                                                        class="w-12 h-12 bg-blue-300 rounded-md flex items-center justify-center">
+                                                        class="flex items-center justify-center w-12 h-12 bg-blue-300 rounded-md">
                                                         <svg class="w-6 h-6 text-blue-700" fill="currentColor"
                                                             viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd"
@@ -53,7 +143,7 @@
                                                         </svg>
                                                     </div>
                                                     <div>
-                                                        <div class="text-xs text-blue-800 font-semibold">นาย สมชาย ใจดี
+                                                        <div class="text-xs font-semibold text-blue-800">นาย สมชาย ใจดี
                                                         </div>
                                                         <div class="text-xs text-blue-700">เลขที่ 12345678</div>
                                                         <div class="text-xs text-blue-600">หมดอายุ 01/01/2027</div>
@@ -61,13 +151,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="text-xs text-gray-600 text-center">วางบัตรบนพื้นผิวเรียบ ถ่ายให้ชัดเจน
+                                        <p class="text-xs text-center text-gray-600">วางบัตรบนพื้นผิวเรียบ ถ่ายให้ชัดเจน
                                         </p>
                                     </div>
                                     <div @click="triggerFileInput('nationalIdPhoto')"
-                                        class="upload-zone h-40 border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 hover:border-blue-400 relative flex items-center justify-center">
+                                        class="relative flex items-center justify-center h-40 p-8 border-2 border-gray-300 border-dashed rounded-lg upload-zone bg-gray-50 hover:bg-gray-100 hover:border-blue-400">
                                         <div v-if="!previews.nationalIdPhoto" class="text-center">
-                                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none"
+                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
@@ -75,11 +165,11 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
-                                            <p class="text-lg text-gray-600 mb-2">คลิกเพื่ออัปโหลด</p>
+                                            <p class="mb-2 text-lg text-gray-600">คลิกเพื่ออัปโหลด</p>
                                             <p class="text-sm text-gray-500">JPG, PNG (ไม่เกิน 10MB)</p>
                                         </div>
                                         <img v-else :src="previews.nationalIdPhoto"
-                                            class="w-full h-full object-cover rounded-md" />
+                                            class="object-cover w-full h-full rounded-md" />
                                         <input type="file" ref="nationalIdInput"
                                             @change="handleFileChange($event, 'nationalIdPhoto')" class="hidden"
                                             accept="image/png, image/jpeg" />
@@ -89,19 +179,19 @@
 
                             <div class="relative">
                                 <div class="flex items-center mb-6">
-                                    <div class="step-indicator mr-4">2</div>
+                                    <div class="mr-4 step-indicator">2</div>
                                     <label class="text-xl font-semibold text-gray-800">
                                         รูปถ่าย (Selfie) <span class="text-red-500">*</span>
                                     </label>
                                 </div>
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">ตัวอย่างที่ถูกต้อง:</h4>
-                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                <h4 class="mb-2 text-sm font-medium text-gray-700">ตัวอย่างที่ถูกต้อง:</h4>
+                                <div class="grid gap-6 mb-6 md:grid-cols-2">
                                     <div class="space-y-4">
-                                        <div class="selfie-frame p-6 h-40 relative">
-                                            <div class="relative z-10 h-full flex items-center justify-center">
+                                        <div class="relative h-40 p-6 selfie-frame">
+                                            <div class="relative z-10 flex items-center justify-center h-full">
                                                 <div class="flex items-center space-x-4">
                                                     <div
-                                                        class="person-silhouette w-20 h-20 flex items-center justify-center">
+                                                        class="flex items-center justify-center w-20 h-20 person-silhouette">
                                                         <svg class="w-12 h-12 text-gray-200" fill="currentColor"
                                                             viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd"
@@ -112,24 +202,24 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="text-xs text-gray-600 text-center">ถือบัตรชิดข้างใบหน้า
+                                        <p class="text-xs text-center text-gray-600">ถือบัตรชิดข้างใบหน้า
                                             ให้เห็นทั้งสองอย่างชัดเจน</p>
                                     </div>
                                     <div @click="triggerFileInput('selfiePhoto')"
-                                        class="upload-zone h-40 border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 hover:border-blue-400 relative flex items-center justify-center">
+                                        class="relative flex items-center justify-center h-40 p-8 border-2 border-gray-300 border-dashed rounded-lg upload-zone bg-gray-50 hover:bg-gray-100 hover:border-blue-400">
                                         <div v-if="!previews.selfiePhoto" class="text-center">
-                                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none"
+                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
-                                            <p class="text-lg text-gray-600 mb-2">คลิกเพื่ออัปโหลด</p>
+                                            <p class="mb-2 text-lg text-gray-600">คลิกเพื่ออัปโหลด</p>
                                             <p class="text-sm text-gray-500">JPG, PNG (ไม่เกิน 10MB)</p>
                                         </div>
                                         <img v-else :src="previews.selfiePhoto"
-                                            class="w-full h-full object-cover rounded-md" />
+                                            class="object-cover w-full h-full rounded-md" />
                                         <input type="file" ref="selfieInput"
                                             @change="handleFileChange($event, 'selfiePhoto')" class="hidden"
                                             accept="image/png, image/jpeg" />
@@ -139,41 +229,41 @@
 
                             <div class="relative">
                                 <div class="flex items-center mb-4">
-                                    <div class="step-indicator mr-4">3</div>
+                                    <div class="mr-4 step-indicator">3</div>
                                     <h2 class="text-xl font-semibold text-gray-800">ข้อมูลในบัตรประจำตัวประชาชน</h2>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
                                     <div>
                                         <label for="nationalIdNumber"
-                                            class="block text-sm font-medium text-gray-700 mb-2">เลขบัตรประชาชน <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">เลขบัตรประชาชน <span
                                                 class="text-red-500">*</span></label>
                                         <input v-model="formattedNationalId" id="nationalIdNumber" type="text"
                                             maxlength="17" placeholder="x-xxxx-xxxxx-xx-x"
-                                            class="w-full border border-gray-300 rounded-lg focus:outline-none px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                     <div>
                                         <label for="nationalIdExpiryDate"
-                                            class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุในบัตร <span
+                                            class="block mb-2 text-sm font-medium text-gray-700">วันหมดอายุในบัตร <span
                                                 class="text-red-500">*</span></label>
                                         <input v-model="form.nationalIdExpiryDate" id="nationalIdExpiryDate" type="date"
-                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required />
                                     </div>
                                 </div>
                             </div>
 
-                            <p class="text-sm text-gray-500 text-center mt-4">
+                            <p class="mt-4 text-sm text-center text-gray-500">
                                 ข้อมูลของคุณจะได้รับการตรวจสอบโดยเจ้าหน้าที่ระบบโดยเร็วที่สุด
                             </p>
-                            <div class="pt-6 flex justify-end gap-4">
+                            <div class="flex justify-end gap-4 pt-6">
                                 <button type="button" @click="resetForm" :disabled="isLoading"
-                                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50">
+                                    class="px-6 py-3 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50">
                                     ยกเลิก
                                 </button>
                                 <button type="submit" :disabled="!isFormValid || isLoading"
-                                    class="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center">
-                                    <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                    class="flex items-center px-6 py-3 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed">
+                                    <svg v-if="isLoading" class="w-5 h-5 mr-3 -ml-1 text-white animate-spin"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                             stroke-width="4"></circle>
@@ -221,6 +311,44 @@ const form = reactive({
 });
 
 const formattedNationalId = ref('');
+
+const meBasic = ref(null)
+const isLoadingMeBasic = ref(false)
+const showNationalId = ref(false)
+
+const formatDate = (iso) => {
+    if (!iso) return '-'
+    try {
+        return new Date(iso).toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' })
+    } catch { return '-' }
+}
+
+const formatNationalId = (raw) => {
+    if (!raw) return '-'
+    const s = String(raw).replace(/\D/g, '').slice(0, 13)
+    if (s.length < 13) return s
+    return `${s[0]}-${s.slice(1, 5)}-${s.slice(5, 10)}-${s.slice(10, 12)}-${s.slice(12, 13)}`
+}
+
+const maskedNationalId = (raw) => {
+    if (!raw) return '-'
+    const s = String(raw)
+    const last4 = s.slice(-4)
+    return '•'.repeat(Math.max(0, s.length - 4)) + last4
+}
+
+const fetchMeBasic = async () => {
+    isLoadingMeBasic.value = true
+    try {
+        const res = await $api('/users/me')
+        const record = (res && typeof res === 'object' && 'data' in res) ? res.data : res
+        meBasic.value = record || null
+    } catch (e) {
+        meBasic.value = null
+    } finally {
+        isLoadingMeBasic.value = false
+    }
+}
 
 watch(formattedNationalId, (newValue) => {
     const digitsOnly = newValue.replace(/\D/g, '');
@@ -355,6 +483,10 @@ const handleSubmit = async () => {
         isLoading.value = false;
     }
 };
+
+onMounted(() => {
+    fetchMeBasic()
+})
 </script>
 
 <style scoped>
