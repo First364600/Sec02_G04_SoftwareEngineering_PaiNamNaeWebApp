@@ -4,7 +4,7 @@
     <AdminSidebar />
 
     <main id="main-content" class="main-content mt-16 ml-0 lg:ml-[280px] p-6 min-h-screen">
-      <div class="mx-auto max-w-6xl">
+      <div class="max-w-6xl mx-auto">
         <!-- Back button -->
         <div class="mb-8">
           <NuxtLink
@@ -25,7 +25,7 @@
         </div>
 
         <!-- Card -->
-        <div class="flex bg-white rounded-lg shadow-lg overflow-hidden w-full border border-gray-300">
+        <div class="flex w-full overflow-hidden bg-white border border-gray-300 rounded-lg shadow-lg">
           <main class="flex-1 p-8">
             <!-- Loading / Error -->
             <div v-if="isLoading" class="p-8 text-center text-gray-500">กำลังโหลดข้อมูล...</div>
@@ -36,20 +36,20 @@
               <!-- STEP 0: เจ้าของคำขอ (อ่านอย่างเดียว) -->
               <div class="mb-2">
                 <div class="flex items-center mb-4">
-                  <div class="step-indicator mr-4">0</div>
+                  <div class="mr-4 step-indicator">0</div>
                   <h2 class="text-xl font-semibold text-gray-800">
                     เจ้าของคำขอยืนยันตัวตน
-                    <span class="ml-2 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 align-middle">
+                    <span class="px-2 py-1 ml-2 text-xs text-gray-600 align-middle bg-gray-100 rounded-full">
                       ไม่สามารถแก้ไขเจ้าของคำขอได้
                     </span>
                   </h2>
                 </div>
 
-                <label class="block text-sm font-medium text-gray-700 mb-2">ผู้ใช้</label>
+                <label class="block mb-2 text-sm font-medium text-gray-700">ผู้ใช้</label>
                 <input
                   :value="dv?.user ? `${dv.user.firstName || ''} ${dv.user.lastName || ''} (${dv.user.email})` : '-'"
                   type="text"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 text-gray-700"
+                  class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-lg bg-gray-50"
                   disabled
                 />
               </div>
@@ -57,42 +57,42 @@
               <!-- STEP 1: รูปบัตรขับขี่ -->
               <div class="relative">
                 <div class="flex items-center mb-6">
-                  <div class="step-indicator mr-4">1</div>
+                  <div class="mr-4 step-indicator">1</div>
                   <label class="text-xl font-semibold text-gray-800">
                     รูปบัตรขับขี่ประจำตัว (ด้านหน้า)
                   </label>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6 mb-2">
+                <div class="grid gap-6 mb-2 md:grid-cols-2">
                   <!-- preview ปัจจุบัน -->
                   <div class="space-y-4">
                     <h4 class="text-sm font-medium text-gray-700">ไฟล์ปัจจุบัน:</h4>
-                    <div class="upload-zone h-40 border border-gray-300 rounded-lg p-4 bg-gray-50 relative flex items-center justify-center">
+                    <div class="relative flex items-center justify-center h-40 p-4 border border-gray-300 rounded-lg upload-zone bg-gray-50">
                       <template v-if="dv?.licensePhotoUrl && !licenseFrontPreview">
                         <a :href="dv.licensePhotoUrl" target="_blank" class="block w-full h-full">
-                          <img :src="dv.licensePhotoUrl" class="w-full h-full object-contain rounded-md" alt="license" />
+                          <img :src="dv.licensePhotoUrl" class="object-contain w-full h-full rounded-md" alt="license" />
                         </a>
                       </template>
                       <template v-else-if="licenseFrontPreview">
-                        <img :src="licenseFrontPreview" class="w-full h-full object-contain rounded-md" />
+                        <img :src="licenseFrontPreview" class="object-contain w-full h-full rounded-md" />
                         <button
                           type="button"
                           @click="removeImage('front')"
-                          class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                          class="absolute flex items-center justify-center w-8 h-8 text-white rounded-full top-2 right-2 bg-black/50"
                         >×</button>
                       </template>
                       <template v-else>
-                        <div class="text-gray-500 text-sm">ไม่มีรูป</div>
+                        <div class="text-sm text-gray-500">ไม่มีรูป</div>
                       </template>
                     </div>
                   </div>
 
                   <!-- อัปโหลดใหม่ -->
                   <div
-                    class="upload-zone h-40 border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 hover:border-blue-400 relative flex items-center justify-center"
+                    class="relative flex items-center justify-center h-40 p-8 border-2 border-gray-300 border-dashed rounded-lg upload-zone bg-gray-50 hover:bg-gray-100 hover:border-blue-400"
                   >
                     <div class="text-center pointer-events-none">
-                      <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2"></i>
+                      <i class="mb-2 text-3xl text-gray-400 fa-solid fa-cloud-arrow-up"></i>
                       <p class="text-lg text-gray-600">คลิกเพื่ออัปโหลด</p>
                       <p class="text-sm text-gray-500">JPG, PNG (ไม่เกิน 10MB)</p>
                     </div>
@@ -110,42 +110,42 @@
               <!-- STEP 2: Selfie -->
               <div class="relative">
                 <div class="flex items-center mb-6">
-                  <div class="step-indicator mr-4">2</div>
+                  <div class="mr-4 step-indicator">2</div>
                   <label class="text-xl font-semibold text-gray-800">
                     รูปถ่าย (Selfie)
                   </label>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6 mb-2">
+                <div class="grid gap-6 mb-2 md:grid-cols-2">
                   <!-- preview ปัจจุบัน -->
                   <div class="space-y-4">
                     <h4 class="text-sm font-medium text-gray-700">ไฟล์ปัจจุบัน:</h4>
-                    <div class="upload-zone h-40 border border-gray-300 rounded-lg p-4 bg-gray-50 relative flex items-center justify-center">
+                    <div class="relative flex items-center justify-center h-40 p-4 border border-gray-300 rounded-lg upload-zone bg-gray-50">
                       <template v-if="dv?.selfiePhotoUrl && !licenseSelfiePreview">
                         <a :href="dv.selfiePhotoUrl" target="_blank" class="block w-full h-full">
-                          <img :src="dv.selfiePhotoUrl" class="w-full h-full object-contain rounded-md" alt="selfie" />
+                          <img :src="dv.selfiePhotoUrl" class="object-contain w-full h-full rounded-md" alt="selfie" />
                         </a>
                       </template>
                       <template v-else-if="licenseSelfiePreview">
-                        <img :src="licenseSelfiePreview" class="w-full h-full object-contain rounded-md" />
+                        <img :src="licenseSelfiePreview" class="object-contain w-full h-full rounded-md" />
                         <button
                           type="button"
                           @click="removeImage('selfie')"
-                          class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                          class="absolute flex items-center justify-center w-8 h-8 text-white rounded-full top-2 right-2 bg-black/50"
                         >×</button>
                       </template>
                       <template v-else>
-                        <div class="text-gray-500 text-sm">ไม่มีรูป</div>
+                        <div class="text-sm text-gray-500">ไม่มีรูป</div>
                       </template>
                     </div>
                   </div>
 
                   <!-- อัปโหลดใหม่ -->
                   <div
-                    class="upload-zone h-40 border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 hover:border-blue-400 relative flex items-center justify-center"
+                    class="relative flex items-center justify-center h-40 p-8 border-2 border-gray-300 border-dashed rounded-lg upload-zone bg-gray-50 hover:bg-gray-100 hover:border-blue-400"
                   >
                     <div class="text-center pointer-events-none">
-                      <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2"></i>
+                      <i class="mb-2 text-3xl text-gray-400 fa-solid fa-cloud-arrow-up"></i>
                       <p class="text-lg text-gray-600">คลิกเพื่ออัปโหลด</p>
                       <p class="text-sm text-gray-500">JPG, PNG (ไม่เกิน 10MB)</p>
                     </div>
@@ -163,21 +163,21 @@
               <!-- STEP 3: ข้อมูลบนบัตร -->
               <div class="relative">
                 <div class="flex items-center mb-4">
-                  <div class="step-indicator mr-4">3</div>
+                  <div class="mr-4 step-indicator">3</div>
                   <h2 class="text-xl font-semibold text-gray-800">ข้อมูลในบัตรขับขี่ประจำตัว</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">เลขที่ใบขับขี่ <span class="text-red-500">*</span></label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">เลขที่ใบขับขี่ <span class="text-red-500">*</span></label>
                     <input v-model.trim="form.licenseNumber" type="text"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ชนิดของบัตรขับขี่ <span class="text-red-500">*</span></label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">ชนิดของบัตรขับขี่ <span class="text-red-500">*</span></label>
                     <select v-model="form.typeOnLicense"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                       <option disabled value="">กรุณาเลือกชนิดของบัตร</option>
                       <option value="PRIVATE_CAR_TEMPORARY">รถยนต์ส่วนบุคคลชั่วคราว (2 ปี)</option>
                       <option value="PRIVATE_CAR">รถยนต์ส่วนบุคคล (5 ปี)</option>
@@ -187,46 +187,46 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อ (บนบัตร) <span class="text-red-500">*</span></label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">ชื่อ (บนบัตร) <span class="text-red-500">*</span></label>
                     <input v-model.trim="form.firstNameOnLicense" type="text"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">นามสกุล (บนบัตร) <span class="text-red-500">*</span></label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">นามสกุล (บนบัตร) <span class="text-red-500">*</span></label>
                     <input v-model.trim="form.lastNameOnLicense" type="text"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">วันออกใบขับขี่ <span class="text-red-500">*</span></label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">วันออกใบขับขี่ <span class="text-red-500">*</span></label>
                     <input v-model="form.licenseIssueDate" type="date"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุใบขับขี่ <span class="text-red-500">*</span></label>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">วันหมดอายุใบขับขี่ <span class="text-red-500">*</span></label>
                     <input v-model="form.licenseExpiryDate" type="date"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                   </div>
                 </div>
               </div>
 
-              <div class="pt-6 flex justify-end gap-4">
+              <div class="flex justify-end gap-4 pt-6">
                 <button
                   type="button"
                   @click="resetLocalImages"
                   :disabled="isSubmitting"
-                  class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50"
+                  class="px-6 py-3 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-50"
                 >
                   ล้างรูปที่อัปโหลด
                 </button>
                 <button
                   type="submit"
                   :disabled="isSubmitting"
-                  class="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center"
+                  class="flex items-center px-6 py-3 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
                 >
-                  <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg v-if="isSubmitting" class="w-5 h-5 mr-3 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -299,7 +299,7 @@ async function fetchDV() {
   try {
     const config = useRuntimeConfig()
     const token = useCookie('token').value || (process.client ? localStorage.getItem('token') : '')
-    const res = await $fetch(`/driver-verifications/${dvId}`, {
+    const res = await $fetch(`/driver-verifications/admin/${dvId}`, {
       baseURL: config.public.apiBase,
       headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
     })

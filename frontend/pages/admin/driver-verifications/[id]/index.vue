@@ -24,7 +24,7 @@
                 </div>
 
                 <!-- Status & actions -->
-                <div class="bg-white border border-gray-300 rounded-lg shadow-sm mb-6">
+                <div class="mb-6 bg-white border border-gray-300 rounded-lg shadow-sm">
                     <div class="flex flex-wrap items-center gap-3 px-4 py-4 sm:px-6">
                         <div class="text-sm text-gray-700">สถานะปัจจุบัน:</div>
                         <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full" :class="{
@@ -35,25 +35,25 @@
                             <i class="fa-solid fa-circle mr-1 text-[8px]"></i>{{ statusLower(dv?.status) }}
                         </span>
 
-                        <div class="ml-auto flex gap-2">
-                            <button class="px-3 py-2 rounded-md border hover:bg-gray-50 disabled:opacity-50"
+                        <div class="flex gap-2 ml-auto">
+                            <button class="px-3 py-2 border rounded-md hover:bg-gray-50 disabled:opacity-50"
                                 :disabled="isPatchingStatus || !dv" @click="patchStatus('PENDING')">
                                 <i v-if="isPatchingStatus && targetStatus === 'PENDING'"
-                                    class="fa-solid fa-spinner fa-spin mr-1"></i>
+                                    class="mr-1 fa-solid fa-spinner fa-spin"></i>
                                 pending
                             </button>
                             <button
-                                class="px-3 py-2 rounded-md border hover:bg-gray-50 text-green-700 border-green-300 disabled:opacity-50"
+                                class="px-3 py-2 text-green-700 border border-green-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                                 :disabled="isPatchingStatus || !dv" @click="patchStatus('APPROVED')">
                                 <i v-if="isPatchingStatus && targetStatus === 'APPROVED'"
-                                    class="fa-solid fa-spinner fa-spin mr-1"></i>
+                                    class="mr-1 fa-solid fa-spinner fa-spin"></i>
                                 approve
                             </button>
                             <button
-                                class="px-3 py-2 rounded-md border hover:bg-gray-50 text-red-700 border-red-300 disabled:opacity-50"
+                                class="px-3 py-2 text-red-700 border border-red-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                                 :disabled="isPatchingStatus || !dv" @click="patchStatus('REJECTED')">
                                 <i v-if="isPatchingStatus && targetStatus === 'REJECTED'"
-                                    class="fa-solid fa-spinner fa-spin mr-1"></i>
+                                    class="mr-1 fa-solid fa-spinner fa-spin"></i>
                                 reject
                             </button>
                         </div>
@@ -124,7 +124,7 @@
                                         <div v-if="dv.licensePhotoUrl" class="photo-box">
                                             <a :href="dv.licensePhotoUrl" target="_blank" class="block w-full h-full">
                                                 <img :src="dv.licensePhotoUrl" alt="license"
-                                                    class="w-full h-full object-contain" />
+                                                    class="object-contain w-full h-full" />
                                             </a>
                                         </div>
                                         <div v-else class="photo-box empty">ไม่มีรูป</div>
@@ -137,7 +137,7 @@
                                         <div v-if="dv.selfiePhotoUrl" class="photo-box">
                                             <a :href="dv.selfiePhotoUrl" target="_blank" class="block w-full h-full">
                                                 <img :src="dv.selfiePhotoUrl" alt="selfie"
-                                                    class="w-full h-full object-contain" />
+                                                    class="object-contain w-full h-full" />
                                             </a>
                                         </div>
                                         <div v-else class="photo-box empty">ไม่มีรูป</div>
@@ -263,7 +263,7 @@ async function fetchDV() {
     try {
         const config = useRuntimeConfig()
         const token = useCookie('token').value || (process.client ? localStorage.getItem('token') : '')
-        const res = await $fetch<ApiResponse<DriverVerification>>(`/driver-verifications/${dvId}`, {
+        const res = await $fetch<ApiResponse<DriverVerification>>(`/driver-verifications/admin/${dvId}`, {
             baseURL: config.public.apiBase,
             headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
         })

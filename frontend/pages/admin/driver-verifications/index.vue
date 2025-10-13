@@ -349,7 +349,7 @@ async function fetchRows(page = 1) {
             sortOrder
         }
 
-        const res = await $fetch('/driver-verifications', {
+        const res = await $fetch('/driver-verifications/admin', {
             baseURL: config.public.apiBase,
             headers: { Accept: 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
             query
