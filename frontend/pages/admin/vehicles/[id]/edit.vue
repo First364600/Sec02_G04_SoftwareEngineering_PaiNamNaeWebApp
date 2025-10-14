@@ -82,7 +82,7 @@
                                 <h3 class="mb-3 text-sm font-semibold text-gray-700">รูปภาพ</h3>
                                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                                      <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปหน้ารถ *</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปด้านหน้า *</label>
                                         <div class="p-4 text-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500" @click="pick('photoFrontInput')">
                                             <img v-if="photoFrontPreview" :src="photoFrontPreview" class="object-cover w-full h-32 rounded-md" />
                                             <div v-else class="text-gray-500"><i class="text-3xl fa-regular fa-image"></i><p class="mt-1 text-sm">กดเพื่อเลือกรูปภาพ</p></div>
@@ -90,7 +90,7 @@
                                         <input ref="photoFrontInput" type="file" accept="image/*" class="hidden" @change="onFile($event, 'front')" />
                                     </div>
                                      <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปหลังรถ *</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปด้านข้าง *</label>
                                         <div class="p-4 text-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500" @click="pick('photoBackInput')">
                                             <img v-if="photoBackPreview" :src="photoBackPreview" class="object-cover w-full h-32 rounded-md" />
                                             <div v-else class="text-gray-500"><i class="text-3xl fa-regular fa-image"></i><p class="mt-1 text-sm">กดเพื่อเลือกรูปภาพ</p></div>
@@ -98,7 +98,7 @@
                                         <input ref="photoBackInput" type="file" accept="image/*" class="hidden" @change="onFile($event, 'back')" />
                                     </div>
                                      <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปป้ายทะเบียน *</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปภายใน *</label>
                                         <div class="p-4 text-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500" @click="pick('licensePlatePhotoInput')">
                                             <img v-if="licensePlatePhotoPreview" :src="licensePlatePhotoPreview" class="object-cover w-full h-32 rounded-md" />
                                             <div v-else class="text-gray-500"><i class="text-3xl fa-regular fa-image"></i><p class="mt-1 text-sm">กดเพื่อเลือกรูปภาพ</p></div>
@@ -112,8 +112,8 @@
                             <div>
                                 <h3 class="mb-3 text-sm font-semibold text-gray-700">ตัวเลือกเพิ่มเติม</h3>
                                  <div class="flex items-center">
-                                     <input id="isDefault" v-model="form.isDefault" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                     <label for="isDefault" class="ml-2 block text-sm text-gray-900">ตั้งเป็นยานพาหนะเริ่มต้นสำหรับผู้ใช้นี้</label>
+                                     <input id="isDefault" v-model="form.isDefault" type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                     <label for="isDefault" class="block ml-2 text-sm text-gray-900">ตั้งเป็นยานพาหนะเริ่มต้นสำหรับผู้ใช้นี้</label>
                                  </div>
                              </div>
                         </div>

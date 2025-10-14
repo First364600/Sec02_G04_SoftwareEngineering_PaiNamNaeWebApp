@@ -138,28 +138,28 @@
                                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                                     <!-- รูปหน้ารถ -->
                                     <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปหน้ารถ</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปด้านหน้า</label>
                                         <a v-if="vehicle?.photos?.[0]" :href="vehicle.photos[0]" target="_blank"
-                                            class="block p-4 text-center border-2 border-dashed border-gray-300 rounded-md hover:shadow-sm">
+                                            class="block p-4 text-center border-2 border-gray-300 border-dashed rounded-md hover:shadow-sm">
                                             <img :src="vehicle.photos[0]" class="object-cover w-full h-40 rounded-md"
                                                 alt="front" />
                                         </a>
                                         <div v-else
-                                            class="p-10 text-center border-2 border-dashed border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                                            class="p-10 text-center text-gray-500 border-2 border-gray-300 border-dashed rounded-md bg-gray-50">
                                             ไม่พบรูป
                                         </div>
                                     </div>
 
                                     <!-- รูปหลังรถ -->
                                     <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปหลังรถ</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปด้านข้าง</label>
                                         <a v-if="vehicle?.photos?.[1]" :href="vehicle.photos[1]" target="_blank"
-                                            class="block p-4 text-center border-2 border-dashed border-gray-300 rounded-md hover:shadow-sm">
+                                            class="block p-4 text-center border-2 border-gray-300 border-dashed rounded-md hover:shadow-sm">
                                             <img :src="vehicle.photos[1]" class="object-cover w-full h-40 rounded-md"
                                                 alt="back" />
                                         </a>
                                         <div v-else
-                                            class="p-10 text-center border-2 border-dashed border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                                            class="p-10 text-center text-gray-500 border-2 border-gray-300 border-dashed rounded-md bg-gray-50">
                                             ไม่พบรูป
                                         </div>
                                     </div>
@@ -167,14 +167,14 @@
                                     <!-- รูปป้ายทะเบียน -->
                                     <div>
                                         <label
-                                            class="block mb-1 text-xs font-medium text-gray-600">รูปป้ายทะเบียน</label>
+                                            class="block mb-1 text-xs font-medium text-gray-600">รูปภายใน</label>
                                         <a v-if="vehicle?.photos?.[2]" :href="vehicle.photos[2]" target="_blank"
-                                            class="block p-4 text-center border-2 border-dashed border-gray-300 rounded-md hover:shadow-sm">
+                                            class="block p-4 text-center border-2 border-gray-300 border-dashed rounded-md hover:shadow-sm">
                                             <img :src="vehicle.photos[2]" class="object-cover w-full h-40 rounded-md"
                                                 alt="plate" />
                                         </a>
                                         <div v-else
-                                            class="p-10 text-center border-2 border-dashed border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                                            class="p-10 text-center text-gray-500 border-2 border-gray-300 border-dashed rounded-md bg-gray-50">
                                             ไม่พบรูป
                                         </div>
                                     </div>

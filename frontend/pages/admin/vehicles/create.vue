@@ -42,7 +42,7 @@
                                             />
                                             <div
                                                 v-if="userSearchResults.length > 0 && !selectedUser"
-                                                class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+                                                class="absolute z-10 w-full mt-1 overflow-auto bg-white border border-gray-300 rounded-md shadow-lg max-h-60"
                                             >
                                                 <ul>
                                                     <li
@@ -72,7 +72,7 @@
                                             <option value="SEDAN">Sedan</option>
                                             <option value="SUV">SUV</option>
                                              <option value="Hatchback">Hatchback</option>
-                                            <option value="VAN">Van</option>
+                                            <option value="MINI-VAN">Mini-Van</option>
                                             <option value="PICKUP">Pickup</option>
                                         </select>
                                     </div>
@@ -137,7 +137,7 @@
                                 <h3 class="mb-3 text-sm font-semibold text-gray-700">รูปภาพ</h3>
                                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                                     <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปหน้ารถ *</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปด้านหน้า *</label>
                                         <div
                                             class="p-4 text-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500"
                                             @click="pick('photoFrontInput')"
@@ -162,7 +162,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปหลังรถ *</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปด้านข้าง *</label>
                                         <div
                                             class="p-4 text-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500"
                                             @click="pick('photoBackInput')"
@@ -187,7 +187,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปป้ายทะเบียน *</label>
+                                        <label class="block mb-1 text-xs font-medium text-gray-600">รูปภายใน *</label>
                                         <div
                                             class="p-4 text-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500"
                                             @click="pick('licensePlatePhotoInput')"
@@ -220,9 +220,9 @@
                                         id="isDefault"
                                         v-model="form.isDefault"
                                         type="checkbox"
-                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
-                                    <label for="isDefault" class="ml-2 block text-sm text-gray-900">
+                                    <label for="isDefault" class="block ml-2 text-sm text-gray-900">
                                         ตั้งเป็นยานพาหนะเริ่มต้นสำหรับผู้ใช้นี้
                                     </label>
                                 </div>
