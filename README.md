@@ -117,7 +117,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 # Google Maps API Key (Backend)
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_backend
 
-# Google Maps API Key (Frontkend)
+# Google Maps API Key (Frontend)
 NUXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_frontend
 ```
 
