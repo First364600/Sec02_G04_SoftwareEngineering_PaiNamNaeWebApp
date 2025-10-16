@@ -1,11 +1,12 @@
 # Pai Nam Nae - A Safe Ride Sharing App
 
-A safe ride-sharing application with a **Nuxt.js** frontend and **Express.js** backend, powered by **Prisma** ORM and **PostgreSQL**.
-
+<!-- A safe ride-sharing application with a **Nuxt.js** frontend and **Express.js** backend, powered by **Prisma** ORM and **PostgreSQL**. -->
+"Pai Nam Nae is a carpooling web application that connects drivers and passengers heading in the same direction, with a primary focus on safety and convenience. It is developed with a **Nuxt.js** frontend and an **Express.js**  backend, powered by the **Prisma** ORM and a **PostgreSQL** database."
 ## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Google Maps APIs Used](#google-maps-apis-used)
 - [Prerequisites](#prerequisites)
 - [Security & Rate Limiting](#security--rate-limiting)
 - [Installation](#installation)
@@ -13,6 +14,7 @@ A safe ride-sharing application with a **Nuxt.js** frontend and **Express.js** b
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
+- [License](#license)
 - [Contact](#contact)
 
 ## Features
@@ -20,17 +22,21 @@ A safe ride-sharing application with a **Nuxt.js** frontend and **Express.js** b
 - User registration with multi-step identity verification
 - JWT authentication
 - Role-based access control (PASSENGER / DRIVER / ADMIN)
+- Route & Trip Management: Drivers can create and manage their routes.
+- Booking System: Passengers can find and book trips.
+- Real-time Notifications: In-app notifications for booking status and other events.
+- Google Maps Integration: For directions, geocoding, and distance calculation.
 - Vehicle management (CRUD, set default)
 - User profile management
 - Admin capabilities for user management (list, update status, delete)
 - Image uploads for verification handled via **Cloudinary**
 - Input validation via **Zod**
 - API documentation with Swagger UI
-- Health-check & Metrics endpoints (`/health`, `/metrics`)
+<!-- - Health-check & Metrics endpoints (`/health`, `/metrics`) -->
 
 ## Tech Stack
 
-- **Frontend:** Nuxt.js
+- **Frontend:** Nuxt.js, Tailwind CSS
 - **Backend:** Express.js
 - **ORM:** Prisma
 - **Database:** PostgreSQL
@@ -39,12 +45,27 @@ A safe ride-sharing application with a **Nuxt.js** frontend and **Express.js** b
 - **Validation:** Zod
 - **API Docs:** Swagger (Swagger UI Express, Swagger JSDoc)
 
+## Google Maps APIs Used
+
+- **Backend**
+  - Geocoding API
+  - Directions API
+  - Distance Matrix API
+
+- **Frontend**
+  - Maps JavaScript API
+  - Places API
+  - Places API (New)
+  - Geocoding API
+  - Distance Matrix API
+
 ## Prerequisites
 
 - Node.js v16+
 - npm or yarn
 - PostgreSQL instance
 - Cloudinary Account (for API Key, Secret, and Cloud Name)
+- Google Maps API Keys (for both frontend and backend)
 
 <!-- ## Security & Rate Limiting
 
@@ -92,6 +113,12 @@ JWT_SECRET=your_super_secret_jwt_key
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# Google Maps API Key (Backend)
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_backend
+
+# Google Maps API Key (Frontkend)
+NUXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_for_frontend
 ```
 
 ## Database Setup
