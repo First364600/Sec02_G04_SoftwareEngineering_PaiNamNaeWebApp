@@ -11,6 +11,7 @@ const routes = require('./src/routes');
 const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
+const ensureAdmin = require('./src/bootstrap/ensureAdmin');
 
 const app = express();
 promClient.collectDefaultMetrics();
