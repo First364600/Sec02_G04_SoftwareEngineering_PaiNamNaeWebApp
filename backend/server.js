@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+// const rateLimit = require('express-rate-limit');
 const promClient = require('prom-client');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger');
@@ -31,13 +31,13 @@ app.options('*', cors(corsOptions)); // เปิดรับ preflight สำ�
 app.use(express.json());
 
 //Rate Limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, // 15 minutes
+//     max: 100,
+//     standardHeaders: true,
+//     legacyHeaders: false,
+// });
+// app.use(limiter);
 
 //Metrics Middleware
 app.use(metricsMiddleware);
@@ -75,10 +75,17 @@ app.use(errorHandler);
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+(async () => {
+    try {
+        await ensureAdmin();
+    } catch (e) {
+        console.error('Admin bootstrap failed:', e);
+    }
 
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
+})();
 // Graceful Shutdown
 process.on('unhandledRejection', (err) => {
     console.error('UNHANDLED REJECTION! 💥 Shutting down...');
