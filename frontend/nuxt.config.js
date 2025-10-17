@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcssVite from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
@@ -6,8 +5,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      // apiBase: "http://localhost:3000/api/",
-      apiBase:"https://painamnae-backend.onrender.com/api/",
+      apiBase: "http://localhost:3000/api/",
+      // apiBase:"https://painamnae-backend.onrender.com/api/",
       googleMapsApiKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
     },
   },
@@ -17,8 +16,7 @@ export default defineNuxtConfig({
   plugins: ["~/plugins/api.client.js"],
   app: {
     head: {
-      // update Nuxt defaults
-      title: "ร้านค้าโจอี้",
+      title: "ไปนำแหน่",
       meta: [{ name: "description", content: "รายละเอียด" }],
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1, maximum-scale=1",
