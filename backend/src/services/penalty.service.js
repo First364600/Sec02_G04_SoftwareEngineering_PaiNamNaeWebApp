@@ -9,14 +9,13 @@ function addDays(date, days) {
   return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
 }
 
-// 👇 ปรับรับ opts
 async function checkAndApplyPassengerSuspension(passengerId, opts = {}) {
   const since = new Date(Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
   let cancelCount;
 
   if (opts.confirmedOnly) {
-    // ✅ นับเฉพาะ "การยกเลิกหลังจากเคย CONFIRMED"
+    //นับเฉพาะ "การยกเลิกหลังจากเคย CONFIRMED"
     // อ้างอิงจาก Notification ที่บันทึกไว้ตอน cancel
     cancelCount = await prisma.notification.count({
       where: {
@@ -64,10 +63,53 @@ async function checkAndApplyPassengerSuspension(passengerId, opts = {}) {
           },
         },
       });
-    } catch (_) {}
+    } catch (_) { }
+  }
+}
+
+async function checkAndApplyDriverSuspension(driverId, opts = {}) {
+  const { confirmedOnly = false } = opts;
+  const since = new Date(Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000);
+
+  // นับจำนวนเส้นทางที่ถูกยกเลิกโดยไดรเวอร์ในช่วงเวลา
+  const cancelCount = await prisma.route.count({
+    where: {
+      driverId,
+      status: "CANCELLED",
+      cancelledBy: "DRIVER",
+      cancelledAt: { gte: since },
+    },
+  });
+
+  // ใช้เกณฑ์พื้นฐานเดียวกับค่าคงที่เดิม (คุณตั้งไว้ที่ไฟล์นี้)
+  // ถ้าต้องการเข้มงวดขึ้นเมื่อเป็น confirmedOnly ให้ปรับเกณฑ์ที่ service ผู้เรียกก็ได้
+  if (cancelCount >= DRIVER_CANCEL_LIMIT) {
+    const until = addDays(new Date(), SUSPEND_DAYS);
+    await prisma.user.update({
+      where: { id: driverId },
+      data: { driverSuspendedUntil: until },
+    });
+
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: driverId,
+          type: "SYSTEM",
+          title: "ระงับสิทธิ์ผู้ขับขี่ชั่วคราว",
+          body: `บัญชีผู้ขับขี่ของคุณถูกระงับ ${SUSPEND_DAYS} วัน เนื่องจากยกเลิกเส้นทาง ${DRIVER_CANCEL_LIMIT} ครั้ง ภายใน ${WINDOW_DAYS} วัน`,
+          metadata: {
+            kind: "DRIVER_SUSPENSION",
+            windowDays: WINDOW_DAYS,
+            suspendDays: SUSPEND_DAYS,
+            confirmedOnly,
+          },
+        },
+      });
+    } catch (_) { }
   }
 }
 
 module.exports = {
   checkAndApplyPassengerSuspension,
+  checkAndApplyDriverSuspension
 };
