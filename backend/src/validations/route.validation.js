@@ -72,6 +72,22 @@ const listRoutesQuerySchema = z.object({
   seatsRequired: z.coerce.number().int().min(1).optional(),
 });
 
+const cancelReasonEnum = z.enum([
+  'CHANGE_OF_PLAN',
+  'FOUND_ALTERNATIVE',
+  'DRIVER_DELAY',
+  'PRICE_ISSUE',
+  'WRONG_LOCATION',
+  'DUPLICATE_OR_WRONG_DATE',
+  'SAFETY_CONCERN',
+  'WEATHER_OR_FORCE_MAJEURE',
+  'COMMUNICATION_ISSUE'
+]);
+
+const cancelRouteSchema = z.object({
+  reason: cancelReasonEnum
+});
+
 module.exports = {
   idParamSchema,
   createRouteSchema,
@@ -79,5 +95,7 @@ module.exports = {
   createRouteByAdminSchema,
   updateRouteByAdminSchema,
   adminDriverIdParamSchema,
-  listRoutesQuerySchema
+  listRoutesQuerySchema,
+  cancelReasonEnum,
+  cancelRouteSchema
 };
