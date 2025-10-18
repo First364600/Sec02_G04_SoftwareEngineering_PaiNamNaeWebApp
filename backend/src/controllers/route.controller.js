@@ -449,6 +449,19 @@ const adminDeleteRoute = asyncHandler(async (req, res) => {
   });
 });
 
+const cancelRoute = asyncHandler(async (req, res) => {
+  const driverId = req.user.sub;
+  const { id } = req.params;
+  const { reason } = req.body;
+
+  const result = await routeService.cancelRoute(id, driverId, { reason });
+  res.status(200).json({
+    success: true,
+    message: "Route cancelled successfully",
+    data: result
+  });
+});
+
 module.exports = {
   getAllRoutes,
   listRoutes,
@@ -462,4 +475,5 @@ module.exports = {
   adminUpdateRoute,
   adminDeleteRoute,
   adminGetRoutesByDriver,
+  cancelRoute,
 };

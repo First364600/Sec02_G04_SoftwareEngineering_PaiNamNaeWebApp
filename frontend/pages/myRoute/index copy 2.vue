@@ -92,9 +92,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ route.destination
-                                                        }}</span>
+                                                    }}</span>
                                                     <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                        }}</span>
+                                                    }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -303,9 +303,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ trip.destination
-                                                        }}</span>
+                                                    }}</span>
                                                     <span v-if="trip.destinationAddress"> — {{ trip.destinationAddress
-                                                        }}</span>
+                                                    }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -473,16 +473,11 @@ async function fetchMyRoutes() {
     try {
         const routes = await $api('/routes/me')
 
-        const allowedRouteStatuses = new Set(['AVAILABLE', 'FULL', 'IN_TRANSIT'])
-
         const formatted = []
         const ownRoutes = []
 
         for (const r of routes) {
             const carDetailsList = []
-            const routeStatus = String(r.status || '').toUpperCase()
-            if (!allowedRouteStatuses.has(routeStatus)) continue
-            
             if (r.vehicle) {
                 carDetailsList.push(`${r.vehicle.vehicleModel} (${r.vehicle.vehicleType})`)
                 if (Array.isArray(r.vehicle.amenities) && r.vehicle.amenities.length > 0) {

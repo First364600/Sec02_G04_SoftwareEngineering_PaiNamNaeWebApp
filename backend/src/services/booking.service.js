@@ -261,6 +261,22 @@ const createBooking = async (data, passengerId) => {
       });
     }
 
+    await tx.notification.create({
+      data: {
+        userId: route.driverId,
+        type: 'BOOKING',
+        title: 'มีการจองใหม่ในเส้นทางของคุณ',
+        body: 'ผู้โดยสารได้ทำการจองที่นั่งในเส้นทางของคุณแล้ว',
+        metadata: {
+          kind: 'BOOKING_CREATED',
+          bookingId: booking.id,
+          routeId: data.routeId,
+          passengerId,
+          numberOfSeats: data.numberOfSeats
+        }
+      }
+    });
+
     return booking;
   });
 };
@@ -332,6 +348,30 @@ const updateBookingStatus = async (id, status, userId) => {
         where: { id: booking.route.id },
         data: routeUpdates,
       });
+
+      await tx.notification.create({
+        data: {
+          userId: booking.passengerId,
+          type: 'BOOKING',
+          title: 'คำขอจองถูกปฏิเสธ',
+          body: 'ขออภัย คนขับได้ปฏิเสธคำขอจองของคุณ',
+          metadata: { kind: 'BOOKING_STATUS', bookingId: id, routeId: booking.route.id, status: 'REJECTED' }
+        }
+      });
+
+    }
+
+    if (status === BookingStatus.CONFIRMED) {
+      // 🔔 แจ้งเตือน Passenger เมื่อถูกยืนยัน
+      await tx.notification.create({
+        data: {
+          userId: booking.passengerId,
+          type: 'BOOKING',
+          title: 'คำขอจองได้รับการยืนยัน',
+          body: 'คนขับได้ยืนยันการจองของคุณแล้ว',
+          metadata: { kind: 'BOOKING_STATUS', bookingId: id, routeId: booking.route.id, status: 'CONFIRMED' }
+        }
+      });
     }
     return updated;
   });
@@ -350,7 +390,6 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
     throw new ApiError(400, 'Cannot cancel at this stage');
   }
 
-  // 👇 เพิ่มบรรทัดนี้
   const wasConfirmed = booking.status === BookingStatus.CONFIRMED;
 
   const updated = await prisma.$transaction(async (tx) => {
@@ -376,7 +415,6 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
       data: routeUpdates,
     });
 
-    // 👇 บันทึกเหตุการณ์ยกเลิกหลังยืนยัน (เฉพาะกรณีเคย CONFIRMED)
     if (wasConfirmed) {
       await tx.notification.create({
         data: {
@@ -392,7 +430,6 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
     return updatedBooking;
   });
 
-  // 👇 นับโทษเฉพาะเคสยกเลิกที่ "เคย CONFIRMED"
   if (wasConfirmed) {
     await checkAndApplyPassengerSuspension(passengerId, { confirmedOnly: true });
   }

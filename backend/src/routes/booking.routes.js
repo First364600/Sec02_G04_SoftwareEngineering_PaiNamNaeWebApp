@@ -36,7 +36,7 @@ router.get(
   bookingController.adminGetBookingById
 )
 
-// POST /bookings/admin  (แอดมินสร้างการจองแทนผู้ใช้)
+// POST /bookings/admin
 router.post(
   "/admin",
   protect,
@@ -45,7 +45,7 @@ router.post(
   bookingController.adminCreateBooking
 )
 
-// PUT /bookings/admin/:id  (แอดมินแก้ไขการจอง)
+// PUT /bookings/admin/:id
 router.put(
   "/admin/:id",
   protect,
