@@ -380,7 +380,7 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
         data: {
           userId: passengerId,
           type: 'SYSTEM',
-          title: '1บันทึกการยกเลิกหลังยืนยัน',
+          title: 'บันทึกการยกเลิกหลังยืนยัน',
           body: 'คุณได้ยกเลิกการจองที่เคยได้รับการยืนยันแล้ว',
           metadata: { kind: 'PASSENGER_CONFIRMED_CANCEL', bookingId: id },
         },
