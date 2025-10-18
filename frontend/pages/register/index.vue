@@ -1,15 +1,15 @@
 <template>
   <div class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-['Kanit']">
-    <main class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 sm:p-8">
-      <h1 class="text-3xl font-bold text-blue-600 mb-8 text-center">สมัครสมาชิก</h1>
+    <main class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg sm:p-8">
+      <h1 class="mb-8 text-3xl font-bold text-center text-blue-600">สมัครสมาชิก</h1>
 
       <!-- Stepper Indicator -->
       <div class="relative mb-10">
         <div class="absolute left-0 right-0 top-5 h-0.5 bg-gray-200"></div>
         <div class="absolute left-0 top-5 h-0.5 bg-blue-600 transition-all duration-500"
           :style="{ width: stepProgress }"></div>
-        <div class="flex justify-between items-center relative">
-          <div v-for="step in totalSteps" :key="step" class="flex flex-col items-center w-1/3 z-10">
+        <div class="relative flex items-center justify-between">
+          <div v-for="step in totalSteps" :key="step" class="z-10 flex flex-col items-center w-1/3">
             <div :class="getStepClass(step)">
               <span>{{ step }}</span>
             </div>
@@ -22,175 +22,178 @@
       <form @submit.prevent="handleRegister" novalidate>
         <!-- Step 1: Account Info -->
         <div v-if="currentStep === 1">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">ข้อมูลบัญชีผู้ใช้</h2>
+          <h2 class="mb-4 text-xl font-semibold text-gray-800">ข้อมูลบัญชีผู้ใช้</h2>
           <div class="mb-4">
-            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้ <span
+            <label for="username" class="block mb-1 text-sm font-medium text-gray-700">ชื่อผู้ใช้ <span
                 class="text-red-500">*</span></label>
             <input type="text" id="username" v-model="formData.username" placeholder="example123"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.username }">
-            <p v-if="errors.username" class="text-red-600 text-xs mt-1">{{ errors.username }}</p>
+            <p v-if="errors.username" class="mt-1 text-xs text-red-600">{{ errors.username }}</p>
             <p v-else class="mt-1 text-xs text-gray-500">ความยาว 4–20 ตัวอักษร ภาษาอังกฤษ ตัวเลข หรือขีดล่าง (_)
               เท่านั้น</p>
           </div>
           <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">อีเมล <span
+            <label for="email" class="block mb-1 text-sm font-medium text-gray-700">อีเมล <span
                 class="text-red-500">*</span></label>
             <input type="email" id="email" v-model="formData.email" placeholder="example@example.com"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.email }">
-            <p v-if="errors.email" class="text-red-600 text-xs mt-1">{{ errors.email }}</p>
+            <p v-if="errors.email" class="mt-1 text-xs text-red-600">{{ errors.email }}</p>
           </div>
           <div class="mb-4">
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน <span
+            <label for="password" class="block mb-1 text-sm font-medium text-gray-700">รหัสผ่าน <span
                 class="text-red-500">*</span></label>
             <input type="password" id="password" v-model="formData.password" placeholder="อย่างน้อย 8 ตัวอักษร"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.password }">
-            <p v-if="errors.password" class="text-red-600 text-xs mt-1">{{ errors.password }}</p>
+            <p v-if="errors.password" class="mt-1 text-xs text-red-600">{{ errors.password }}</p>
             <p v-else class="mt-1 text-xs text-gray-500">ต้องประกอบด้วย A–Z, a–z และตัวเลข 0–9</p>
           </div>
           <div class="mb-6">
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">ยืนยันรหัสผ่าน <span
+            <label for="confirmPassword" class="block mb-1 text-sm font-medium text-gray-700">ยืนยันรหัสผ่าน <span
                 class="text-red-500">*</span></label>
             <input type="password" id="confirmPassword" v-model="formData.confirmPassword"
               placeholder="กรอกรหัสผ่านอีกครั้ง"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.confirmPassword }">
-            <p v-if="errors.confirmPassword" class="text-red-600 text-xs mt-1">{{ errors.confirmPassword }}</p>
+            <p v-if="errors.confirmPassword" class="mt-1 text-xs text-red-600">{{ errors.confirmPassword }}</p>
           </div>
           <button type="button" @click="nextStep"
-            class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition">ถัดไป</button>
+            class="w-full py-3 font-medium text-white transition bg-blue-600 rounded-md hover:bg-blue-700">ถัดไป</button>
         </div>
 
         <!-- Step 2: Personal Info -->
         <div v-if="currentStep === 2">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">ข้อมูลส่วนตัว</h2>
+          <h2 class="mb-4 text-xl font-semibold text-gray-800">ข้อมูลส่วนตัว</h2>
           <div class="mb-4">
-            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">ชื่อจริง <span
+            <label for="firstName" class="block mb-1 text-sm font-medium text-gray-700">ชื่อจริง <span
                 class="text-red-500">*</span></label>
             <input type="text" id="firstName" v-model="formData.firstName" placeholder="กรอกชื่อจริง"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.firstName }">
-            <p v-if="errors.firstName" class="text-red-600 text-xs mt-1">{{ errors.firstName }}</p>
+            <p v-if="errors.firstName" class="mt-1 text-xs text-red-600">{{ errors.firstName }}</p>
           </div>
           <div class="mb-4">
-            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">นามสกุล <span
+            <label for="lastName" class="block mb-1 text-sm font-medium text-gray-700">นามสกุล <span
                 class="text-red-500">*</span></label>
             <input type="text" id="lastName" v-model="formData.lastName" placeholder="กรอกนามสกุล"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.lastName }">
-            <p v-if="errors.lastName" class="text-red-600 text-xs mt-1">{{ errors.lastName }}</p>
+            <p v-if="errors.lastName" class="mt-1 text-xs text-red-600">{{ errors.lastName }}</p>
           </div>
           <div class="mb-4">
-            <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">เบอร์โทรศัพท์ <span
+            <label for="phoneNumber" class="block mb-1 text-sm font-medium text-gray-700">เบอร์โทรศัพท์ <span
                 class="text-red-500">*</span></label>
             <input type="tel" id="phoneNumber" v-model="formData.phoneNumber" placeholder="เช่น 0891234567"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.phoneNumber }">
-            <p v-if="errors.phoneNumber" class="text-red-600 text-xs mt-1">{{ errors.phoneNumber }}</p>
+            <p v-if="errors.phoneNumber" class="mt-1 text-xs text-red-600">{{ errors.phoneNumber }}</p>
           </div>
           <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">เพศ <span class="text-red-500">*</span></label>
+            <label class="block mb-2 text-sm font-medium text-gray-700">เพศ <span class="text-red-500">*</span></label>
             <div class="flex gap-6">
               <label class="flex items-center"><input type="radio" name="gender" value="male" v-model="formData.gender"
                   class="mr-2 text-blue-600 focus:ring-blue-500"> ชาย</label>
               <label class="flex items-center"><input type="radio" name="gender" value="female"
                   v-model="formData.gender" class="mr-2 text-blue-600 focus:ring-blue-500"> หญิง</label>
             </div>
-            <p v-if="errors.gender" class="text-red-600 text-xs mt-1">{{ errors.gender }}</p>
+            <p v-if="errors.gender" class="mt-1 text-xs text-red-600">{{ errors.gender }}</p>
           </div>
           <div class="flex gap-4">
             <button type="button" @click="prevStep"
-              class="w-full py-3 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition">ย้อนกลับ</button>
+              class="w-full py-3 font-medium text-white transition bg-gray-600 rounded-md hover:bg-gray-700">ย้อนกลับ</button>
             <button type="button" @click="nextStep"
-              class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition">ถัดไป</button>
+              class="w-full py-3 font-medium text-white transition bg-blue-600 rounded-md hover:bg-blue-700">ถัดไป</button>
           </div>
         </div>
 
         <!-- Step 3: Verification -->
         <div v-if="currentStep === 3">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">ยืนยันตัวตน</h2>
+          <h2 class="mb-4 text-xl font-semibold text-gray-800">ยืนยันตัวตน</h2>
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">บัตรประชาชน <span
+            <label class="block mb-1 text-sm font-medium text-gray-700">บัตรประชาชน <span
                 class="text-red-500">*</span></label>
             <div v-if="!idCardPreview" @click="triggerFileUpload('idCardFile')"
-              class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-blue-500 transition"
+              class="p-6 text-center transition border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.idCardFile }">
-              <i class="fa-regular fa-image text-4xl text-gray-400"></i>
+              <i class="text-4xl text-gray-400 fa-regular fa-image"></i>
               <p class="mt-2 text-sm text-gray-600">กดเพื่อเลือกรูปภาพ</p>
             </div>
             <div v-else class="relative">
-              <img :src="idCardPreview" alt="ID Card Preview" class="w-full rounded-md mt-2" />
+              <img :src="idCardPreview" alt="ID Card Preview" class="w-full mt-2 rounded-md" />
               <button type="button" @click="removeImage('idCard')"
-                class="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center">&times;</button>
+                class="absolute flex items-center justify-center w-6 h-6 text-white bg-black bg-opacity-50 rounded-full top-2 right-2">&times;</button>
             </div>
             <input type="file" id="idCardFile" @change="handleFileUpload($event, 'idCard')" accept="image/*"
               class="hidden">
-            <p v-if="errors.idCardFile" class="text-red-600 text-xs mt-1">{{ errors.idCardFile }}</p>
+            <p v-if="errors.idCardFile" class="mt-1 text-xs text-red-600">{{ errors.idCardFile }}</p>
           </div>
           <div class="mb-4">
-            <label for="idNumber" class="block text-sm font-medium text-gray-700 mb-1">หมายเลขบัตรประชาชน <span
+            <label for="idNumber" class="block mb-1 text-sm font-medium text-gray-700">หมายเลขบัตรประชาชน <span
                 class="text-red-500">*</span></label>
             <input type="text" id="idNumber" v-model="formData.idNumber" placeholder="กรอกหมายเลข 13 หลัก"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.idNumber }">
-            <p v-if="errors.idNumber" class="text-red-600 text-xs mt-1">{{ errors.idNumber }}</p>
+            <p v-if="errors.idNumber" class="mt-1 text-xs text-red-600">{{ errors.idNumber }}</p>
           </div>
           <div class="mb-4">
-            <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">วันหมดอายุบัตร <span
+            <label for="expiryDate" class="block mb-1 text-sm font-medium text-gray-700">วันหมดอายุบัตร <span
                 class="text-red-500">*</span></label>
             <input type="text" id="expiryDate" v-model="formData.expiryDate" placeholder="วว/ดด/ปปปป"
               @input="formatExpiryDate" maxlength="10"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              class="w-full px-4 py-2 transition border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.expiryDate }">
-            <p v-if="errors.expiryDate" class="text-red-600 text-xs mt-1">{{ errors.expiryDate }}</p>
+            <p v-if="errors.expiryDate" class="mt-1 text-xs text-red-600">{{ errors.expiryDate }}</p>
           </div>
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">รูปถ่ายใบหน้าปกติ (Selfie) <span
+            <label class="block mb-1 text-sm font-medium text-gray-700">รูปถ่ายใบหน้าปกติ (Selfie) <span
                 class="text-red-500">*</span></label>
             <div v-if="!selfiePreview" @click="triggerFileUpload('selfieFile')"
-              class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-blue-500 transition"
+              class="p-6 text-center transition border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-blue-500"
               :class="{ 'border-red-500 ring-1 ring-red-500': errors.selfieFile }">
-              <i class="fa-regular fa-image text-4xl text-gray-400"></i>
+              <i class="text-4xl text-gray-400 fa-regular fa-image"></i>
               <p class="mt-2 text-sm text-gray-600">กดเพื่อเลือกรูปภาพ</p>
             </div>
             <div v-else class="relative">
-              <img :src="selfiePreview" alt="Selfie Preview" class="w-full rounded-md mt-2" />
+              <img :src="selfiePreview" alt="Selfie Preview" class="w-full mt-2 rounded-md" />
               <button type="button" @click="removeImage('selfie')"
-                class="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center">&times;</button>
+                class="absolute flex items-center justify-center w-6 h-6 text-white bg-black bg-opacity-50 rounded-full top-2 right-2">&times;</button>
             </div>
             <input type="file" id="selfieFile" @change="handleFileUpload($event, 'selfie')" accept="image/*"
               class="hidden">
-            <p v-if="errors.selfieFile" class="text-red-600 text-xs mt-1">{{ errors.selfieFile }}</p>
+            <p v-if="errors.selfieFile" class="mt-1 text-xs text-red-600">{{ errors.selfieFile }}</p>
           </div>
-          <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">
-            <p class="font-semibold mb-2">ข้อควรหลีกเลี่ยง:</p>
+          <div class="p-4 mb-4 text-sm text-red-700 border border-red-200 rounded-md bg-red-50">
+            <p class="mb-2 font-semibold">ข้อควรหลีกเลี่ยง:</p>
             <ul class="space-y-1">
               <li class="flex items-center"><i
-                  class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>ใบหน้าไม่ชัดหรือถูกบัง</li>
+                  class="mr-2 text-red-500 fa-solid fa-circle-xmark"></i>ใบหน้าไม่ชัดหรือถูกบัง</li>
               <li class="flex items-center"><i
-                  class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>บัตรไม่ชัดหรือไม่เต็ม</li>
-              <li class="flex items-center"><i class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>แสงน้อยเกินไป</li>
-              <li class="flex items-center"><i class="fa-solid fa-circle-xmark mr-2 text-red-500"></i>ระยะไกลเกินไป</li>
+                  class="mr-2 text-red-500 fa-solid fa-circle-xmark"></i>บัตรไม่ชัดหรือไม่เต็ม</li>
+              <li class="flex items-center"><i class="mr-2 text-red-500 fa-solid fa-circle-xmark"></i>แสงน้อยเกินไป</li>
+              <li class="flex items-center"><i class="mr-2 text-red-500 fa-solid fa-circle-xmark"></i>ระยะไกลเกินไป</li>
             </ul>
           </div>
           <div class="mb-6">
             <label class="flex items-start">
               <input type="checkbox" v-model="formData.pdpa"
-                class="mr-3 mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-              <span class="text-sm text-gray-700">ข้าพเจ้ายินยอมรับ <a href="#"
-                  class="text-blue-600 hover:underline">ข้อตกลงและเงื่อนไขฯ</a> และได้อ่าน <a href="#"
-                  class="text-blue-600 hover:underline">นโยบายความเป็นส่วนตัว</a> แล้ว</span>
+                class="w-4 h-4 mt-1 mr-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+              <span class="text-sm text-gray-700">ข้าพเจ้ายินยอมรับ
+                <NuxtLink to="/terms-of-service" target="_blank" rel="noopener noreferrer"
+                  class="text-blue-600 hover:underline">ข้อตกลงและเงื่อนไขฯ</NuxtLink> และได้อ่าน <NuxtLink
+                  to="/privacy" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                  นโยบายความเป็นส่วนตัว</NuxtLink> แล้ว
+              </span>
             </label>
-            <p v-if="errors.pdpa" class="text-red-600 text-xs mt-1">{{ errors.pdpa }}</p>
+            <p v-if="errors.pdpa" class="mt-1 text-xs text-red-600">{{ errors.pdpa }}</p>
           </div>
           <div class="flex gap-4">
             <button type="button" @click="prevStep"
-              class="w-full py-3 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition">ย้อนกลับ</button>
-            <button type="submit" :disabled="isLoading" class="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition
-         disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center">
-              <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+              class="w-full py-3 font-medium text-white transition bg-gray-600 rounded-md hover:bg-gray-700">ย้อนกลับ</button>
+            <button type="submit" :disabled="isLoading"
+              class="flex items-center justify-center w-full py-3 font-medium text-white transition bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed">
+              <svg v-if="isLoading" class="w-5 h-5 mr-3 -ml-1 text-white animate-spin"
                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor"
@@ -202,8 +205,8 @@
         </div>
       </form>
 
-      <p class="mt-8 text-center text-gray-600 text-sm">
-        มีบัญชีแล้ว? <NuxtLink to="/login" class="text-blue-600 hover:underline font-medium">เข้าสู่ระบบ</NuxtLink>
+      <p class="mt-8 text-sm text-center text-gray-600">
+        มีบัญชีแล้ว? <NuxtLink to="/login" class="font-medium text-blue-600 hover:underline">เข้าสู่ระบบ</NuxtLink>
       </p>
     </main>
   </div>
