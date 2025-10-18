@@ -1,5 +1,8 @@
 const prisma = require('../utils/prisma');
 const { Prisma } = require('@prisma/client');
+const ApiError = require('../utils/ApiError');
+const { RouteStatus, BookingStatus } = require('@prisma/client');
+const { checkAndApplyDriverSuspension } = require('./penalty.service');
 
 const baseInclude = {
   driver: {
@@ -302,6 +305,72 @@ const deleteRoute = async (id) => {
   return { id }
 };
 
+const cancelRoute = async (routeId, driverId, opts = {}) => {
+  const { reason } = opts;
+
+  const route = await prisma.route.findUnique({
+    where: { id: routeId },
+    include: {
+      driver: { select: { id: true } },
+      bookings: {
+        where: { status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] } },
+        include: { passenger: { select: { id: true } } }
+      }
+    }
+  });
+  if (!route) throw new ApiError(404, 'Route not found');
+  if (route.driverId !== driverId) throw new ApiError(403, 'Forbidden');
+  if (![RouteStatus.AVAILABLE, RouteStatus.FULL].includes(route.status)) {
+    throw new ApiError(400, 'Route cannot be cancelled at this stage');
+  }
+
+  const now = new Date();
+  const affected = route.bookings || [];
+  const hasConfirmed = affected.some(b => b.status === BookingStatus.CONFIRMED);
+
+  await prisma.$transaction(async (tx) => {
+    //ยกเลิก Route
+    await tx.route.update({
+      where: { id: routeId },
+      data: {
+        status: RouteStatus.CANCELLED,
+        cancelledBy: 'DRIVER',
+        cancelledAt: now
+      }
+    });
+
+    if (affected.length) {
+      //ยกเลิก Booking ที่ค้างทั้งหมด
+      await tx.booking.updateMany({
+        where: { routeId, status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] } },
+        data: {
+          status: BookingStatus.CANCELLED,
+          cancelledBy: 'DRIVER',
+          cancelledAt: now,
+          cancelReason: reason
+        }
+      });
+
+      const notiData = affected.map(b => ({
+        userId: b.passengerId,
+        type: 'BOOKING',
+        title: 'การจองถูกยกเลิกเนื่องจากคนขับยกเลิกเส้นทาง',
+        body: 'ขออภัย เส้นทางที่คุณจองถูกยกเลิกโดยคนขับ',
+        metadata: { routeId, bookingId: b.id, by: 'DRIVER', reason }
+      }));
+      // ทำ bulk insert ทีละก้อน
+      for (const n of notiData) {
+        await tx.notification.create({ data: n });
+      }
+    }
+  });
+
+  //บทลงโทษฝั่งไดรเวอร์
+  await checkAndApplyDriverSuspension(driverId, { confirmedOnly: hasConfirmed });
+
+  return { id: routeId, status: RouteStatus.CANCELLED, cancelledBy: 'DRIVER', cancelledAt: now };
+};
+
 module.exports = {
   getAllRoutes,
   searchRoutes,
@@ -309,5 +378,6 @@ module.exports = {
   getMyRoutes,
   createRoute,
   updateRoute,
-  deleteRoute
+  deleteRoute,
+  cancelRoute
 };
