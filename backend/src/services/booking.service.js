@@ -350,7 +350,6 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
     throw new ApiError(400, 'Cannot cancel at this stage');
   }
 
-  // 👇 เพิ่มบรรทัดนี้
   const wasConfirmed = booking.status === BookingStatus.CONFIRMED;
 
   const updated = await prisma.$transaction(async (tx) => {
@@ -376,13 +375,12 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
       data: routeUpdates,
     });
 
-    // 👇 บันทึกเหตุการณ์ยกเลิกหลังยืนยัน (เฉพาะกรณีเคย CONFIRMED)
     if (wasConfirmed) {
       await tx.notification.create({
         data: {
           userId: passengerId,
           type: 'SYSTEM',
-          title: 'บันทึกการยกเลิกหลังยืนยัน',
+          title: '1บันทึกการยกเลิกหลังยืนยัน',
           body: 'คุณได้ยกเลิกการจองที่เคยได้รับการยืนยันแล้ว',
           metadata: { kind: 'PASSENGER_CONFIRMED_CANCEL', bookingId: id },
         },
@@ -392,7 +390,6 @@ const cancelBooking = async (id, passengerId, opts = {}) => {
     return updatedBooking;
   });
 
-  // 👇 นับโทษเฉพาะเคสยกเลิกที่ "เคย CONFIRMED"
   if (wasConfirmed) {
     await checkAndApplyPassengerSuspension(passengerId, { confirmedOnly: true });
   }
