@@ -92,9 +92,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ route.destination
-                                                    }}</span>
+                                                        }}</span>
                                                     <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                    }}</span>
+                                                        }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -266,7 +266,7 @@
                                             <div class="flex text-sm text-yellow-400">
                                                 <span>
                                                     {{ '★'.repeat(Math.round(trip.passenger.rating)) }}{{ '☆'.repeat(5 -
-                                                        Math.round(trip.passenger.rating)) }}
+                                                    Math.round(trip.passenger.rating)) }}
                                                 </span>
                                             </div>
                                             <span class="ml-2 text-sm text-gray-600">
@@ -303,9 +303,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ trip.destination
-                                                    }}</span>
+                                                        }}</span>
                                                     <span v-if="trip.destinationAddress"> — {{ trip.destinationAddress
-                                                    }}</span>
+                                                        }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -553,9 +553,6 @@ async function fetchMyRoutes() {
             }
 
             // เก็บ “เส้นทางของฉัน”
-            const confirmedBookings = (r.bookings || []).filter(
-                b => (b.status || '').toUpperCase() === 'CONFIRMED'
-            )
             ownRoutes.push({
                 id: r.id,
                 status: (r.status || '').toLowerCase(),
@@ -576,10 +573,10 @@ async function fetchMyRoutes() {
                     : ['ไม่มีข้อมูลรถ']),
                 photos: r.vehicle?.photos || [],
                 conditions: r.conditions || '',
-                passengers: confirmedBookings.map(b => ({
+                passengers: (r.bookings || []).map(b => ({
                     id: b.id,
                     seats: b.numberOfSeats || 0,
-                    status: 'confirmed',
+                    status: (b.status || '').toLowerCase(),
                     name: `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร',
                     image: b.passenger?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.passenger?.firstName || 'P')}&background=random&size=64`,
                     email: b.passenger?.email || '',
