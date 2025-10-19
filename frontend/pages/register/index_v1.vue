@@ -213,13 +213,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, nextTick } from 'vue';
+import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import { useAuth } from '~/composables/useAuth';
-import { useToast } from '~/composables/useToast';
 import { useRouter } from '#app';
 
 const { register } = useAuth();
-const { toast } = useToast();
 const router = useRouter();
 
 const currentStep = ref(1);
@@ -247,23 +245,16 @@ const selfiePreview = ref(null);
 
 const isLoading = ref(false);
 
-// onMounted(() => {
-//   const faScript = document.createElement('script');
-//   faScript.src = 'https://kit.fontawesome.com/a076d05399.js';
-//   faScript.crossOrigin = 'anonymous';
-//   document.head.appendChild(faScript);
+onMounted(() => {
+  const faScript = document.createElement('script');
+  faScript.src = 'https://kit.fontawesome.com/a076d05399.js';
+  faScript.crossOrigin = 'anonymous';
+  document.head.appendChild(faScript);
 
-//   const fontLink = document.createElement('link');
-//   fontLink.href = 'https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap';
-//   fontLink.rel = 'stylesheet';
-//   document.head.appendChild(fontLink);
-// });
-
-useHead({
-  link: [
-    { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' },
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap' },
-  ],
+  const fontLink = document.createElement('link');
+  fontLink.href = 'https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap';
+  fontLink.rel = 'stylesheet';
+  document.head.appendChild(fontLink);
 });
 
 const stepProgress = computed(() => {
@@ -322,11 +313,7 @@ const validationFunctions = [
     clearErrors();
     if (!formData.idCardFile) errors.idCardFile = 'กรุณาอัปโหลดรูปบัตรประชาชน';
     if (!/^\d{13}$/.test(formData.idNumber)) errors.idNumber = 'กรุณากรอกหมายเลขบัตรประชาชน 13 หลัก';
-    if (!formData.expiryDate.trim() || !/^\d{2}\/\d{2}\/\d{4}$/.test(formData.expiryDate)) {
-      errors.expiryDate = 'กรุณากรอกวันหมดอายุบัตรในรูปแบบ วว/ดด/ปปปป';
-    } else if (!isValidDDMMYYYY(formData.expiryDate)) {
-      errors.expiryDate = 'วันที่ไม่ถูกต้อง โปรดตรวจสอบวัน/เดือน เช่น 31/04/2025 ไม่ถูกต้อง';
-    }
+    if (!formData.expiryDate.trim() || !/^\d{2}\/\d{2}\/\d{4}$/.test(formData.expiryDate)) errors.expiryDate = 'กรุณากรอกวันหมดอายุบัตรในรูปแบบ วว/ดด/ปปปป';
     if (!formData.selfieFile) errors.selfieFile = 'กรุณาอัปโหลดรูปถ่ายใบหน้า';
     if (!formData.pdpa) errors.pdpa = 'กรุณายอมรับข้อตกลงและเงื่อนไข';
     return Object.keys(errors).length === 0;
@@ -348,132 +335,37 @@ const prevStep = () => {
   }
 };
 
-// ===== Helpers (same behavior as admin create) =====
-const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api';
-
-async function postForm(url, formData, token = '') {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: formData,
-    credentials: 'include',
-  });
-  let body;
-  try {
-    body = await res.json();
-  } catch {
-    const text = await res.text();
-    const err = new Error(text || 'Unexpected response from server');
-    err.status = res.status;
-    throw err;
-  }
-  if (!res.ok) {
-    const msg = body?.message || `Request failed with status ${res.status}`;
-    const err = new Error(msg);
-    err.status = res.status;
-    err.payload = body;
-    throw err;
-  }
-  return body;
-}
-
-// dd/mm/yyyy -> ISO (T00:00:00.000Z) เพื่อกันปัญหา timezone/off-by-one
-function isValidDDMMYYYY(ddmmyyyy) {
-  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(ddmmyyyy)) return false;
-  const [dd, mm, yyyy] = ddmmyyyy.split('/').map(Number);
-  const d = new Date(yyyy, mm - 1, dd);
-  return d.getFullYear() === yyyy && d.getMonth() === mm - 1 && d.getDate() === dd;
-}
-
-// dd/mm/yyyy -> ISO (T00:00:00.000Z) (กัน timezone/off-by-one และกัน invalid)
-function toISODateFromDDMMYYYY(ddmmyyyy) {
-  if (!isValidDDMMYYYY(ddmmyyyy)) return '';
-  const [dd, mm, yyyy] = ddmmyyyy.split('/');
-  const d = new Date(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
-  return Number.isNaN(d.getTime()) ? '' : d.toISOString();
-}
-
-// const handleRegister = async () => {
-//   if (validationFunctions[currentStep.value - 1]()) {
-//     isLoading.value = true;
-//     await nextTick();
-//     console.log('Form is valid, preparing data to submit...');
-//     const parts = formData.expiryDate.split('/');
-//     const isoDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).toISOString();
-
-//     const dataToSubmit = new FormData();
-//     dataToSubmit.append('email', formData.email);
-//     dataToSubmit.append('username', formData.username);
-//     dataToSubmit.append('password', formData.password);
-//     dataToSubmit.append('firstName', formData.firstName);
-//     dataToSubmit.append('lastName', formData.lastName);
-//     dataToSubmit.append('phoneNumber', formData.phoneNumber);
-//     dataToSubmit.append('gender', formData.gender.toUpperCase());
-//     dataToSubmit.append('nationalIdNumber', formData.idNumber);
-//     dataToSubmit.append('nationalIdExpiryDate', isoDate);
-//     dataToSubmit.append('nationalIdPhotoUrl', formData.idCardFile);
-//     dataToSubmit.append('selfiePhotoUrl', formData.selfieFile);
-
-//     try {
-//       await register(dataToSubmit);
-//       router.push('/register/success');
-//     } catch (err) {
-//       console.error('Registration failed:', err);
-//       const errorMessage = err.data?.message || 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
-//       alert(errorMessage);
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
-// };
-
 const handleRegister = async () => {
-  if (!validationFunctions[currentStep.value - 1]()) return;
-  isLoading.value = true;
-  await nextTick();
-  const isoDate = toISODateFromDDMMYYYY(formData.expiryDate);
-  if (!isoDate) {
-    // แจ้งผู้ใช้ทันทีผ่าน toast
-    const msg = (errors.expiryDate || 'วันที่ไม่ถูกต้อง โปรดกรอกเป็น วว/ดด/ปปปป');
-    toast.error('ข้อมูลไม่ถูกต้อง', msg);
-    isLoading.value = false;
-    return;
-  }
+  if (validationFunctions[currentStep.value - 1]()) {
+    isLoading.value = true;
+    await nextTick();
+    console.log('Form is valid, preparing data to submit...');
+    const parts = formData.expiryDate.split('/');
+    const isoDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).toISOString();
 
-  const fd = new FormData();
-  fd.append('email', formData.email);
-  fd.append('username', formData.username);
-  fd.append('password', formData.password);
-  fd.append('firstName', formData.firstName);
-  fd.append('lastName', formData.lastName);
-  fd.append('phoneNumber', formData.phoneNumber);
-  fd.append('gender', String(formData.gender || '').toUpperCase()); // 'MALE' | 'FEMALE'
-  fd.append('nationalIdNumber', formData.idNumber);
-  fd.append('nationalIdExpiryDate', isoDate);
-  fd.append('nationalIdPhotoUrl', formData.idCardFile);
-  fd.append('selfiePhotoUrl', formData.selfieFile);
-  // ผู้ใช้ทั่วไป: บังคับ role เป็น PASSENGER (สอดคล้องฝั่ง backend/แอดมิน)
-  fd.append('role', 'PASSENGER');
+    const dataToSubmit = new FormData();
+    dataToSubmit.append('email', formData.email);
+    dataToSubmit.append('username', formData.username);
+    dataToSubmit.append('password', formData.password);
+    dataToSubmit.append('firstName', formData.firstName);
+    dataToSubmit.append('lastName', formData.lastName);
+    dataToSubmit.append('phoneNumber', formData.phoneNumber);
+    dataToSubmit.append('gender', formData.gender.toUpperCase());
+    dataToSubmit.append('nationalIdNumber', formData.idNumber);
+    dataToSubmit.append('nationalIdExpiryDate', isoDate);
+    dataToSubmit.append('nationalIdPhotoUrl', formData.idCardFile);
+    dataToSubmit.append('selfiePhotoUrl', formData.selfieFile);
 
-  try {
-    // เรียก endpoint เดียวกับหน้าแอดมิน
-    await postForm(`${apiBase}/users`, fd);
-    router.push('/register/success');
-  } catch (err) {
-    console.error('Registration failed:', err);
-    const status = err?.status;
-    const msg = err?.message || 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
-    // แจ้งผ่าน toast และคงข้อความจาก backend ถ้ามี
-    if (status === 409) {
-      toast.error('ข้อมูลซ้ำ', msg); // เช่น อีเมล/เลขบัตรซ้ำ
-    } else {
-      toast.error('เกิดข้อผิดพลาด', msg);
+    try {
+      await register(dataToSubmit);
+      router.push('/register/success');
+    } catch (err) {
+      console.error('Registration failed:', err);
+      const errorMessage = err.data?.message || 'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+      alert(errorMessage);
+    } finally {
+      isLoading.value = false;
     }
-  } finally {
-    isLoading.value = false;
   }
 };
 
