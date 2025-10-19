@@ -92,9 +92,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ route.destination
-                                                        }}</span>
+                                                    }}</span>
                                                     <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                        }}</span>
+                                                    }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -164,11 +164,11 @@
 
                                 <!-- ปุ่มขวาล่าง -->
                                 <div class="flex justify-end" :class="{ 'mt-4': selectedTripId !== route.id }">
-                                    <button
+                                    <NuxtLink :to="`/myRoute/${route.id}/edit`"
                                         class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700"
-                                        @click.stop="updateMap(route)">
-                                        ดูเส้นทางบนแผนที่
-                                    </button>
+                                        @click.stop>
+                                        แก้ไขเส้นทาง
+                                    </NuxtLink>
                                 </div>
                             </div>
                         </div>
@@ -303,9 +303,9 @@
                                                 <li class="mt-1">
                                                     • จุดปลายทาง:
                                                     <span class="font-medium text-gray-900">{{ trip.destination
-                                                        }}</span>
+                                                    }}</span>
                                                     <span v-if="trip.destinationAddress"> — {{ trip.destinationAddress
-                                                        }}</span>
+                                                    }}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -482,7 +482,7 @@ async function fetchMyRoutes() {
             const carDetailsList = []
             const routeStatus = String(r.status || '').toUpperCase()
             if (!allowedRouteStatuses.has(routeStatus)) continue
-            
+
             if (r.vehicle) {
                 carDetailsList.push(`${r.vehicle.vehicleModel} (${r.vehicle.vehicleType})`)
                 if (Array.isArray(r.vehicle.amenities) && r.vehicle.amenities.length > 0) {
