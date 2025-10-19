@@ -278,7 +278,9 @@
                             ค้นหาเส้นทาง
                         </NuxtLink>
 
-                        <NuxtLink to="/createTrip" class="block px-3 py-2 transition-colors duration-200 rounded-md"
+                        <NuxtLink
+                            v-if="user && (user.role === 'PASSENGER' || user.role === 'DRIVER' || user.role === 'ADMIN')"
+                            to="/createTrip" class="block px-3 py-2 transition-colors duration-200 rounded-md"
                             :class="$route.path === '/createTrip' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'"
                             @click="closeMobileMenu">
                             สร้างเส้นทาง
@@ -293,7 +295,7 @@
                         </NuxtLink>
 
                         <!-- คนขับ: เมนูย่อย 2 รายการ -->
-                        <div v-else-if="user && user.role === 'DRIVER'" class="relative">
+                        <div v-else-if="user && (user.role === 'DRIVER' || user.role === 'ADMIN')" class="relative">
                             <button @click="toggleMobileTripMenu"
                                 class="flex items-center justify-between w-full px-3 py-2 text-left text-gray-600 transition-colors duration-200 rounded-md hover:text-blue-600 hover:bg-blue-50">
                                 การเดินทางทั้งหมด
@@ -347,6 +349,32 @@
                                 <NuxtLink to="/profile" @click="closeMobileMenu"
                                     class="flex items-center block w-full px-3 py-2 text-left text-gray-600 transition-colors duration-200 rounded-md hover:bg-blue-50 hover:text-blue-600">
                                     บัญชีของฉัน
+                                </NuxtLink>
+                                <button @click="logout"
+                                    class="flex items-center block w-full px-3 py-2 text-left text-red-600 transition-colors duration-200 rounded-md hover:bg-red-50 hover:text-red-700">
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                        <div v-else-if="user && user.role === 'ADMIN'" class="pt-2 mt-2 border-t border-gray-200">
+                            <div class="flex items-center px-3 py-2">
+                                <div class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-2 font-medium text-gray-700">{{ user.firstName }}</span>
+                            </div>
+                            <div class="mt-1 ml-6">
+                                <NuxtLink to="/profile" @click="closeMobileMenu"
+                                    class="flex items-center block w-full px-3 py-2 text-left text-gray-600 transition-colors duration-200 rounded-md hover:bg-blue-50 hover:text-blue-600">
+                                    บัญชีของฉัน
+                                </NuxtLink>
+                                <NuxtLink to="/admin/users" @click="closeMobileMenu"
+                                    class="flex items-center block w-full px-3 py-2 text-left text-gray-600 transition-colors duration-200 rounded-md hover:bg-blue-50 hover:text-blue-600">
+                                    Dashboard
                                 </NuxtLink>
                                 <button @click="logout"
                                     class="flex items-center block w-full px-3 py-2 text-left text-red-600 transition-colors duration-200 rounded-md hover:bg-red-50 hover:text-red-700">
@@ -533,7 +561,7 @@ onUnmounted(() => {
 useHead({
     link: [
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap' },
-       //{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }
+        //{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }
     ]
 })
 </script>
