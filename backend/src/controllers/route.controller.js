@@ -145,6 +145,20 @@ const updateRoute = asyncHandler(async (req, res) => {
     throw new ApiError(400, "ไม่สามารถแก้ไขเส้นทางที่ถูกยกเลิกได้");
   }
 
+  const hasBookings = Array.isArray(existing.bookings) && existing.bookings.length > 0;
+  if (hasBookings) {
+    const hasConfirmed = existing.bookings.some(b => b.status === 'CONFIRMED');
+    if (hasConfirmed) {
+      throw new ApiError(400, "ไม่สามารถแก้ไขเส้นทางได้ เนื่องจากมีคำจองที่ยืนยันแล้ว (CONFIRMED)");
+    }
+    // อนุญาตกรณีสถานะรวมอยู่ใน {PENDING, REJECTED, CANCELLED} เท่านั้น
+    const allowed = new Set(['PENDING', 'REJECTED', 'CANCELLED']);
+    const allAllowed = existing.bookings.every(b => allowed.has(b.status));
+    if (!allAllowed) {
+      throw new ApiError(400, "ไม่สามารถแก้ไขเส้นทางได้ เนื่องจากมีคำจองที่อยู่ในสถานะที่ไม่อนุญาต");
+    }
+  }
+
   // await vehicleService.getVehicleById(vehicleId, driverId);
   let newVehicleId = existing.vehicleId;
   if (vehicleId) {
