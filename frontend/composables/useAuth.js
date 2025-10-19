@@ -3,8 +3,17 @@ import { useRouter } from 'vue-router'
 
 export function useAuth() {
   const { $api } = useNuxtApp()
-  const token = useCookie('token', { maxAge: 60 * 60 * 24 * 7, secure: true })
-  const user = useCookie('user', { maxAge: 60 * 60 * 24 * 7, secure: true })
+
+  const cookieOpts = {
+    maxAge: 60 * 60 * 24 * 7,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
+  }
+  const token = useCookie('token', cookieOpts)
+  const user = useCookie('user', cookieOpts)
+  // const token = useCookie('token', { maxAge: 60 * 60 * 24 * 7, secure: true })
+  // const user = useCookie('user', { maxAge: 60 * 60 * 24 * 7, secure: true })
   const router = useRouter()
 
   const login = async (identifier, password) => {
@@ -33,7 +42,6 @@ export function useAuth() {
   // }
 
   const register = async (formData) => {
-    // ฟังก์ชันนี้จะรับ FormData ที่สร้างจากหน้า register.vue มาโดยตรง
     const res = await $api('/users', {
       method: 'POST',
       body: formData // ส่ง FormData ไปทั้งก้อน ไม่ต้องแปลงเป็น JSON
