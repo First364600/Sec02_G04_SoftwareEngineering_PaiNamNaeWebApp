@@ -1,30 +1,36 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const { Parser } = require('json2csv');
+
 
 const getLogs = async (req, res) => {
     try {
-        // 1. รับค่า Page และ Limit จาก Frontend (ถ้าไม่ส่งมา ให้ใช้ค่า Default)
-        const page = parseInt(req.query.page) || 1;     // หน้าปัจจุบัน (Default: 1)
-        const limit = parseInt(req.query.limit) || 20;  // จำนวนต่อหน้า (Default: 20)
+        // 1. รับค่า Page และ Limit จาก Frontend
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
         
-        // 2. คำนวณจุดเริ่มต้น (Skip)
+        // 2. คำนวณจุดเริ่มต้น
         const skip = (page - 1) * limit;
 
-        // 3. ดึงข้อมูลจาก Database (ใช้ Transaction เพื่อดึงทั้ง Data และ Count พร้อมกัน)
+        // 3. ดึงข้อมูลจาก Database
         const [logs, total] = await prisma.$transaction([
             prisma.systemLog.findMany({
                 skip: skip,
                 take: limit,
                 orderBy: {
-                    created_at: 'desc' // เรียงจากใหม่ไปเก่า (สำคัญมากสำหรับ Log)
+                    created_at: 'desc'
                 },
                 include: {
-                    user: { // จอยตาราง User เพื่อเอาชื่อคนทำมาแสดง
-                        select: { username: true, email: true } 
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            role: true
+                        }
                     }
                 }
             }),
-            prisma.systemLog.count() // นับจำนวนทั้งหมดเพื่อคำนวณหน้า
+            prisma.systemLog.count()
         ]);
 
         // 4. ส่ง response กลับไปให้ Frontend
@@ -41,8 +47,71 @@ const getLogs = async (req, res) => {
 
     } catch (error) {
         console.error("Get Logs Error:", error);
-        res.status(500).json({ error: "Failed to fetch logs" });
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to fetch logs",
+            error: error.message 
+        });
     }
 };
 
-module.exports = { getLogs };
+const exportLogs = async (req, res) => {
+    try {
+        // 1. รับช่วงเวลาที่จะ Export (ถ้าไม่ส่งมา เอา 7 วันล่าสุด)
+        const endDate = req.query.end_date ? new Date(req.query.end_date) : new Date();
+        const startDate = req.query.start_date ? new Date(req.query.start_date) : new Date(new Date().setDate(endDate.getDate() - 7));
+
+        // 2. ดึงข้อมูลจาก
+        const logs = await prisma.systemLog.findMany({
+            where: {
+                created_at: {
+                    gte: startDate,
+                    lte: endDate
+                }
+            },
+            orderBy: {
+                created_at: 'desc'
+            },
+            include: {
+                user: {
+                    select: { email: true, role: true }
+                }
+            }
+        });
+
+        if (logs.length === 0) {
+            return res.status(404).json({ message: "No logs found for this period" });
+        }
+
+        // 3. เตรียมข้อมูลสำหรับ CSV
+        const logData = logs.map(log => ({
+            ID: log.id,
+            User: log.user ? log.user.email : 'Guest',
+            Role: log.user ? log.user.role : '-',
+            Action: log.action,
+            Method: log.method,
+            Endpoint: log.endpoint,
+            IP_Address: log.ip_address,
+            Status: log.status_code,
+            Date: log.created_at.toISOString().split('T')[0],
+            Time: log.created_at.toISOString().split('T')[1].split('.')[0]
+        }));
+
+        // 4. JSON -> CSV
+        const json2csvParser = new Parser();
+        const csv = json2csvParser.parse(logData);
+
+        // 5. name file
+        const filename = `system_logs_${startDate.toISOString().split('T')[0]}_to_${endDate.toISOString().split('T')[0]}.csv`;
+        
+        res.header('Content-Type', 'text/csv');
+        res.attachment(filename);
+        return res.send(csv);
+
+    } catch (error) {
+        console.error("Export Error:", error);
+        res.status(500).json({ message: "Export failed", error: error.message });
+    }
+};
+
+module.exports = { getLogs ,exportLogs };
