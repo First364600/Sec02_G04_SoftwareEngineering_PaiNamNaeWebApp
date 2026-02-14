@@ -88,6 +88,7 @@ model User {
   notification          Notification[]
   createdRoutes         Route[]             @relation("DriverRoutes")
   bookings              Booking[]           @relation("PassengerBookings")
+  systemLogs            SystemLog[]  
 
   @@index([role])
   @@index([isActive])
@@ -210,4 +211,20 @@ model Booking {
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
+}
+
+model SystemLog {
+    id          Int      @id @default(autoincrement())
+    user_id     String?
+    user        User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+    action      String   @db.VarChar(255)
+    method      String   @db.VarChar(10)
+    endpoint    String   @db.VarChar(255)
+    ip_address  String   @db.VarChar(50)
+    user_agent  String?
+    status_code Int?
+    log_hash    String?  @db.VarChar(64)
+    created_at  DateTime @default(now())
+
+    @@index([user_id, created_at])
 }

@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const logger = require('./src/middlewares/logger');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -30,6 +31,8 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // เปิดรับ preflight สำหรับทุก route
 
 app.use(express.json());
+
+app.use(logger); //catch all request and log to database
 
 //Rate Limiting
 // const limiter = rateLimit({

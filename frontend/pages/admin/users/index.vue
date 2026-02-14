@@ -561,6 +561,10 @@ function onViewUser(u) {
     navigateTo(`/admin/users/${u.id}`).catch(() => { })
 }
 
+function onUserLogs(u) {
+    navigateTo(`/admin/user-logs/${u.id}`).catch(() => { })
+}
+
 function closeMobileSidebar() {
     const sidebar = document.getElementById('sidebar')
     const overlay = document.getElementById('overlay')
