@@ -6,7 +6,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: "http://localhost:3000/api/",
-      // apiBase:"https://painamnae-backend.onrender.com/api/",
+      // apiBase: process.env.API_BASE || "",
+      gatewaySecret: process.env.NUXT_PUBLIC_GATEWAY_SECRET || process.env.GATEWAY_SECRET || "",
       googleMapsApiKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
     },
   },

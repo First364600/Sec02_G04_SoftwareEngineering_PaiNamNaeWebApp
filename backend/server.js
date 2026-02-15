@@ -3,7 +3,10 @@ require("dotenv").config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-// const rateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 const promClient = require('prom-client');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger');
@@ -16,29 +19,39 @@ const ensureAdmin = require('./src/bootstrap/ensureAdmin');
 const app = express();
 promClient.collectDefaultMetrics();
 
+app.set('trust proxy', 1);
+
+app.disable('x-powered-by');
+
 app.use(helmet());
 
 const corsOptions = {
-    origin: ['http://localhost:3001',
+    origin: [
+        'http://localhost:3001',
+        process.env.ALLOWED_ORIGINS,
         'https://amazing-crisp-9bcb1a.netlify.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Gateway-Key', 'x-gateway-key']
 };
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // เปิดรับ preflight สำหรับทุก route
 
 app.use(express.json());
+app.use(cookieParser());
 
-//Rate Limiting
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 minutes
-//     max: 100,
-//     standardHeaders: true,
-//     legacyHeaders: false,
-// });
-// app.use(limiter);
+app.use(xss());
+app.use(hpp());
+
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api', limiter);
 
 //Metrics Middleware
 app.use(metricsMiddleware);

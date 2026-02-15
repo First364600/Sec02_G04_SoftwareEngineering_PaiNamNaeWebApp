@@ -9,11 +9,19 @@ export default defineNuxtPlugin(() => {
 
     async onRequest({ options }) {
       const token = useCookie('token').value
+      const gatewaySecret = config.public.gatewaySecret
+
+      options.headers = options.headers || {}
+
       if (token) {
         options.headers = {
           ...options.headers,
           Authorization: `Bearer ${token}`,
         }
+      }
+
+      if (gatewaySecret) {
+        options.headers['X-Gateway-Key'] = gatewaySecret
       }
     },
 
@@ -52,5 +60,9 @@ export default defineNuxtPlugin(() => {
     },
   })
 
-  return { provide: { api } }
+  return {
+    provide: {
+      api,
+    },
+  }
 })

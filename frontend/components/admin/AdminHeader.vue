@@ -119,7 +119,7 @@
 
                 <!-- Profile -->
                 <div class="flex items-center gap-3">
-                    <span class="hidden text-sm text-gray-700 md:block">{{ user.firstName }}</span>
+                    <span class="hidden text-sm text-gray-700 md:block">{{ user.firstName || ''}}</span>
                     <div class="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-full">
                         <i class="w-6 text-lg text-center text-white fas fa-user"></i>
                     </div>
