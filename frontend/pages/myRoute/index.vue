@@ -34,8 +34,8 @@
                                 <p>ยังไม่มีเส้นทางที่คุณสร้าง</p>
                             </div>
 
-                            <div v-for="route in myRoutes" :key="route.id"
-                                class="p-6 transition-colors duration-200 cursor-pointer trip-card hover:bg-gray-50"
+                            <div v-for="route in sortedMyRoutes" :key="route.id"
+                                :class="['p-6 trip-card', getTripState(route.id).completed ? 'opacity-75 bg-gray-50' : 'hover:bg-gray-50']"
                                 @click="toggleTripDetails(route.id)">
                                 <div class="flex items-start justify-between mb-4">
                                     <div class="flex-1">
@@ -69,40 +69,60 @@
                                     </div>
                                 </div>
 
-                                <!-- รายละเอียดเมื่อเปิด -->
+                                <!-- รายละเอียดเมื่อเปิด --> <!--เพิ่มการสลับตำแหน่งและการแสดงรายละเอียดเส้นทางแบบใหม่-->
                                 <div v-if="selectedTripId === route.id"
                                     class="pt-4 mt-4 mb-5 duration-300 border-t border-gray-300 animate-in slide-in-from-top">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                        <div>
-                                            <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
-                                                <li>
-                                                    • จุดเริ่มต้น:
-                                                    <span class="font-medium text-gray-900">{{ route.origin }}</span>
-                                                    <span v-if="route.originAddress"> — {{ route.originAddress }}</span>
-                                                </li>
-
-                                                <template v-if="route.stops && route.stops.length">
-                                                    <li class="mt-2 text-gray-700">• จุดแวะระหว่างทาง ({{
-                                                        route.stops.length }} จุด):</li>
-                                                    <li v-for="(stop, idx) in route.stops" :key="idx">  - จุดแวะ {{ idx
-                                                        + 1 }}: {{ stop }}</li>
-                                                </template>
-
-                                                <li class="mt-1">
-                                                    • จุดปลายทาง:
-                                                    <span class="font-medium text-gray-900">{{ route.destination
-                                                    }}</span>
-                                                    <span v-if="route.destinationAddress"> — {{ route.destinationAddress
-                                                    }}</span>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดรถ</h5>
                                             <ul class="space-y-1 text-sm text-gray-600">
                                                 <li v-for="detail in route.carDetails" :key="detail">• {{ detail }}</li>
                                             </ul>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-4 font-medium text-gray-900 flex items-center gap-2">
+                                                รายละเอียดเส้นทาง
+                                                <span v-if="getTripState(route.id).started" class="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full animate-pulse">
+                                                    กำลังเดินทาง
+                                                </span>
+                                                <span v-if="getTripState(route.id).completed" class="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                   สิ้นสุดการเดินทาง
+                                                </span>
+                                            </h5>
+
+                                            <div class="relative pl-2">
+                                                <div class="absolute left-[15px] top-2 bottom-4 w-0.5 bg-gray-200"></div>
+                                                <div class="space-y-6 relative">
+                                                    <div v-for="(point, index) in getRouteTimeline(route)" :key="index" class="flex items-start group relative">
+                                                        <div class="relative z-10 flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border-2 bg-white transition-colors"
+                                                            :class="index <= getTripState(route.id).currentIndex ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'">
+                                                            <span v-if="index < getTripState(route.id).currentIndex">✓</span>
+                                                            <span v-else class="text-[10px] font-bold">{{ index + 1 }}</span>
+                                                        </div>
+                                                        <div class="ml-3 pt-1">
+                                                            <p class="text-sm font-bold" :class="index <= getTripState(route.id).currentIndex ? 'text-gray-900' : 'text-gray-400'">
+                                                                {{ point.name }}
+                                                            </p>
+                                                            <p class="text-[10px] text-gray-400" v-if="point.address">{{ point.address }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button 
+                                                    v-if="getTripState(route.id).started && !getTripState(route.id).completed" 
+                                                    @click.stop="handleCheckPoint(route.id, route)"
+                                                    :disabled="isProcessing"
+                                                    class="mt-4 w-full py-2 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 shadow-md transition-all flex justify-center items-center gap-2"
+                                                >
+                                                    <span v-if="isProcessing" class="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full"></span>
+                                                     {{ getTripState(route.id).currentIndex === getRouteTimeline(route).length - 2 ? 'ยืนยันการถึงปลายทาง' : 'Checkpoint' }}
+                                                </button>
+
+                                                <div v-if="getTripState(route.id).completed" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-center text-sm text-green-700 font-medium">
+                                                     การเดินทางนี้เสร็จสิ้นสมบูรณ์แล้ว
+                                                </div>
                                         </div>
                                     </div>
 
@@ -162,11 +182,33 @@
                                     </div>
                                 </div>
 
-                                <!-- ปุ่มขวาล่าง -->
-                                <div class="flex justify-end" :class="{ 'mt-4': selectedTripId !== route.id }">
-                                    <NuxtLink :to="`/myRoute/${route.id}/edit`"
-                                        class="px-4 py-2 text-sm text-white transition duration-200 bg-blue-600 rounded-md hover:bg-blue-700"
-                                        @click.stop>
+                                <!-- ปุ่มขวาล่าง --> <!--เพิ่มปุ่มเริ่มต้นการเดินทางและprocessการทำงานใหม่-->
+                                <div class="flex justify-end gap-2" :class="{ 'mt-4': selectedTripId !== route.id }">
+                                   <button
+                                        type="button"
+                                        @click.stop="triggerStartTrip(route.id)"
+                                        :disabled="getTripState(route.id).started || isProcessing || getTripState(route.id).completed"
+                                        class="px-4 py-2 text-sm text-white rounded-md transition duration-200 flex items-center gap-2 shadow-sm"
+                                        :class="[
+                                            getTripState(route.id).completed 
+                                                ? 'bg-gray-400 cursor-not-allowed' 
+                                                : (getTripState(route.id).started ? 'bg-green-600 cursor-default' : 'bg-blue-600 hover:bg-blue-700')
+                                        ]">
+                                        <span v-if="isProcessing && pendingRouteId === route.id" class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                                        <span v-if="getTripState(route.id).completed">สิ้นสุดการเดินทางแล้ว</span>
+                                        <span v-else-if="getTripState(route.id).started">กำลังเดินทาง...</span>
+                                        <span v-else>เริ่มต้นการเดินทาง</span>
+                                    </button>
+                                    <NuxtLink 
+                                        :to="getTripState(route.id).completed ? '#' : `/myRoute/${route.id}/edit`"
+                                        class="px-4 py-2 text-sm transition duration-200 rounded-md border"
+                                        :class="[
+                                            getTripState(route.id).completed 
+                                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                                                : 'bg-white text-blue-600 border-blue-600 hover:bg-gray-100'
+                                        ]"
+                                        @click.stop="(e) => getTripState(route.id).completed && e.preventDefault()"
+                                    >
                                         แก้ไขเส้นทาง
                                     </NuxtLink>
                                 </div>
@@ -280,40 +322,60 @@
                                     </div>
                                 </div>
 
-                                <!-- รายละเอียดเส้นทาง + จุดแวะ -->
+                                <!-- รายละเอียดเส้นทาง + จุดแวะ --> <!--เพิ่มการสลับตำแหน่งและการแสดงรายละเอียดเส้นทางแบบใหม่-->
                                 <div v-if="selectedTripId === trip.id"
                                     class="pt-4 mt-4 mb-5 duration-300 border-t border-gray-300 animate-in slide-in-from-top">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                        <div>
-                                            <h5 class="mb-2 font-medium text-gray-900">รายละเอียดเส้นทาง</h5>
-                                            <ul class="space-y-1 text-sm text-gray-600">
-                                                <li>
-                                                    • จุดเริ่มต้น:
-                                                    <span class="font-medium text-gray-900">{{ trip.origin }}</span>
-                                                    <span v-if="trip.originAddress"> — {{ trip.originAddress }}</span>
-                                                </li>
-
-                                                <template v-if="trip.stops && trip.stops.length">
-                                                    <li class="mt-2 text-gray-700">• จุดแวะระหว่างทาง ({{
-                                                        trip.stops.length }} จุด):</li>
-                                                    <li v-for="(stop, idx) in trip.stops" :key="idx">  - จุดแวะ {{ idx +
-                                                        1 }}: {{ stop }}</li>
-                                                </template>
-
-                                                <li class="mt-1">
-                                                    • จุดปลายทาง:
-                                                    <span class="font-medium text-gray-900">{{ trip.destination
-                                                    }}</span>
-                                                    <span v-if="trip.destinationAddress"> — {{ trip.destinationAddress
-                                                    }}</span>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        
                                         <div>
                                             <h5 class="mb-2 font-medium text-gray-900">รายละเอียดรถ</h5>
                                             <ul class="space-y-1 text-sm text-gray-600">
-                                                <li v-for="detail in trip.carDetails" :key="detail">• {{ detail }}</li>
+                                                <li v-for="detail in route.carDetails" :key="detail">• {{ detail }}</li>
                                             </ul>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-4 font-medium text-gray-900 flex items-center gap-2">
+                                                รายละเอียดเส้นทาง
+                                                <span v-if="getTripState(route.id).started" class="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full animate-pulse">
+                                                    กำลังเดินทาง
+                                                </span>
+                                                <span v-if="getTripState(route.id).completed" class="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                   สิ้นสุดการเดินทาง
+                                                </span>
+                                            </h5>
+
+                                            <div class="relative pl-2">
+                                                <div class="absolute left-[15px] top-2 bottom-4 w-0.5 bg-gray-200"></div>
+                                                <div class="space-y-6 relative">
+                                                    <div v-for="(point, index) in getRouteTimeline(route)" :key="index" class="flex items-start group relative">
+                                                        <div class="relative z-10 flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border-2 bg-white transition-colors"
+                                                            :class="index <= getTripState(route.id).currentIndex ? 'border-green-500 text-green-600' : 'border-gray-300 text-gray-400'">
+                                                            <span v-if="index < getTripState(route.id).currentIndex">✓</span>
+                                                            <span v-else class="text-[10px] font-bold">{{ index + 1 }}</span>
+                                                        </div>
+                                                        <div class="ml-3 pt-1">
+                                                            <p class="text-sm font-bold" :class="index <= getTripState(route.id).currentIndex ? 'text-gray-900' : 'text-gray-400'">
+                                                                {{ point.name }}
+                                                            </p>
+                                                            <p class="text-[10px] text-gray-400" v-if="point.address">{{ point.address }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button 
+                                                    v-if="getTripState(route.id).started && !getTripState(route.id).completed" 
+                                                    @click.stop="handleCheckPoint(route.id, route)"
+                                                    :disabled="isProcessing"
+                                                    class="mt-4 w-full py-2 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 shadow-md transition-all flex justify-center items-center gap-2"
+                                                >
+                                                    <span v-if="isProcessing" class="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full"></span>
+                                                     {{ getTripState(route.id).currentIndex === getRouteTimeline(route).length - 2 ? 'ยืนยันการถึงปลายทาง' : 'Checkpoint' }}
+                                                </button>
+
+                                                <div v-if="getTripState(route.id).completed" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-center text-sm text-green-700 font-medium">
+                                                    การเดินทางนี้เสร็จสิ้นสมบูรณ์แล้ว
+                                                </div>
                                         </div>
                                     </div>
                                     <div class="mt-4 space-y-4">
@@ -381,7 +443,20 @@
 
         <ConfirmModal :show="isModalVisible" :title="modalContent.title" :message="modalContent.message"
             :confirmText="modalContent.confirmText" :variant="modalContent.variant" @confirm="handleConfirmAction"
-            @cancel="closeConfirmModal" />
+            @cancel="closeTripActionModal" />
+
+                    <ConfirmModal 
+                :show="isConfirmModalVisible" 
+                :title="modalMode === 'start' ? 'ยืนยันการเริ่มเดินทาง' : 'การเดินทางเสร็จสิ้น'" 
+                :message="modalMode === 'start' 
+                    ? 'คุณพร้อมที่จะเริ่มต้นการเดินทางในเส้นทางนี้ใช่หรือไม่?' 
+                    : 'คุณได้เดินทางถึงจุดหมายปลายทางเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ'"
+                :confirmText="isProcessing ? 'กำลังบันทึก...' : (modalMode === 'start' ? 'เริ่มเดินทาง' : 'ตกลง')" 
+                :variant="modalMode === 'start' ? 'primary' : 'primary'"
+                :cancelText="modalMode === 'start' ? 'ยกเลิก' : null " 
+                @confirm="handleConfirmModal" 
+                @cancel="closeTripActionModal" 
+            />
     </div>
 </template>
 
@@ -406,6 +481,183 @@ const isLoading = ref(false)
 const mapContainer = ref(null)
 const allTrips = ref([])
 const myRoutes = ref([])
+
+// --- ต่อท้าย State Management เดิม ---
+
+const tripStates = ref({}); 
+const isProcessing = ref(false);
+
+// --- State Trip---
+const getTripState = (routeId) => {
+    if (!tripStates.value[routeId]) {
+        tripStates.value[routeId] = { started: false, currentIndex: 0 };
+    }
+    return tripStates.value[routeId];
+};
+// --- Route timeline---
+const getRouteTimeline = (t) => {
+    if (!t) return [];
+    let timeline = [];
+    //จุดเริ่มต้น
+    timeline.push({ name: t.origin, address: t.originAddress, type: 'origin' });
+    //จุดแวะพัก
+    if (t.stops && Array.isArray(t.stops)) {
+        t.stops.forEach((stop, index) => {
+            const isString = typeof stop === 'string';
+            timeline.push({
+                name: isString ? stop : stop.name,
+                address: isString ? `จุดแวะที่ ${index + 1}` : stop.address,
+                type: 'stop'
+            });
+        });
+    }
+    //จุดปลายทาง
+    timeline.push({ name: t.destination, address: t.destinationAddress, type: 'destination' });
+    return timeline;
+};
+
+// แก้ไขฟังก์ชัน Checkpoint ให้รองรับการจบการเดินทาง
+// สูตรคำนวณระยะห่างระหว่างพิกัด 2 จุด (คืนค่าเป็นเมตรเพราะระยะห่างไม่่เกิน500เมตร)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371e3; // รัศมีโลก(เมตร)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; 
+};
+const handleCheckPoint = async (routeId, routeData) => {
+    const state = getTripState(routeId);
+    const timeline = getRouteTimeline(routeData); //checkpoint จะอิงตามลำดับใน timeline ซึ่งรวมจุดเริ่ม จุดแวะ และจุดปลายทาง
+    
+    // ดึงเป้าหมายจากลำดับปัจจุบันใน timeline ถ้า currentIndex = 0 (ยังอยู่ที่จุดเริ่ม) target ก็คือพิกัดของจุดเริ่ม
+    const currentTarget = timeline[state.currentIndex];
+    // ดึงพิกัดให้ถูก
+    let targetLat, targetLng;
+
+    if (currentTarget.type === 'origin') {
+        targetLat = Number(routeData.coords[0][0]);
+        targetLng = Number(routeData.coords[0][1]);
+    } else if (currentTarget.type === 'destination') {
+        targetLat = Number(routeData.coords[1][0]);
+        targetLng = Number(routeData.coords[1][1]);
+    } else {
+        const stopIndex = state.currentIndex - 1;
+        targetLat = Number(routeData.stopsCoords[stopIndex].lat);
+        targetLng = Number(routeData.stopsCoords[stopIndex].lng);
+    }
+
+    try {
+        isProcessing.value = true;
+         //ดึงพิกัดปัจจุบันจาก GPS
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 10000
+            });
+        });
+        const { latitude, longitude } = position.coords;
+        // คำนวณระยะห่างจากจุดcheckpoint
+        const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
+        if (distance > 500) {
+            toast.error('คุณไม่อยู่ในพื้นที่', 
+                `คุณต้องเช็คอินที่ [${currentTarget.name}] ในรัศมี 500 ม. (ปัจจุบันห่าง ${Math.round(distance)} ม.)`
+            );
+            return;
+        }
+
+        // อัปเดตสถานะ
+        await new Promise(resolve => setTimeout(resolve, 800)); // จำลองส่งไป Backend
+        toast.success('Check-in สำเร็จ', `ยืนยันพิกัดที่: ${currentTarget.name}`);
+
+        if (state.currentIndex < timeline.length - 1) {
+            // ขยับไปcheckpointถัดไป
+            state.currentIndex++;
+        } else {
+            state.completed = true;
+            state.started = false;
+            modalMode.value = 'complete';
+            pendingRouteId.value = routeId;
+            isConfirmModalVisible.value = true;
+        }
+        
+    } catch (error) {
+        console.error(error);
+        toast.error('ตำแหน่งผิดพลาด', 'ไม่สามารถเข้าถึง GPS ได้');
+    } finally {
+        isProcessing.value = false;
+    }
+};
+// --- ส่วนจัดการ Modal ---
+const isConfirmModalVisible = ref(false);
+const pendingRouteId = ref(null);
+const modalMode = ref('start'); 
+
+// ฟังก์ชันModal สำหรับเริ่มเดินทาง
+const triggerStartTrip = (routeId) => {
+    modalMode.value = 'start';
+    pendingRouteId.value = routeId;
+    isConfirmModalVisible.value = true;
+};
+
+// ฟังก์ชันเมื่อกดยืนยันใน Modal
+const handleConfirmModal = async () => {
+    if (!pendingRouteId.value) return;
+
+    try {
+        isProcessing.value = true;
+
+        // เริ่มต้นการเดินทาง 
+        if (modalMode.value === 'start') {
+            // จุดที่เตรียมไว้เชื่อม Backend: await $api(`/routes/${pendingRouteId.value}/start`, { method: 'POST' }) เบื้องต้น
+            await new Promise(resolve => setTimeout(resolve, 1000)); // จำลองรอ Backend
+
+            const state = getTripState(pendingRouteId.value);
+            state.started = true;
+            state.currentIndex = 0;
+            
+            toast.success('สำเร็จ', 'เริ่มต้นการเดินทางแล้ว!');
+        } 
+        
+        // สิ้นสุดการเดินทาง
+        else if (modalMode.value === 'complete') {
+            // ใส่ Logic อัปเดตสถานะ Backend เพิ่มเติมตรงนี้ก็ได้
+            await new Promise(resolve => setTimeout(resolve, 500)); 
+            toast.success('สำเร็จ', 'ระบบบันทึกการสิ้นสุดการเดินทางแล้ว');
+        }
+
+        closeTripActionModal(); // ปิด Modal เมื่อทำงานสำเร็จ
+    } catch (error) {
+        const action = modalMode.value === 'start' ? 'เริ่มเดินทาง' : 'บันทึกข้อมูล';
+        toast.error('เกิดข้อผิดพลาด', `ไม่สามารถ ${action} ได้`);
+    } finally {
+        isProcessing.value = false;
+    }
+};
+
+// ฟังก์ชันปิด Modal
+const closeTripActionModal = () => {
+    isConfirmModalVisible.value = false;
+    pendingRouteId.value = null;
+};
+
+//  เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล
+const sortedMyRoutes = computed(() => {
+  return [...myRoutes.value].sort((a, b) => {
+    const stateA = getTripState(a.id);
+    const stateB = getTripState(b.id);
+
+    //  ถ้า A จบแล้ว แต่ B ยังไม่จบ  ให้ A ไปอยู่ข้างหลัง 
+    if (stateA.completed && !stateB.completed) return 1;
+    // ถ้า A ยังไม่จบ แต่ B จบแล้ว   ให้ A อยู่ข้างหน้า
+    if (!stateA.completed && stateB.completed) return -1;
+    
+    // ถ้าสถานะเหมือนกัน ให้เรียงตามลำดับเดิม
+    return 0;
+  });
+});
 
 // ---------- Google Maps states ----------
 let gmap = null
