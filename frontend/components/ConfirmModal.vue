@@ -17,9 +17,9 @@
                         <p class="mt-1 text-sm text-gray-600">{{ message }}</p>
                     </div>
                 </div>
-
+                <!-- เพิ่มให้ยืดหยุ่นปรับใช้ได้ -->
                 <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
-                    <button @click="handleCancel" type="button" class="btn-secondary">
+                    <button  v-if="cancelText" @click="handleCancel" type="button" class="btn-secondary" >
                         {{ cancelText }}
                     </button>
                     <button @click="handleConfirm" type="button" :class="['btn-primary', confirmButtonClass]">
