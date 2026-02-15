@@ -15,6 +15,9 @@
                     <div class="ml-4 text-left">
                         <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
                         <p class="mt-1 text-sm text-gray-600">{{ message }}</p>
+                        <div class="mt-4">
+                            <slot />
+                        </div>
                     </div>
                 </div>
                 <!-- เพิ่มให้ยืดหยุ่นปรับใช้ได้ -->
@@ -59,6 +62,9 @@ const props = defineProps({
         type: String,
         default: 'danger', // 'danger' or 'primary'
     },
+    disabledConfirm: { 
+        type: Boolean,
+        default: false }
 });
 
 const emit = defineEmits(['confirm', 'cancel']);
