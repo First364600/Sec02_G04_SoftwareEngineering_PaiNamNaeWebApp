@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2026-02-14T21:58:34.511436" rpa="false" schemaversion="5">
+<suite id="s1" name="Delete Account" source="C:\Users\NITRO\project\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\delete_account.robot">
+<kw name="เปิดเว็บ" owner="common_keywords" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:34.697255" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:3001'.</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-14T21:58:34.697077" elapsed="2.061300"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-14T21:58:36.758595" elapsed="0.028257"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:34.696629" elapsed="2.090338"/>
+</kw>
+<test id="s1-t1" name="ผู้ใช้ลบบัญชีได้หลัง Login" line="7">
+<kw name="ไปหน้า Login" owner="common_keywords">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:36.787937" level="INFO">Opening url 'http://localhost:3001/login'</msg>
+<arg>${BASE_URL}/login</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-14T21:58:36.787848" elapsed="0.194875"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เข้าสู่ระบบ</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-14T21:58:36.982995" elapsed="0.030528"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:36.787688" elapsed="0.226026"/>
+</kw>
+<kw name="กรอกข้อมูล Login" owner="common_keywords">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>id=identifier</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.014461" elapsed="0.022482"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:37.037298" level="INFO">Typing text 'ohm123' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${USERNAME}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.037098" elapsed="0.064317"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:37.101887" level="INFO">Typing text 'namidablack1' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${PASSWORD}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.101614" elapsed="0.054014"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:37.014132" elapsed="0.141596"/>
+</kw>
+<kw name="กดปุ่ม Login" owner="common_keywords">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:37.156360" level="INFO">Clicking button 'css=button[type="submit"]'.</msg>
+<arg>css=button[type="submit"]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.156198" elapsed="0.050283"/>
+</kw>
+<kw name="Wait Until Page Does Not Contain" owner="SeleniumLibrary">
+<arg>เข้าสู่ระบบ</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` disappears from the current page.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.206633" elapsed="0.218851"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:37.156013" elapsed="0.269594"/>
+</kw>
+<kw name="ต้องอยู่หน้า Home" owner="common_keywords">
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เดินทางร่วมกัน</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.426216" elapsed="0.011508"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:37.451409" level="INFO">Current page contains text 'ค้นหาเส้นทาง'.</msg>
+<arg>ค้นหาเส้นทาง</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.437946" elapsed="0.013567"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:37.425921" elapsed="0.025686"/>
+</kw>
+<kw name="ไปหน้าโปรไฟล์ผู้ใช้" owner="common_keywords">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:37.452365" level="INFO">Opening url 'http://localhost:3001/profile'</msg>
+<arg>${BASE_URL}/profile</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.452242" elapsed="0.174274"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>บัญชีผู้ใช้</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.626712" elapsed="0.014085"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:37.451978" elapsed="0.188964"/>
+</kw>
+<kw name="กดปุ่มลบบัญชีจากหน้าโปรไฟล์" owner="common_keywords">
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:42.837356" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-12.png"&gt;&lt;img src="selenium-screenshot-12.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-02-14T21:58:42.837560" level="FAIL">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</msg>
+<arg>การลบบัญชีผู้ใช้</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="FAIL" start="2026-02-14T21:58:37.641464" elapsed="5.198197">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</status>
+</kw>
+<status status="FAIL" start="2026-02-14T21:58:37.641244" elapsed="5.198633">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</status>
+</kw>
+<kw name="ต้องอยู่หน้าลบบัญชี" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840178" elapsed="0.000049"/>
+</kw>
+<kw name="กรอกข้อมูลยืนยันการลบ" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840421" elapsed="0.000031"/>
+</kw>
+<kw name="ยืนยันลบบัญชี" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840603" elapsed="0.000025"/>
+</kw>
+<kw name="ต้องเห็น popup ลบสำเร็จ" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840920" elapsed="0.000031"/>
+</kw>
+<status status="FAIL" start="2026-02-14T21:58:36.787045" elapsed="6.054091">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</status>
+</test>
+<kw name="ปิดเว็บ" owner="common_keywords" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-14T21:58:42.842009" elapsed="2.177636"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:42.841852" elapsed="2.177926"/>
+</kw>
+<status status="FAIL" start="2026-02-14T21:58:34.512504" elapsed="10.507316"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Delete Account" id="s1" pass="0" fail="1" skip="0">Delete Account</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
