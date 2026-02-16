@@ -14,6 +14,16 @@
                             โปรไฟล์ของฉัน
                         </NuxtLink>
                     </li>
+                    <li>
+                       <NuxtLink 
+                                to="/profile/deleteAccount" 
+                                class="block px-4 py-2 text-sm rounded-md transition-colors"
+                                :class="isActive('/profile/deleteAccount') 
+                                    ? 'font-bold text-red-600 bg-red-100' 
+                                    : 'text-red-600  hover:bg-red-100'">
+                                ลบบัญชีผู้ใช้
+                                </NuxtLink>
+                    </li>
                 </ul>
             </div>
             <div>
