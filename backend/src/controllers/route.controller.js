@@ -476,6 +476,29 @@ const cancelRoute = asyncHandler(async (req, res) => {
   });
 });
 
+const updateRouteProgress = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { currentStep, status } = req.body;
+  const driverId = req.user.sub;
+
+  const updatedRoute = await prisma.route.update({
+    where: {
+      id: id,
+      driverId: driverId,
+    },
+    data: {
+      currentStep: parseInt(currentStep),
+      status: status,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "อัปเดตสถานะการเดินทางเรียบร้อยแล้ว",
+    data: updatedRoute,
+  });
+});
+
 module.exports = {
   getAllRoutes,
   listRoutes,
@@ -490,4 +513,5 @@ module.exports = {
   adminDeleteRoute,
   adminGetRoutesByDriver,
   cancelRoute,
+  updateRouteProgress,
 };

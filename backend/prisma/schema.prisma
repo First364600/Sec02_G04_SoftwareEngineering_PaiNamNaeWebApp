@@ -116,6 +116,7 @@ model Route {
   pricePerSeat    Float
   conditions      String?
   status          RouteStatus @default(AVAILABLE)
+  currentStep   Int           @default(0)
   routeSummary    String?
   distance        String?
   duration        String?
@@ -192,6 +193,7 @@ enum RouteStatus {
   COMPLETED
   CANCELLED
   IN_TRANSIT
+  ARRIVED
 }
 
 enum BookingStatus {

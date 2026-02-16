@@ -474,6 +474,10 @@ dayjs.extend(buddhistEra)
 const { $api } = useNuxtApp()
 const { toast } = useToast()
 
+let directionsService = null;
+let activePolylines = []; // เก็บเส้น Polyline ที่วาดบนแผนที่ (เพื่อลบออกเมื่อเปลี่ยนสเตป)
+let infoWindow = null; // สำหรับแสดงป้ายเวลาเมื่อกดที่เส้น
+
 // --- State Management ---
 const activeTab = ref('pending')
 const selectedTripId = ref(null)
@@ -530,11 +534,10 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 const handleCheckPoint = async (routeId, routeData) => {
     const state = getTripState(routeId);
-    const timeline = getRouteTimeline(routeData); //checkpoint จะอิงตามลำดับใน timeline ซึ่งรวมจุดเริ่ม จุดแวะ และจุดปลายทาง
+    const timeline = getRouteTimeline(routeData); 
     
-    // ดึงเป้าหมายจากลำดับปัจจุบันใน timeline ถ้า currentIndex = 0 (ยังอยู่ที่จุดเริ่ม) target ก็คือพิกัดของจุดเริ่ม
+    // ดึงข้อมูลจุดเป้าหมายปัจจุบันจาก timeline
     const currentTarget = timeline[state.currentIndex];
-    // ดึงพิกัดให้ถูก
     let targetLat, targetLng;
 
     if (currentTarget.type === 'origin') {
@@ -544,6 +547,7 @@ const handleCheckPoint = async (routeId, routeData) => {
         targetLat = Number(routeData.coords[1][0]);
         targetLng = Number(routeData.coords[1][1]);
     } else {
+        // สำหรับจุดแวะพัก (Stops)
         const stopIndex = state.currentIndex - 1;
         targetLat = Number(routeData.stopsCoords[stopIndex].lat);
         targetLng = Number(routeData.stopsCoords[stopIndex].lng);
@@ -551,7 +555,8 @@ const handleCheckPoint = async (routeId, routeData) => {
 
     try {
         isProcessing.value = true;
-         //ดึงพิกัดปัจจุบันจาก GPS
+
+        // ดึงพิกัดปัจจุบันจาก GPS ของอุปกรณ์
         const position = await new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
                 enableHighAccuracy: true,
@@ -559,33 +564,63 @@ const handleCheckPoint = async (routeId, routeData) => {
             });
         });
         const { latitude, longitude } = position.coords;
-        // คำนวณระยะห่างจากจุดcheckpoint
+
+        // คำนวณระยะห่างจากจุด Checkpoint (ต้องอยู่ในรัศมี 500 เมตร)
         const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
+        
+        // หมายเหตุ: สำหรับการทดสอบ ถ้าตัวไม่อยู่หน้างานจริง อาจจะ comment if นี้ออกก่อนได้เช็คๆ
         if (distance > 500) {
-            toast.error('คุณไม่อยู่ในพื้นที่', 
-                `คุณต้องเช็คอินที่ [${currentTarget.name}] ในรัศมี 500 ม. (ปัจจุบันห่าง ${Math.round(distance)} ม.)`
-            );
-            return;
+           toast.error('คุณไม่อยู่ในพื้นที่', 
+               `คุณต้องเช็คอินที่ [${currentTarget.name}] ในรัศมี 500 ม. (ปัจจุบันห่าง ${Math.round(distance)} ม.)`
+           );
+           return;
         }
 
-        // อัปเดตสถานะ
-        await new Promise(resolve => setTimeout(resolve, 800)); // จำลองส่งไป Backend
-        toast.success('Check-in สำเร็จ', `ยืนยันพิกัดที่: ${currentTarget.name}`);
+        // คำนวณสถานะและลำดับถัดไป
+        const nextIndex = state.currentIndex + 1;
+        const isLastStep = nextIndex >= timeline.length; 
+        const nextStatus = isLastStep ? 'COMPLETED' : 'IN_TRANSIT';
 
-        if (state.currentIndex < timeline.length - 1) {
-            // ขยับไปcheckpointถัดไป
-            state.currentIndex++;
+        // ส่งข้อมูลไปบันทึกที่ Backend API
+        await $api(`/routes/${routeId}/progress`, {
+            method: 'PATCH',
+            body: { 
+                currentStep: isLastStep ? state.currentIndex : nextIndex, 
+                status: nextStatus 
+            }
+        });
+
+        // บันทึกสำเร็จอัปเดต UI State
+        if (!isLastStep) {
+            // กรณีมีจุดถัดไป
+            state.currentIndex = nextIndex;
+            state.status = 'IN_TRANSIT';
+            toast.success('Check-in สำเร็จ', `ยืนยันพิกัดที่: ${currentTarget.name}`);
+            
+            // --- อัปเดตแผนที่ให้โชว์เส้นทางช่วงถัดไป ---
+            updateMap(routeData); 
+
         } else {
+            // กรณีถึงจุดหมายปลายทางสุดท้าย
             state.completed = true;
             state.started = false;
+            state.status = 'COMPLETED';
+            
+            // --- อัปเดตแผนที่ให้โชว์ภาพรวมเมื่อจบงาน ---
+            updateMap(routeData);
+
+            // แสดง Modal แจ้งเตือนการสิ้นสุดการเดินทาง
             modalMode.value = 'complete';
             pendingRouteId.value = routeId;
             isConfirmModalVisible.value = true;
+            
+            toast.success('ถึงจุดหมายปลายทางแล้ว', `สิ้นสุดการเดินทางที่: ${currentTarget.name}`);
         }
         
     } catch (error) {
-        console.error(error);
-        toast.error('ตำแหน่งผิดพลาด', 'ไม่สามารถเข้าถึง GPS ได้');
+        console.error('Checkpoint error:', error);
+        const errorMsg = error.code === 1 ? 'กรุณาอนุญาตการเข้าถึงพิกัด GPS' : 'ไม่สามารถเชื่อมต่อ Server ได้';
+        toast.error('เกิดข้อผิดพลาด', errorMsg);
     } finally {
         isProcessing.value = false;
     }
@@ -608,30 +643,54 @@ const handleConfirmModal = async () => {
 
     try {
         isProcessing.value = true;
+        const state = getTripState(pendingRouteId.value);
 
-        // เริ่มต้นการเดินทาง 
+        // --- เริ่มต้นการเดินทาง (Start Trip) ---
         if (modalMode.value === 'start') {
-            // จุดที่เตรียมไว้เชื่อม Backend: await $api(`/routes/${pendingRouteId.value}/start`, { method: 'POST' }) เบื้องต้น
-            await new Promise(resolve => setTimeout(resolve, 1000)); // จำลองรอ Backend
+            // เริ่ม0
+            await $api(`/routes/${pendingRouteId.value}/progress`, { 
+                method: 'PATCH',
+                body: {
+                    currentStep: 0,
+                    status: 'IN_TRANSIT'
+                }
+            });
 
-            const state = getTripState(pendingRouteId.value);
+            // อัปเดต UI State
             state.started = true;
+            state.completed = false;
             state.currentIndex = 0;
+            state.status = 'IN_TRANSIT';
             
-            toast.success('สำเร็จ', 'เริ่มต้นการเดินทางแล้ว!');
+            toast.success('สำเร็จ', 'เริ่มต้นการเดินทางแล้ว! ขอให้เดินทางโดยสวัสดิภาพ');
         } 
         
-        // สิ้นสุดการเดินทาง
-        else if (modalMode.value === 'complete') {
-            // ใส่ Logic อัปเดตสถานะ Backend เพิ่มเติมตรงนี้ก็ได้
-            await new Promise(resolve => setTimeout(resolve, 500)); 
-            toast.success('สำเร็จ', 'ระบบบันทึกการสิ้นสุดการเดินทางแล้ว');
+        // --- สิ้นสุดการเดินทาง--
+        else if (modalMode.value === 'complete') { 
+            // อัปเดตสถานะใน Backend เป็น COMPLETED เตรียมทำreviewได้
+            await $api(`/routes/${pendingRouteId.value}/progress`, { 
+                method: 'PATCH',
+                body: {
+                    currentStep: state.currentIndex,
+                    status: 'COMPLETED'
+                }
+            });
+
+           
+            state.started = false;
+            state.completed = true;
+            state.status = 'COMPLETED';
+
+            toast.success('สำเร็จ', 'ระบบบันทึกการสิ้นสุดการเดินทางเรียบร้อยแล้ว');
         }
 
-        closeTripActionModal(); // ปิด Modal เมื่อทำงานสำเร็จ
+        
+        closeTripActionModal(); 
+        
     } catch (error) {
-        const action = modalMode.value === 'start' ? 'เริ่มเดินทาง' : 'บันทึกข้อมูล';
-        toast.error('เกิดข้อผิดพลาด', `ไม่สามารถ ${action} ได้`);
+        console.error('Modal Action Error:', error);
+        const action = modalMode.value === 'start' ? 'เริ่มเดินทาง' : 'บันทึกการสิ้นสุดการเดินทาง';
+        toast.error('เกิดข้อผิดพลาด', `ไม่สามารถ ${action} ได้ในขณะนี้`);
     } finally {
         isProcessing.value = false;
     }
@@ -643,18 +702,17 @@ const closeTripActionModal = () => {
     pendingRouteId.value = null;
 };
 
-//  เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล
+//  เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล ลำดับการ source
 const sortedMyRoutes = computed(() => {
   return [...myRoutes.value].sort((a, b) => {
     const stateA = getTripState(a.id);
     const stateB = getTripState(b.id);
 
-    //  ถ้า A จบแล้ว แต่ B ยังไม่จบ  ให้ A ไปอยู่ข้างหลัง 
+
     if (stateA.completed && !stateB.completed) return 1;
-    // ถ้า A ยังไม่จบ แต่ B จบแล้ว   ให้ A อยู่ข้างหน้า
+
     if (!stateA.completed && stateB.completed) return -1;
     
-    // ถ้าสถานะเหมือนกัน ให้เรียงตามลำดับเดิม
     return 0;
   });
 });
@@ -725,7 +783,7 @@ async function fetchMyRoutes() {
     try {
         const routes = await $api('/routes/me')
 
-        const allowedRouteStatuses = new Set(['AVAILABLE', 'FULL', 'IN_TRANSIT'])
+        const allowedRouteStatuses = new Set(['AVAILABLE', 'FULL', 'IN_TRANSIT', 'COMPLETED'])
 
         const formatted = []
         const ownRoutes = []
@@ -733,7 +791,19 @@ async function fetchMyRoutes() {
         for (const r of routes) {
             const carDetailsList = []
             const routeStatus = String(r.status || '').toUpperCase()
+            
+            // ตรวจสอบสถานะที่อนุญาต
             if (!allowedRouteStatuses.has(routeStatus)) continue
+
+            // ล็อก Stage และ Step 
+           
+            tripStates.value[r.id] = {
+                started: routeStatus === 'IN_TRANSIT',
+                completed: routeStatus === 'COMPLETED',
+                currentIndex: r.currentStep || 0, 
+                status: routeStatus
+            }
+            
 
             if (r.vehicle) {
                 carDetailsList.push(`${r.vehicle.vehicleModel} (${r.vehicle.vehicleType})`)
@@ -772,7 +842,7 @@ async function fetchMyRoutes() {
                 )
                 .filter(Boolean)
 
-            // แปลงเป็น "คำขอจอง" ต่อ booking
+            
             for (const b of (r.bookings || [])) {
                 formatted.push({
                     id: b.id,
@@ -815,7 +885,8 @@ async function fetchMyRoutes() {
             )
             ownRoutes.push({
                 id: r.id,
-                status: (r.status || '').toLowerCase(),
+                status: routeStatus.toLowerCase(),
+                currentStep: r.currentStep || 0, // เก็บค่าลำดับจุดเช็คพอยท์ปัจจุบัน
                 origin: start?.name || `(${Number(start.lat).toFixed(2)}, ${Number(start.lng).toFixed(2)})`,
                 destination: end?.name || `(${Number(end.lat).toFixed(2)}, ${Number(end.lng).toFixed(2)})`,
                 originAddress: start?.address ? cleanAddr(start.address) : null,
@@ -852,7 +923,7 @@ async function fetchMyRoutes() {
         allTrips.value = formatted
         myRoutes.value = ownRoutes
 
-        // รอแผนที่พร้อม แล้ว reverse เฉพาะกรณีที่ backend ไม่มี name (เฉพาะ list คำขอจอง)
+        
         await waitMapReady()
         const jobs = allTrips.value.map(async (t, idx) => {
             const [o, d] = await Promise.all([
@@ -887,7 +958,6 @@ const getTripCount = (status) => {
 }
 
 const toggleTripDetails = (id) => {
-    // หา item ตามแท็บที่เปิดอยู่ เพื่ออัปเดตแผนที่
     const item = activeTab.value === 'myRoutes'
         ? myRoutes.value.find(r => r.id === id)
         : allTrips.value.find(t => t.id === id)
@@ -896,6 +966,205 @@ const toggleTripDetails = (id) => {
     selectedTripId.value = (selectedTripId.value === id) ? null : id
 }
 
+async function updateMap(trip) {
+    if (!trip) return;
+    await waitMapReady();
+    if (!gmap) return;
+
+    //เคลียร์แผนที่เดิม
+    if (activePolyline) { activePolyline.setMap(null); activePolyline = null; }
+    if (activePolylines && activePolylines.length) {
+        activePolylines.forEach(p => p.setMap(null));
+        activePolylines = [];
+    }
+    if (startMarker) { startMarker.setMap(null); startMarker = null; }
+    if (endMarker) { endMarker.setMap(null); endMarker = null; }
+    if (stopMarkers.length) {
+        stopMarkers.forEach(m => m.setMap(null));
+        stopMarkers = [];
+    }
+    if (infoWindow) infoWindow.close();
+    else infoWindow = new google.maps.InfoWindow();
+
+    if (!directionsService) directionsService = new google.maps.DirectionsService();
+
+    const state = getTripState(trip.id);
+    const timeline = getRouteTimeline(trip);
+
+    // กำหนดจุด Origin และ Destination 
+    let originLatLng, destLatLng, prevIndex, targetIndex;
+
+    // ภาพรวม
+    if (!state.started || state.completed || state.currentIndex === 0) {
+        originLatLng = { lat: Number(trip.coords[0][0]), lng: Number(trip.coords[0][1]) };
+        destLatLng = { lat: Number(trip.coords[1][0]), lng: Number(trip.coords[1][1]) };
+        prevIndex = 0; 
+        targetIndex = timeline.length - 1; 
+    } 
+    // นำทางทีละช่วง
+    else {
+        prevIndex = state.currentIndex - 1;
+        targetIndex = state.currentIndex;
+        originLatLng = getLatLngFromTimeline(trip, prevIndex);
+        destLatLng = getLatLngFromTimeline(trip, targetIndex);
+    }
+
+    if (!originLatLng || !destLatLng) return;
+
+    // Marker A และ B
+    startMarker = new google.maps.Marker({
+        position: originLatLng,
+        map: gmap,
+        label: { text: 'A', color: 'white' },
+        title: timeline[prevIndex].name,
+        zIndex: 100
+    });
+
+    endMarker = new google.maps.Marker({
+        position: destLatLng,
+        map: gmap,
+        label: { text: 'B', color: 'white' },
+        title: timeline[targetIndex].name,
+        zIndex: 100
+    });
+
+    // Request 2 แบบ (ปกติ และเลี่ยงทางด่วน) เพื่อให้ได้เส้นทางที่หลากหลายมากขึ้น กว่าจะเจอ
+    const baseRequest = {
+        origin: originLatLng,
+        destination: destLatLng,
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: true, // ขอเส้นทางทางเลือก
+    };
+
+    const requests = [
+        //  ปกติ
+        directionsService.route(baseRequest),
+        // เลี่ยงทางด่วน 
+        directionsService.route({ ...baseRequest, avoidHighways: true })
+    ];
+
+    try {
+        // ยิง API พร้อมกัน 2 ตัว ปล.ใช้ Promise.allSettled เพื่อกัน error ตัวใดตัวหนึ่งทำให้อีกตัวพัง
+        const results = await Promise.allSettled(requests);
+        
+        let mergedRoutes = [];
+        
+        // รวบรวมเส้นทางที่ได้ทั้งหมด
+        results.forEach(res => {
+            if (res.status === 'fulfilled' && res.value.status === 'OK') {
+                mergedRoutes.push(...res.value.routes);
+            }
+        });
+
+        // กรองเส้นทางที่ซ้ำกันออก เช็คจาก overview_polyline
+        const uniqueRoutes = [];
+        const seenPolylines = new Set();
+
+        mergedRoutes.forEach(route => {
+            if (!seenPolylines.has(route.overview_polyline)) {
+                seenPolylines.add(route.overview_polyline);
+                uniqueRoutes.push(route);
+            }
+        });
+
+        if (uniqueRoutes.length === 0) {
+            console.warn('ไม่พบเส้นทางใดๆ');
+            // Fallback เส้นตรง
+             activePolyline = new google.maps.Polyline({
+                path: [originLatLng, destLatLng],
+                map: gmap,
+                strokeColor: '#ef4444',
+                strokeWeight: 4
+            });
+            return;
+        }
+
+        // วาดเส้นทางทั้งหมดลงแผนที่
+        const bounds = new google.maps.LatLngBounds();
+        
+        uniqueRoutes.forEach((route, index) => {
+            // ลงสี
+            const isPrimary = index === 0;
+            
+            const polyline = new google.maps.Polyline({
+                path: route.overview_path,
+                map: gmap,
+                
+                strokeColor: isPrimary ? '#2563eb' : (route.warnings && route.warnings.length ? '#d97706' : '#9ca3af'), 
+                strokeOpacity: isPrimary ? 1.0 : 0.6,
+                strokeWeight: isPrimary ? 7 : 5,
+                zIndex: isPrimary ? 100 : (50 - index), //เส้นหลักอยู่บนสุด เห็นชัด
+                cursor: 'pointer'
+            });
+
+            if (!activePolylines) activePolylines = [];
+            activePolylines.push(polyline);
+
+            
+            google.maps.event.addListener(polyline, 'click', (e) => {
+                const leg = route.legs[0];
+                
+                const warningMsg = (route.warnings && route.warnings.length) ? `<br><span class="text-xs text-orange-600">(${route.warnings.join(', ')})</span>` : '';
+                
+                const content = `
+                    <div class="text-center p-2">
+                        <p class="font-bold text-gray-800 text-sm mb-1">ทางเลือกที่ ${index + 1}</p>
+                        <p class="font-bold text-indigo-600 text-lg">${leg.duration.text}</p>
+                        <p class="text-gray-500 text-xs mb-2">${leg.distance.text}${warningMsg}</p>
+                        <a href="https://www.google.com/maps/dir/?api=1&origin=${originLatLng.lat},${originLatLng.lng}&destination=${destLatLng.lat},${destLatLng.lng}&travelmode=driving" 
+                           target="_blank"
+                           class="inline-block px-3 py-1 bg-blue-600 text-white text-xs rounded shadow hover:bg-blue-700 transition">
+                           เปิด Google Maps ↗
+                        </a>
+                    </div>`;
+                infoWindow.setContent(content);
+                infoWindow.setPosition(e.latLng);
+                infoWindow.open(gmap);
+                
+                // ไฮไลท์เส้นที่ถูกคลิก
+                activePolylines.forEach((p, i) => {
+                    if (i === index) {
+                        p.setOptions({ strokeColor: '#2563eb', zIndex: 100, strokeOpacity: 1.0 });
+                    } else {
+                        p.setOptions({ strokeColor: '#9ca3af', zIndex: 10, strokeOpacity: 0.5 });
+                    }
+                });
+            });
+
+            route.overview_path.forEach(p => bounds.extend(p));
+        });
+
+        gmap.fitBounds(bounds);
+
+    } catch (error) {
+        console.error('Error fetching routes:', error);
+    }
+}
+const getLatLngFromTimeline = (trip, index) => {
+    const timeline = getRouteTimeline(trip);
+    const point = timeline[index];
+
+    if (!point) return null;
+
+    let lat, lng;
+
+    if (point.type === 'origin') {
+        lat = Number(trip.coords[0][0]);
+        lng = Number(trip.coords[0][1]);
+    } else if (point.type === 'destination') {
+        lat = Number(trip.coords[1][0]);
+        lng = Number(trip.coords[1][1]);
+    } else if (point.type === 'stop') {
+        const stopIndex = index - 1;
+        if (trip.stopsCoords && trip.stopsCoords[stopIndex]) {
+            lat = Number(trip.stopsCoords[stopIndex].lat);
+            lng = Number(trip.stopsCoords[stopIndex].lng);
+        }
+    }
+
+    if (lat && lng) return { lat, lng };
+    return null;
+};
 // ---------- Google Maps helpers ----------
 function waitMapReady() {
     return new Promise((resolve) => {
@@ -946,62 +1215,6 @@ function getPlaceName(placeId) {
     })
 }
 
-async function updateMap(trip) {
-    if (!trip) return
-    await waitMapReady()
-    if (!gmap) return
-
-    // cleanup เดิม
-    if (activePolyline) { activePolyline.setMap(null); activePolyline = null }
-    if (startMarker) { startMarker.setMap(null); startMarker = null }
-    if (endMarker) { endMarker.setMap(null); endMarker = null }
-    if (stopMarkers.length) {
-        stopMarkers.forEach(m => m.setMap(null))
-        stopMarkers = []
-    }
-
-    const start = { lat: Number(trip.coords[0][0]), lng: Number(trip.coords[0][1]) }
-    const end = { lat: Number(trip.coords[1][0]), lng: Number(trip.coords[1][1]) }
-
-    startMarker = new google.maps.Marker({ position: start, map: gmap, label: 'A' })
-    endMarker = new google.maps.Marker({ position: end, map: gmap, label: 'B' })
-
-    // หมุดจุดแวะ
-    if (Array.isArray(trip.stopsCoords) && trip.stopsCoords.length) {
-        stopMarkers = trip.stopsCoords.map((s, idx) => new google.maps.Marker({
-            position: { lat: s.lat, lng: s.lng },
-            map: gmap,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            title: s.name || s.address || `จุดแวะ ${idx + 1}`
-        }))
-    }
-
-    // polyline
-    if (trip.polyline && google.maps.geometry?.encoding) {
-        const path = google.maps.geometry.encoding.decodePath(trip.polyline)
-        activePolyline = new google.maps.Polyline({
-            path,
-            map: gmap,
-            strokeColor: '#2563eb',
-            strokeOpacity: 0.9,
-            strokeWeight: 5,
-        })
-        const bounds = new google.maps.LatLngBounds()
-        path.forEach(p => bounds.extend(p))
-        if (trip.stopsCoords?.length) {
-            trip.stopsCoords.forEach(s => bounds.extend(new google.maps.LatLng(s.lat, s.lng)))
-        }
-        gmap.fitBounds(bounds)
-    } else {
-        const bounds = new google.maps.LatLngBounds()
-        bounds.extend(start)
-        bounds.extend(end)
-        if (trip.stopsCoords?.length) {
-            trip.stopsCoords.forEach(s => bounds.extend(new google.maps.LatLng(s.lat, s.lng)))
-        }
-        gmap.fitBounds(bounds)
-    }
-}
 
 // --- Modal ---
 const isModalVisible = ref(false)
@@ -1177,7 +1390,6 @@ watch(activeTab, () => {
 </script>
 
 <style scoped>
-/* (สไตล์ทั้งหมดคงเดิม) */
 .trip-card {
     transition: all 0.3s ease;
     cursor: pointer;
