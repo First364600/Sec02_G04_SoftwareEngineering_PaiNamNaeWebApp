@@ -146,6 +146,22 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
     });
 });
 
+const deleteCurrentUser = asyncHandler(async (req, res) => {
+    const userId = req.user.sub;
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const userAgent = req.get('user-agent');
+    
+    const result = await userService.requestDeleteAccount(userId, ipAddress, userAgent);
+    res.status(200).json({
+        success: true,
+        message: result.message,
+        data: { 
+            requestId: result.id,
+            scheduledDeletionDate: result.scheduledDeletionDate
+        }
+    });
+});
+
 const setUserStatus = asyncHandler(async (req, res) => {
     const { isActive, isVerified } = req.body
 
@@ -206,6 +222,7 @@ module.exports = {
     updateCurrentUserProfile,
     adminUpdateUser,
     adminDeleteUser,
+    deleteCurrentUser,
     setUserStatus,
 
 };
