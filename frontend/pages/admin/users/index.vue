@@ -121,8 +121,8 @@
                     </div>
 
                     <!-- Table -->
-                    <div v-else class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
+                    <div class="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <table class="min-w-full text-sm text-gray-700">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-3 text-xs font-medium text-left text-gray-500 uppercase">ผู้ใช้
@@ -216,6 +216,12 @@
                                             class="p-2 text-gray-500 transition-colors cursor-pointer hover:text-red-600"
                                             title="ลบ" aria-label="ลบ">
                                             <i class="text-lg fa-regular fa-trash-can"></i>
+                                        </button>
+                                        <!-- ดู Log -->
+                                        <button @click="onViewLog(u)"
+                                           class="p-2 text-gray-500 transition-colors cursor-pointer hover:text-purple-600"
+                                           title="ดู Log" aria-label="ดู Log">
+                                           <i class="text-lg fa-solid fa-file-lines"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -436,6 +442,13 @@ function onEditUser(u) {
     navigateTo(`/admin/users/${u.id}/edit`).catch(() => { })
 }
 
+// ดู log
+function onViewLog(u) {
+    navigateTo(`/admin/users/${u.id}/log`).catch(() => {})
+}
+
+
+
 /* ---------- Toggle Active Status ---------- */
 async function onToggleActive(user, nextActive) {
     const prev = user.isActive
@@ -559,10 +572,6 @@ function onCreateUser() {
 
 function onViewUser(u) {
     navigateTo(`/admin/users/${u.id}`).catch(() => { })
-}
-
-function onUserLogs(u) {
-    navigateTo(`/admin/user-logs/${u.id}`).catch(() => { })
 }
 
 function closeMobileSidebar() {

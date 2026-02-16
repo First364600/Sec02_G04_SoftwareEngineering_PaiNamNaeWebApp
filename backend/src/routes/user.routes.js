@@ -12,16 +12,21 @@ const router = express.Router();
 // GET /api/admin/logs
 router.get('/logs', async (req, res) => {
     try {
-        // ดึง Log ล่าสุด 100 รายการ
-        const result = await db.query('SELECT * FROM system_logs ORDER BY created_at DESC LIMIT 100');
-        
-        // ส่งข้อมูลกลับไปเป็น JSON
+        const result = await db.query(`
+            SELECT * 
+            FROM system_logs 
+            ORDER BY created_at DESC 
+            LIMIT 1000
+        `);
+
         res.status(200).json(result.rows);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
     }
 });
+
 
 // GET /api/users/admin
 router.get(
