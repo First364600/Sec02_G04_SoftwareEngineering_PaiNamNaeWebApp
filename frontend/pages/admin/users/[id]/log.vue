@@ -13,13 +13,13 @@
           <button
             @click="exportLogs"
             class="inline-flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
+            >
             Export
           </button>
         </div>
 
         <!-- ================= USER SUMMARY TABLE ================= -->
-        <div v-if="user && user.id" class="mb-6 overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div v-if="user && Object.keys(user).length" class="mb-6 overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm">
           <table class="min-w-full text-sm text-gray-700">
             <thead class="bg-gray-50">
               <tr>
@@ -199,9 +199,9 @@ import dayjs from 'dayjs'
 import AdminHeader from '~/components/admin/AdminHeader.vue'
 import AdminSidebar from '~/components/admin/AdminSidebar.vue'
 
-const search = ref('') // อันนี้เพิ่ม
-const dateFrom = ref('') //
-const dateTo = ref('') //
+const search = ref('') //เก็บค่า search text
+const dateFrom = ref('') //เก็บวันที่เริ่มต้น filter
+const dateTo = ref('') //เก็บวันที่สิ้นสุด filter
 
 
 const route = useRoute()
@@ -220,6 +220,7 @@ const pagination = reactive({
   totalPages: 1
 })
 
+//generate รูปโปรไฟล์อัตโนมัติ
 const avatarFallback =
   'https://ui-avatars.com/api/?name=U&background=random'
 
@@ -228,6 +229,7 @@ function formatDate(d) {
   return dayjs(d).format('DD/MM/YYYY HH:mm')
 }
 
+//ดึงข้อมูล Log จาก API
 async function fetchLogs(page = 1) {
   isLoading.value = true
   try {
@@ -262,7 +264,7 @@ async function fetchLogs(page = 1) {
     session: log.action
   }))
 
-    user.value = res.user || {}
+    //user.value = res.user || {}
 
    pagination.page = res.meta?.current_page || page
    pagination.totalPages = res.meta?.total_pages || 1
@@ -275,7 +277,7 @@ async function fetchLogs(page = 1) {
 }
 
 
-
+//โหลดข้อมูล User รายคน
 async function fetchUser() {
   try {
     const token =
@@ -296,6 +298,7 @@ async function fetchUser() {
   }
 }
 
+//กำหนดสี role
 function roleBadge(role) {
   if (role === 'ADMIN') return 'bg-purple-100 text-purple-700'
   if (role === 'DRIVER') return 'bg-blue-100 text-blue-700'
@@ -325,7 +328,7 @@ function getStatusClass(session) {
   return 'bg-gray-100 text-gray-600'
 }
 
-//อันนี้เพิ่ม
+//Export CSV
 function exportLogs() {
 
   const rows = logs.value.map(l => ({
@@ -352,6 +355,4 @@ function exportLogs() {
 
   window.URL.revokeObjectURL(url)
 }
-
-
 </script>

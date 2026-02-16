@@ -217,7 +217,7 @@
                                             title="ลบ" aria-label="ลบ">
                                             <i class="text-lg fa-regular fa-trash-can"></i>
                                         </button>
-                                        <!-- ดู Log -->
+                                        <!-- log icon -->
                                         <button @click="onViewLog(u)"
                                            class="p-2 text-gray-500 transition-colors cursor-pointer hover:text-purple-600"
                                            title="ดู Log" aria-label="ดู Log">
