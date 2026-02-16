@@ -2,6 +2,7 @@ const prisma = require("../utils/prisma");
 const ApiError = require('../utils/ApiError');
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
+//const prisma = new PrismaClient();
 
 const searchUsers = async (opts = {}) => {
     const {
@@ -302,6 +303,26 @@ const processScheduledDeletions = async () => {
 //     return safeUser;
 // };
 
+//เพิ่ม Export Full User Data 
+const exportFullUserData = async (userId) => {
+
+    if (!userId) {
+    console.error("Error: exportFullUserData received undefined userId");
+    throw new Error("UserId is required to fetch data");
+  }
+
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      vehicles: true,
+      createdRoutes: { include: { vehicle: true } },
+      bookings: { include: { route: true } },
+      driverVerification: true,
+      notification: { take: 20, orderBy: { createdAt: 'desc' } }
+    }
+  });
+};
+
 module.exports = {
     searchUsers,
     getAllUsers,
@@ -316,4 +337,5 @@ module.exports = {
     processScheduledDeletions,
     updateUserProfile,
     getUserPublicById,
+    exportFullUserData,//เพิ่มตรงนี้ด้วยสำหรับฟังก์ชันส่งออกข้อมูลผู้ใช้แบบเต็มรูปแบบ
 };

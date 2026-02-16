@@ -212,6 +212,33 @@ const setUserStatus = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true, message: "User status updated", data: updatedUser });
 });
 
+const getUserDataExport = asyncHandler(async (req, res) => {
+    try {
+        // ใช้ Optional Chaining เพื่อป้องกัน Error หาก req.user ไม่มีค่า
+        const userId = req.user?.sub;
+
+        if (!userId) {
+            // ส่ง Error 401 กลับไปหากไม่มี UserId (เพราะ Token อาจไม่สมบูรณ์)
+            throw new ApiError(401, 'เซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่');
+        }
+
+        const fullData = await userService.exportFullUserData(userId);
+        
+        if (!fullData) {
+            throw new ApiError(404, 'ไม่พบข้อมูลผู้ใช้สำหรับการส่งออก');
+        }
+
+        const { password, otpCode, ...safeData } = fullData;
+        res.status(200).json(safeData);
+
+    } catch (error) {
+        console.error('Export Data Error:', error);
+        res.status(error.statusCode || 500).json({ 
+            message: error.message || 'เกิดข้อผิดพลาดในการรวบรวมข้อมูลเพื่อส่งออก' 
+        });
+    }
+});
+
 module.exports = {
     adminListUsers,
     getAllUsers,
@@ -224,5 +251,5 @@ module.exports = {
     adminDeleteUser,
     deleteCurrentUser,
     setUserStatus,
-
+    getUserDataExport, 
 };

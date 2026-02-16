@@ -158,7 +158,7 @@
 
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ProfileSidebar from '~/components/ProfileSidebar.vue'
 import ConfirmModal from '~/components/ConfirmModal.vue'
@@ -168,9 +168,11 @@ import Notification from '~/components/ToastNotification.vue'
 definePageMeta({
   middleware: 'auth'
 })
-
+const isDownloadingData = ref(false);
 const router = useRouter()
 const { user, logout, deleteAccount } = useAuth()
+const dataToExport = ref(null)
+const isFetchingData = ref(false)
 
 const accepted = ref(false)
 const confirmText = ref('')
@@ -192,22 +194,111 @@ const canDelete = computed(() => {
   return accepted.value && confirmText.value === 'ยืนยัน'
 })
 
-function handleDownloadCSV() {
-  // สร้างข้อมูลจำลองจาก User Profile รอดึงbackend จริง
-  const data = [
-    ["ID", "Username", "Email"],
-    [user.value?.id || 'N/A', user.value?.username || 'N/A', user.value?.email || 'N/A']
-  ];
-  
-  const csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `my_data_${user.value?.username || 'user'}.csv`);
-  document.body.appendChild(link);
-  
-  link.click();
-  document.body.removeChild(link);
+watch(requestData, async (newValue) => {
+  if (newValue === true && !dataToExport.value) {
+    const token = useCookie('token').value; 
+    const config = useRuntimeConfig();
+    console.log("Token for Pre-fetch:", token); 
+
+    if (!token) {
+      showToast('ผิดพลาด', 'ไม่พบรหัสประจำตัว (Token) กรุณาเข้าสู่ระบบใหม่', 'error');
+      return;
+    }
+
+    isFetchingData.value = true;
+    try {
+      const response = await $fetch(`${config.public.apiBase}/users/export-data`, {
+        headers: { 
+          'Authorization': `Bearer ${token}` 
+        }
+      });
+      dataToExport.value = response;
+      showToast('สำเร็จ', 'เตรียมข้อมูลสำรองเรียบร้อยแล้ว', 'success');
+    } catch (error) {
+      console.error("Pre-fetch error detail:", error.data); 
+      showToast('ดาวน์โหลดล้มเหลว', 'บัญชีของคุณอาจถูกระงับหรือเซสชันหมดอายุ', 'error');
+    } finally {
+      isFetchingData.value = false;
+    }
+  }
+});
+
+async function handleDownloadCSV() {
+  try {
+    const response = dataToExport.value;
+
+    if (!response) {
+       showToast('ไม่พบข้อมูล', 'เกิดข้อผิดพลาดในการดึงข้อมูลที่เตรียมไว้', 'warning');
+       return;
+    }
+
+    let rows = [];
+    
+
+    rows.push(["--- ข้อมูลส่วนบุคคล (PERSONAL PROFILE) ---"]);
+    rows.push(["ID", "ชื่อผู้ใช้", "อีเมล", "ชื่อ-นามสกุล", "เบอร์โทรศัพท์", "บทบาท", "วันที่สร้างบัญชี"]);
+    rows.push([
+      response.id || '-',
+      response.username || '-',
+      response.email || '-',
+      `${response.firstName || ''} ${response.lastName || ''}`.trim() || '-',
+      response.phoneNumber ? `'${response.phoneNumber}` : 'N/A', 
+      response.role || '-',
+      response.createdAt ? new Date(response.createdAt).toLocaleString('th-TH') : '-'
+    ]);
+
+    rows.push([""]);
+
+    //ประวัติการจอง 
+    if (response.bookings && response.bookings.length > 0) {
+      rows.push(["--- ประวัติการจอง (BOOKING HISTORY) ---"]);
+      rows.push(["Booking ID", "เส้นทาง", "จำนวนที่นั่ง", "สถานะ", "วันที่จอง"]);
+      response.bookings.forEach(b => {
+        const routeInfo = b.route ? `${b.route.startLocation?.name || 'ต้นทาง'} ไป ${b.route.endLocation?.name || 'ปลายทาง'}` : 'N/A';
+        rows.push([
+          b.id, 
+          routeInfo, 
+          b.numberOfSeats, 
+          b.status, 
+          // เพิ่ม ' เพื่อให้วันที่ไม่เพี้ยน
+          `'${new Date(b.createdAt).toLocaleString('th-TH')}`
+        ]);
+      });
+    }
+
+    
+    if (response.vehicles && response.vehicles.length > 0) {
+      rows.push([""]);
+      rows.push(["--- ข้อมูลพาหนะ (VEHICLES) ---"]);
+      rows.push(["รุ่นรถ", "ทะเบียน", "ประเภท", "สี"]);
+      response.vehicles.forEach(v => {
+        rows.push([v.vehicleModel, v.licensePlate, v.vehicleType, v.color]);
+      });
+    }
+
+    
+    const csvContent = "\uFEFF" + rows.map(row => 
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Export_PDPA_${response.username || 'user'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    showToast('สำเร็จ', 'ดาวน์โหลดข้อมูลของคุณเรียบร้อยแล้ว', 'success');
+
+  } catch (error) {
+    console.error('CSV Generation error:', error);
+    showToast('ดาวน์โหลดล้มเหลว', 'เกิดข้อผิดพลาดในการสร้างไฟล์ CSV', 'error');
+  }
 }
 
 function showToast(title, message, type = 'warning') {
@@ -226,20 +317,23 @@ function showToast(title, message, type = 'warning') {
 
 async function handleDeleteAccount() {
   if (!canDelete.value) return
-  isLoading.value = true
+  
+  // ตรวจสอบว่าถ้าเลือกขอข้อมูล แต่ข้อมูลยังโหลดไม่เสร็จ ให้รอจนกว่าจะโหลดเสร็จ แก้ปัญหาที่ผู้ใช้กดลบก่อนที่ข้อมูลจะพร้อม
+  if (requestData.value && isFetchingData.value) {
+    showToast('กรุณารอสักครู่', 'กำลังเตรียมข้อมูลสำรองของคุณ...', 'info')
+    return
+  }
 
+  isLoading.value = true
   try {
-    const res = await deleteAccount()
-    requestData.value = res
+    // สั่งลบบัญชีได้เลย เพราะเรามีข้อมูลเก็บไว้ใน dataToExport 
+    await deleteAccount()
+    
     confirmClose.value = false
     showSuccessPopup.value = true
   } catch (error) {
     console.error('Failed to delete account:', error)
-    showToast(
-      'ล้มเหลว',
-      error?.data?.message || 'ไม่สามารถส่งคำขอลบบัญชีได้',
-      'error'
-    )
+    showToast('ล้มเหลว', error?.data?.message || 'ไม่สามารถลบบัญชีได้', 'error')
   } finally {
     isLoading.value = false
   }
