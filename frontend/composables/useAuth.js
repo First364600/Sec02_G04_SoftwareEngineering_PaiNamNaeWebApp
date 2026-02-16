@@ -55,5 +55,17 @@ export function useAuth() {
     return router.push('/')
   }
 
-  return { token, user, login, logout, register }
+  const deleteAccount = async () => {
+    try {
+      const res = await $api('/users/me', {
+        method: 'DELETE'
+      })
+      return res
+    } catch (error) {
+      console.error('Delete account error:', error)
+      throw error
+    }
+  }
+
+  return { token, user, login, logout, register, deleteAccount }
 }

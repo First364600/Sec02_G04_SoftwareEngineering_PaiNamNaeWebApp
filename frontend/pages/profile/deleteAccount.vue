@@ -170,7 +170,7 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { user, logout } = useAuth()
+const { user, logout, deleteAccount } = useAuth()
 
 const accepted = ref(false)
 const confirmText = ref('')
@@ -229,7 +229,17 @@ async function handleDeleteAccount() {
   isLoading.value = true
 
   try {
+    const res = await deleteAccount()
+    requestData.value = res
+    confirmClose.value = false
     showSuccessPopup.value = true
+  } catch (error) {
+    console.error('Failed to delete account:', error)
+    showToast(
+      'ล้มเหลว',
+      error?.data?.message || 'ไม่สามารถส่งคำขอลบบัญชีได้',
+      'error'
+    )
   } finally {
     isLoading.value = false
   }
