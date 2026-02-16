@@ -12,6 +12,7 @@ const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
 const ensureAdmin = require('./src/bootstrap/ensureAdmin');
+const { initializeSchedulers } = require('./src/services/scheduler.service');
 
 const app = express();
 promClient.collectDefaultMetrics();
@@ -75,10 +76,12 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 // --- Start Server ---
+// --- Start Server ---
 const PORT = process.env.PORT || 3000;
 (async () => {
     try {
         await ensureAdmin();
+        initializeSchedulers();
     } catch (e) {
         console.error('Admin bootstrap failed:', e);
     }

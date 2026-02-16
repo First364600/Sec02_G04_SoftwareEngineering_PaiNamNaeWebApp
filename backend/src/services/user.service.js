@@ -207,6 +207,81 @@ const deleteUser = async (id) => {
     return safeDeletedUser;
 };
 
+const requestDeleteAccount = async (userId, ipAddress, userAgent) => {
+    // ตรวจสอบว่า user มีอยู่
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+
+    // คำนวณวันที่สำหรับการลบอัตโนมัติ (90 วันหลังจากวันนี้)
+    const scheduledDeletionDate = new Date();
+    scheduledDeletionDate.setDate(scheduledDeletionDate.getDate() + 90);
+
+    // สร้าง record ใน DeleteAccountRequest และ deactivate account พร้อมกัน
+    const [deleteRequest] = await prisma.$transaction([
+        prisma.deleteAccountRequest.create({
+            data: {
+                userId: userId,
+                state: 'PENDING',
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                scheduledDeletionDate: scheduledDeletionDate,
+            },
+        }),
+        // Deactivate account ทันทีเพื่อไม่ให้ login ได้
+        prisma.user.update({
+            where: { id: userId },
+            data: { isActive: false },
+        }),
+    ]);
+
+    return {
+        id: deleteRequest.id,
+        message: 'Delete account request has been submitted. Your account will be deleted on ' + scheduledDeletionDate.toLocaleDateString('th-TH'),
+        scheduledDeletionDate: scheduledDeletionDate,
+    };
+};
+
+// ฟังก์ชันสำหรับลบบัญชีที่ครบกำหนดแล้ว (ควรเรียกจาก scheduler/cron job)
+const processScheduledDeletions = async () => {
+    const now = new Date();
+
+    // ค้นหา DeleteAccountRequest ที่ถึงเวลาลบแล้ว
+    const expiredRequests = await prisma.deleteAccountRequest.findMany({
+        where: {
+            state: 'PENDING',
+            scheduledDeletionDate: {
+                lte: now,
+            },
+        },
+    });
+
+    for (const request of expiredRequests) {
+        try {
+            // ลบข้อมูล user
+            await prisma.user.delete({
+                where: { id: request.userId },
+            });
+
+            // อัปเดต state เป็น COMPLETED
+            await prisma.deleteAccountRequest.update({
+                where: { id: request.id },
+                data: {
+                    state: 'COMPLETED',
+                    completedAt: now,
+                },
+            });
+
+            console.log(`✓ User ${request.userId} deleted successfully`);
+        } catch (error) {
+            console.error(`✗ Error deleting user ${request.userId}:`, error.message);
+        }
+    }
+
+    return expiredRequests.length;
+};
+
 // const setUserStatusActive = async (id, isActive) => {
 //     const updatedUser = await prisma.user.update({
 //         where: { id },
@@ -237,6 +312,8 @@ module.exports = {
     comparePassword,
     updatePassword,
     deleteUser,
+    requestDeleteAccount,
+    processScheduledDeletions,
     updateUserProfile,
     getUserPublicById,
 };
