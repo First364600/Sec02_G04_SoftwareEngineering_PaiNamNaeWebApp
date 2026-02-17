@@ -4,9 +4,8 @@ const validate = require('../middlewares/validate');
 const upload = require('../middlewares/upload.middleware');
 const { idParamSchema, createUserSchema, updateMyProfileSchema, updateUserByAdminSchema, updateUserStatusSchema, listUsersQuerySchema } = require('../validations/user.validation');
 const { protect, requireAdmin } = require('../middlewares/auth');
-
+const { authMiddleware } = require('../middlewares/auth.js');
 const router = express.Router();
-
 // --- Admin Routes ---
 // GET /api/users/admin
 router.get(
@@ -15,6 +14,12 @@ router.get(
     requireAdmin,
     validate({ query: listUsersQuerySchema }),
     userController.adminListUsers
+);
+
+router.get(
+    '/export-data', 
+    protect, 
+    userController.getUserDataExport
 );
 
 // PUT /api/users/admin/:id
@@ -96,5 +101,14 @@ router.put(
     validate({ body: updateMyProfileSchema }),
     userController.updateCurrentUserProfile
 );
+
+// DELETE /api/users/me
+router.delete(
+    '/me',
+    protect,
+    userController.deleteCurrentUser
+);
+
+
 
 module.exports = router;

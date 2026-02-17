@@ -112,6 +112,14 @@ router.put(
   routeController.updateRoute
 );
 
+router.patch(
+  "/:id/progress",
+  protect,
+  requireDriverVerified,
+  validate({ params: idParamSchema }),
+  routeController.updateRouteProgress
+);
+
 // PATCH /routes/:id/cancel
 router.patch(
   "/:id/cancel",
