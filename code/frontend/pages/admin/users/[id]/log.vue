@@ -209,6 +209,7 @@ const config = useRuntimeConfig()
 
 const userId = route.params.id
 
+const rawLogs = ref([]) //ตัวแปรเก็บ raw logs
 const logs = ref([])
 const user = ref({})
 const isLoading = ref(false)
@@ -251,18 +252,19 @@ async function fetchLogs(page = 1) {
 }
     })
 
-   logs.value = (res.data || [])
-  .filter(log => log.user_id === userId)
-  .map(log => ({
-    id: log.id,
-    event: log.action,
-    userId: log.user_id,
-    name: log.user?.email || 'Guest',
-    date: log.created_at,
-    ip: log.ip_address,
-    mac: '-',
-    session: log.action
-  }))
+   rawLogs.value = res.data || []
+
+    logs.value = rawLogs.value
+      .filter(log => log.user_id === userId)
+      .map(log => ({
+        id: log.id,
+        event: log.action,
+        userId: log.user_id,
+        name: log.user?.email || 'Guest',
+        date: log.created_at,
+        ip: log.ip_address,
+        session: log.action
+      }))
 
     //user.value = res.user || {}
 
@@ -331,20 +333,35 @@ function getStatusClass(session) {
 //Export CSV
 function exportLogs() {
 
-  const rows = logs.value.map(l => ({
-    Event: l.event,
-    UserId: l.userId,
-    Name: l.name,
-    Date: formatDate(l.date),
-    IP: l.ip,
-    Session: l.session
-  }))
+  if (!rawLogs.value.length) return
 
-  const csv =
-    Object.keys(rows[0]).join(',') + '\n' +
-    rows.map(r => Object.values(r).join(',')).join('\n')
+  const rows = rawLogs.value
+    .filter(log => log.user_id === userId)
+    .map(l => ({
+      user_id: l.user_id,
+      action: l.action,
+      method: l.method,
+      endpoint: l.endpoint,
+      ip_address: l.ip_address,
+      user_agent: l.user_agent,
+      status_code: l.status_code,
+      log_hash: l.log_hash,
+      created_at: formatDate(l.created_at)
+    }))
 
-  const blob = new Blob([csv], { type: 'text/csv' })
+  const header = Object.keys(rows[0]).join(',')
+
+  const body = rows
+    .map(r =>
+      Object.values(r)
+        .map(v => `"${String(v ?? '').replace(/"/g, '""')}"`)
+        .join(',')
+    )
+    .join('\n')
+
+  const csv = header + '\n' + body
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
 
   const url = window.URL.createObjectURL(blob)
 
