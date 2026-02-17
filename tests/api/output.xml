@@ -1,241 +1,235 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.1 (Python 3.10.11 on win32)" generated="2026-02-17T21:16:15.308008" rpa="false" schemaversion="5">
+<robot generator="Robot 7.4.1 (Python 3.10.11 on win32)" generated="2026-02-17T22:46:36.662179" rpa="false" schemaversion="5">
 <suite id="s1" name="requestDeleteAccount" source="D:\CS_CP_KKU_3_2_2568\Software_engineering\Project\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\api\requestDeleteAccount.robot">
-<test id="s1-t1" name="Test Request Delete Account - From Authenticated State" line="14">
+<test id="s1-t1" name="Test Request Delete Account" line="14">
 <kw name="Setup Test Session" type="SETUP">
 <kw name="Create Session" owner="RequestsLibrary">
-<msg time="2026-02-17T21:16:15.486901" level="INFO">Creating Session using : alias=api_session, url=http://localhost:3000/api, headers={},                     cookies={}, auth=None, timeout=10, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2026-02-17T22:46:36.807784" level="INFO">Creating Session using : alias=api_session, url=http://localhost:3000/api, headers={},                     cookies={}, auth=None, timeout=10, proxies=None, verify=False,                     debug=0 </msg>
 <arg>api_session</arg>
 <arg>${BASE_URL}</arg>
 <arg>timeout=10</arg>
 <arg>verify=False</arg>
 <doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2026-02-17T21:16:15.486901" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:36.807784" elapsed="0.000000"/>
 </kw>
 <doc>สร้าง session สำหรับการทดสอบ</doc>
-<status status="PASS" start="2026-02-17T21:16:15.486397" elapsed="0.000504"/>
+<status status="PASS" start="2026-02-17T22:46:36.806753" elapsed="0.001031"/>
 </kw>
 <kw name="User Login">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-02-17T21:16:15.487907" level="INFO">${login_data} = {'email': 'eeeeee5@gmail.com', 'password': 'e123456789'}</msg>
+<msg time="2026-02-17T22:46:36.808766" level="INFO">${login_data} = {'email': 'eeeeee5@gmail.com', 'password': 'e123456789'}</msg>
 <var>${login_data}</var>
 <arg>email=${email}</arg>
 <arg>password=${password}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.487907" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:36.808766" elapsed="0.000000"/>
 </kw>
 <kw name="POST On Session" owner="RequestsLibrary">
-<msg time="2026-02-17T21:16:15.588860" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+<msg time="2026-02-17T22:46:36.878558" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
  path_url=/api/auth/login 
  headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '56', 'Content-Type': 'application/json'} 
  body=b'{"email": "eeeeee5@gmail.com", "password": "e123456789"}' 
  </msg>
-<msg time="2026-02-17T21:16:15.588860" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+<msg time="2026-02-17T22:46:36.878558" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
  status=200, reason=OK 
- headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '441', 'ETag': 'W/"1b9-67kdWS5zmkH6z5L2fvj1HGjW2wY"', 'Date': 'Tue, 17 Feb 2026 14:16:15 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
- body={"success":true,"message":"Login successful","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTMzNzc3NSwiZXhwIjoxNzcxMzQxMzc1fQ.Js8u-obwT95UWZr52mGC8mfdc39F9xo8IRZsQPTK_tc","user":{"id":"cmlqobwei0000l8hu1mxym9qm","firstName":"eee","lastName":"eee","profilePicture":null,"role":"PASSENGER","driverSuspendedUntil":null,"passengerSuspendedUntil":null}}} 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '441', 'ETag': 'W/"1b9-48R14IyX/yRhzAdVlFna8PUevSI"', 'Date': 'Tue, 17 Feb 2026 15:46:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Login successful","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTM0MzE5NiwiZXhwIjoxNzcxMzQ2Nzk2fQ.qpNude79daHAdjmvd71IE16MupuyQnCQ02AhTg94tF4","user":{"id":"cmlqobwei0000l8hu1mxym9qm","firstName":"eee","lastName":"eee","profilePicture":null,"role":"PASSENGER","driverSuspendedUntil":null,"passengerSuspendedUntil":null}}} 
  </msg>
-<msg time="2026-02-17T21:16:15.588860" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-02-17T22:46:36.878558" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>api_session</arg>
 <arg>/auth/login</arg>
 <arg>json=${login_data}</arg>
 <arg>expected_status=any</arg>
 <doc>Sends a POST request on a previously created HTTP Session.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.488912" elapsed="0.099948"/>
+<status status="PASS" start="2026-02-17T22:46:36.808766" elapsed="0.069792"/>
 </kw>
 <return>
 <value>${response}</value>
-<status status="PASS" start="2026-02-17T21:16:15.588860" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:36.878558" elapsed="0.000000"/>
 </return>
-<msg time="2026-02-17T21:16:15.588860" level="INFO">${login_response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-02-17T22:46:36.878558" level="INFO">${login_response} = &lt;Response [200]&gt;</msg>
 <var>${login_response}</var>
 <arg>${TEST_EMAIL}</arg>
 <arg>${TEST_PASSWORD}</arg>
 <doc>ยืนยันตัวตนด้วย email และ password</doc>
-<status status="PASS" start="2026-02-17T21:16:15.487907" elapsed="0.100953"/>
+<status status="PASS" start="2026-02-17T22:46:36.807784" elapsed="0.070774"/>
 </kw>
 <kw name="Should Be Equal As Integers" owner="BuiltIn">
-<msg time="2026-02-17T21:16:15.589860" level="INFO">Argument types are:
+<msg time="2026-02-17T22:46:36.879713" level="INFO">Argument types are:
 &lt;class 'int'&gt;
 &lt;class 'str'&gt;</msg>
 <arg>${login_response.status_code}</arg>
 <arg>200</arg>
 <arg>Failed to login</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.589860" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:36.879713" elapsed="0.000000"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-02-17T21:16:15.590860" level="INFO">${auth_token} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTMzNzc3NSwiZXhwIjoxNzcxMzQxMzc1fQ.Js8u-obwT95UWZr52mGC8mfdc39F9xo8IRZsQPTK_tc</msg>
+<msg time="2026-02-17T22:46:36.880698" level="INFO">${auth_token} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTM0MzE5NiwiZXhwIjoxNzcxMzQ2Nzk2fQ.qpNude79daHAdjmvd71IE16MupuyQnCQ02AhTg94tF4</msg>
 <var>${auth_token}</var>
 <arg>${login_response.json()['data']}</arg>
 <arg>token</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.590860" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:36.879713" elapsed="0.000985"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-02-17T21:16:15.591860" level="INFO">${login_user} = {'id': 'cmlqobwei0000l8hu1mxym9qm', 'firstName': 'eee', 'lastName': 'eee', 'profilePicture': None, 'role': 'PASSENGER', 'driverSuspendedUntil': None, 'passengerSuspendedUntil': None}</msg>
+<msg time="2026-02-17T22:46:36.880698" level="INFO">${login_user} = {'id': 'cmlqobwei0000l8hu1mxym9qm', 'firstName': 'eee', 'lastName': 'eee', 'profilePicture': None, 'role': 'PASSENGER', 'driverSuspendedUntil': None, 'passengerSuspendedUntil': None}</msg>
 <var>${login_user}</var>
 <arg>${login_response.json()['data']}</arg>
 <arg>user</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.590860" elapsed="0.001000"/>
-</kw>
-<kw name="Log" owner="BuiltIn">
-<msg time="2026-02-17T21:16:15.593365" level="INFO">Login token received for user id: cmlqobwei0000l8hu1mxym9qm (eee eee)</msg>
-<arg>Login token received for user id: ${login_user['id']} (${login_user['firstName']} ${login_user['lastName']})</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.591860" elapsed="0.001505"/>
+<status status="PASS" start="2026-02-17T22:46:36.880698" elapsed="0.000000"/>
 </kw>
 <kw name="Delete User Account">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-02-17T21:16:15.594371" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTMzNzc3NSwiZXhwIjoxNzcxMzQxMzc1fQ.Js8u-obwT95UWZr52m...</msg>
+<msg time="2026-02-17T22:46:36.881755" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTM0MzE5NiwiZXhwIjoxNzcxMzQ2Nzk2fQ.qpNude79daHAdjmvd7...</msg>
 <var>${headers}</var>
 <arg>Authorization=Bearer ${auth_token}</arg>
 <arg>Content-Type=application/json</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.593365" elapsed="0.001006"/>
+<status status="PASS" start="2026-02-17T22:46:36.881755" elapsed="0.000000"/>
 </kw>
 <kw name="DELETE On Session" owner="RequestsLibrary">
-<msg time="2026-02-17T21:16:15.608640" level="INFO">DELETE Request : url=http://localhost:3000/api/users/me 
+<msg time="2026-02-17T22:46:36.904894" level="INFO">DELETE Request : url=http://localhost:3000/api/users/me 
  path_url=/api/users/me 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTMzNzc3NSwiZXhwIjoxNzcxMzQxMzc1fQ.Js8u-obwT95UWZr52mGC8mfdc39F9xo8IRZsQPTK_tc', 'Content-Type': 'application/json', 'Content-Length': '0'} 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxxb2J3ZWkwMDAwbDhodTFteHltOXFtIiwicm9sZSI6IlBBU1NFTkdFUiIsImlhdCI6MTc3MTM0MzE5NiwiZXhwIjoxNzcxMzQ2Nzk2fQ.qpNude79daHAdjmvd71IE16MupuyQnCQ02AhTg94tF4', 'Content-Type': 'application/json', 'Content-Length': '0'} 
  body=None 
  </msg>
-<msg time="2026-02-17T21:16:15.608640" level="INFO">DELETE Response : url=http://localhost:3000/api/users/me 
+<msg time="2026-02-17T22:46:36.904894" level="INFO">DELETE Response : url=http://localhost:3000/api/users/me 
  status=200, reason=OK 
- headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '213', 'ETag': 'W/"d5-NTUDjTBcQIKecVQqDUo9MDaCv+M"', 'Date': 'Tue, 17 Feb 2026 14:16:15 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
- body={"success":true,"message":"Delete account request has been submitted. Your account will be deleted on 18/5/2569","data":{"requestId":"cmlqorz000008l8hun3kqelid","scheduledDeletionDate":"2026-05-18T14:16:15.598Z"}} 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '213', 'ETag': 'W/"d5-R61Znzyy64zjRlHrUdusR3ECiM4"', 'Date': 'Tue, 17 Feb 2026 15:46:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Delete account request has been submitted. Your account will be deleted on 18/5/2569","data":{"requestId":"cmlqs063f0001ovupxf321ubq","scheduledDeletionDate":"2026-05-18T15:46:36.888Z"}} 
  </msg>
-<msg time="2026-02-17T21:16:15.608640" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-02-17T22:46:36.904894" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>api_session</arg>
 <arg>/users/me</arg>
 <arg>headers=${headers}</arg>
 <arg>expected_status=any</arg>
 <doc>Sends a DELETE request on a previously created HTTP Session.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.594371" elapsed="0.014269"/>
+<status status="PASS" start="2026-02-17T22:46:36.881755" elapsed="0.023139"/>
 </kw>
 <return>
 <value>${response}</value>
-<status status="PASS" start="2026-02-17T21:16:15.608640" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:36.904894" elapsed="0.000000"/>
 </return>
-<msg time="2026-02-17T21:16:15.608640" level="INFO">${delete_response} = &lt;Response [200]&gt;</msg>
+<msg time="2026-02-17T22:46:36.904894" level="INFO">${delete_response} = &lt;Response [200]&gt;</msg>
 <var>${delete_response}</var>
 <arg>${auth_token}</arg>
 <doc>ทำการ request ลบบัญชี (DELETE /api/users/me)</doc>
-<status status="PASS" start="2026-02-17T21:16:15.593365" elapsed="0.016276"/>
+<status status="PASS" start="2026-02-17T22:46:36.881755" elapsed="0.023139"/>
 </kw>
 <kw name="Should Be Equal As Integers" owner="BuiltIn">
-<msg time="2026-02-17T21:16:15.610639" level="INFO">Argument types are:
+<msg time="2026-02-17T22:46:36.904894" level="INFO">Argument types are:
 &lt;class 'int'&gt;
 &lt;class 'str'&gt;</msg>
 <arg>${delete_response.status_code}</arg>
 <arg>200</arg>
 <arg>Failed to request delete</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.609641" elapsed="0.000998"/>
+<status status="PASS" start="2026-02-17T22:46:36.904894" elapsed="0.000000"/>
 </kw>
 <kw name="Evaluate" owner="BuiltIn">
-<msg time="2026-02-17T21:16:15.611780" level="INFO">${delete_response_json} = {'success': True, 'message': 'Delete account request has been submitted. Your account will be deleted on 18/5/2569', 'data': {'requestId': 'cmlqorz000008l8hun3kqelid', 'scheduledDeletionDate': '2026-0...</msg>
+<msg time="2026-02-17T22:46:36.906503" level="INFO">${delete_response_json} = {'success': True, 'message': 'Delete account request has been submitted. Your account will be deleted on 18/5/2569', 'data': {'requestId': 'cmlqs063f0001ovupxf321ubq', 'scheduledDeletionDate': '2026-0...</msg>
 <var>${delete_response_json}</var>
 <arg>json.loads('''${delete_response.text}''')</arg>
 <arg>json</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.611031" elapsed="0.000749"/>
+<status status="PASS" start="2026-02-17T22:46:36.906503" elapsed="0.000000"/>
 </kw>
 <kw name="Should Be True" owner="BuiltIn">
 <arg>${delete_response_json['success']}</arg>
 <arg>Delete response success is false</arg>
 <doc>Fails if the given condition is not true.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.611780" elapsed="0.001572"/>
+<status status="PASS" start="2026-02-17T22:46:36.906503" elapsed="0.001006"/>
 </kw>
 <kw name="Get From Dictionary" owner="Collections">
-<msg time="2026-02-17T21:16:15.613352" level="INFO">${scheduled_deletion} = 2026-05-18T14:16:15.598Z</msg>
+<msg time="2026-02-17T22:46:36.908509" level="INFO">${scheduled_deletion} = 2026-05-18T15:46:36.888Z</msg>
 <var>${scheduled_deletion}</var>
 <arg>${delete_response_json['data']}</arg>
 <arg>scheduledDeletionDate</arg>
 <doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.613352" elapsed="0.001007"/>
+<status status="PASS" start="2026-02-17T22:46:36.907509" elapsed="0.001000"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
-<msg time="2026-02-17T21:16:16.623092" level="INFO">Slept 1 second.</msg>
+<msg time="2026-02-17T22:46:37.911998" level="INFO">Slept 1 second.</msg>
 <arg>1s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2026-02-17T21:16:15.614359" elapsed="1.008733"/>
+<status status="PASS" start="2026-02-17T22:46:36.908509" elapsed="1.003489"/>
 </kw>
 <kw name="User Login">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-02-17T21:16:16.625241" level="INFO">${login_data} = {'email': 'eeeeee5@gmail.com', 'password': 'e123456789'}</msg>
+<msg time="2026-02-17T22:46:37.913714" level="INFO">${login_data} = {'email': 'eeeeee5@gmail.com', 'password': 'e123456789'}</msg>
 <var>${login_data}</var>
 <arg>email=${email}</arg>
 <arg>password=${password}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-02-17T21:16:16.624150" elapsed="0.001091"/>
+<status status="PASS" start="2026-02-17T22:46:37.911998" elapsed="0.001716"/>
 </kw>
 <kw name="POST On Session" owner="RequestsLibrary">
-<msg time="2026-02-17T21:16:16.635135" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+<msg time="2026-02-17T22:46:37.918236" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
  path_url=/api/auth/login 
  headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '56', 'Content-Type': 'application/json'} 
  body=b'{"email": "eeeeee5@gmail.com", "password": "e123456789"}' 
  </msg>
-<msg time="2026-02-17T21:16:16.635135" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+<msg time="2026-02-17T22:46:37.918236" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
  status=401, reason=Unauthorized 
- headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '76', 'ETag': 'W/"4c-4RTFc/KbeBg6WLbX0odiGQBA1nc"', 'Date': 'Tue, 17 Feb 2026 14:16:16 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '76', 'ETag': 'W/"4c-4RTFc/KbeBg6WLbX0odiGQBA1nc"', 'Date': 'Tue, 17 Feb 2026 15:46:37 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
  body={"success":false,"message":"Your account has been deactivated.","data":null} 
  </msg>
-<msg time="2026-02-17T21:16:16.635135" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<msg time="2026-02-17T22:46:37.919235" level="INFO">${response} = &lt;Response [401]&gt;</msg>
 <var>${response}</var>
 <arg>api_session</arg>
 <arg>/auth/login</arg>
 <arg>json=${login_data}</arg>
 <arg>expected_status=any</arg>
 <doc>Sends a POST request on a previously created HTTP Session.</doc>
-<status status="PASS" start="2026-02-17T21:16:16.625241" elapsed="0.010896"/>
+<status status="PASS" start="2026-02-17T22:46:37.913714" elapsed="0.005521"/>
 </kw>
 <return>
 <value>${response}</value>
-<status status="PASS" start="2026-02-17T21:16:16.636137" elapsed="0.000506"/>
+<status status="PASS" start="2026-02-17T22:46:37.919235" elapsed="0.000000"/>
 </return>
-<msg time="2026-02-17T21:16:16.636643" level="INFO">${failed_login_response} = &lt;Response [401]&gt;</msg>
+<msg time="2026-02-17T22:46:37.919235" level="INFO">${failed_login_response} = &lt;Response [401]&gt;</msg>
 <var>${failed_login_response}</var>
 <arg>${TEST_EMAIL}</arg>
 <arg>${TEST_PASSWORD}</arg>
 <doc>ยืนยันตัวตนด้วย email และ password</doc>
-<status status="PASS" start="2026-02-17T21:16:16.624150" elapsed="0.012493"/>
+<status status="PASS" start="2026-02-17T22:46:37.911998" elapsed="0.007237"/>
 </kw>
 <kw name="Should Be Equal As Integers" owner="BuiltIn">
-<msg time="2026-02-17T21:16:16.637649" level="INFO">Argument types are:
+<msg time="2026-02-17T22:46:37.920236" level="INFO">Argument types are:
 &lt;class 'int'&gt;
 &lt;class 'str'&gt;</msg>
 <arg>${failed_login_response.status_code}</arg>
 <arg>401</arg>
 <arg>Login should fail</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="PASS" start="2026-02-17T21:16:16.637649" elapsed="0.000000"/>
+<status status="PASS" start="2026-02-17T22:46:37.919235" elapsed="0.001001"/>
 </kw>
 <kw name="Evaluate" owner="BuiltIn">
-<msg time="2026-02-17T21:16:16.639655" level="INFO">${failed_login_json} = {'success': False, 'message': 'Your account has been deactivated.', 'data': None}</msg>
+<msg time="2026-02-17T22:46:37.921236" level="INFO">${failed_login_json} = {'success': False, 'message': 'Your account has been deactivated.', 'data': None}</msg>
 <var>${failed_login_json}</var>
 <arg>json.loads('''${failed_login_response.text}''')</arg>
 <arg>json</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<status status="PASS" start="2026-02-17T21:16:16.638655" elapsed="0.001000"/>
+<status status="PASS" start="2026-02-17T22:46:37.920236" elapsed="0.001000"/>
 </kw>
 <kw name="Should Contain" owner="BuiltIn">
 <arg>${failed_login_json['message']}</arg>
 <arg>deactivated</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" start="2026-02-17T21:16:16.639655" elapsed="0.001640"/>
+<status status="PASS" start="2026-02-17T22:46:37.921236" elapsed="0.000999"/>
 </kw>
 <doc>ทดสอบการลบบัญชี:
 Pre-condition: login อยู่แล้ว
 1. ล็อกอิน
 2. Request delete account
 3. ตรวจสอบ login ล้มเหลว</doc>
-<status status="PASS" start="2026-02-17T21:16:15.484398" elapsed="1.156897"/>
+<status status="PASS" start="2026-02-17T22:46:36.805704" elapsed="1.116531"/>
 </test>
-<status status="PASS" start="2026-02-17T21:16:15.309942" elapsed="1.332459"/>
+<status status="PASS" start="2026-02-17T22:46:36.664693" elapsed="1.259047"/>
 </suite>
 <statistics>
 <total>
