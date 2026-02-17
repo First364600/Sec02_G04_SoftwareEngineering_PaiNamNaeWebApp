@@ -1,0 +1,12 @@
+<?php
+if (!defined('ACCESS_ALLOWED')) {
+    die('Direct access not permitted');
+}
+
+return [
+    'APP_ENV'       => 'production', 
+    'API_SECRET'    => 'xxx',
+    'BACKEND_BASE'  => 'https://xxx.com',
+    'RATE_LIMIT'    => 1000,
+];
+?>
