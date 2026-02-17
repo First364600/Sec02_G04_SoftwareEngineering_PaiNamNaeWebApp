@@ -256,10 +256,7 @@ function proxyRequest($target_url, $method, $body, $headers) {
     ];
 }
 
-// --------------------------------------------------------
-// 🚀 Main Logic
-// --------------------------------------------------------
-
+// Main Logic
 try {
     // CORS Preflight
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -271,7 +268,7 @@ try {
         exit;
     }
 
-    // 1. รับ Endpoint
+    //รับ Endpoint
     $endpoint = $_GET['endpoint'] ?? $_SERVER['PATH_INFO'] ?? '';
     
     if (empty($endpoint)) {
@@ -296,7 +293,7 @@ try {
         sendError(404, 'Endpoint not allowed', $endpoint);
     }
 
-    // 2. เตรียม URL
+    //เตรียม URL
     $target_url = rtrim($BACKEND_BASE, '/') . $endpoint;
     
     $query_string = $_SERVER['QUERY_STRING'] ?? '';
@@ -306,15 +303,15 @@ try {
         $target_url .= '?' . http_build_query($params);
     }
 
-    // 3. เตรียม Data
+    //เตรียม Data
     $method = $_SERVER['REQUEST_METHOD'];
     $content_type = $_SERVER['CONTENT_TYPE'] ?? '';
     
-    // ✅ ตรวจสอบว่าเป็น Multipart หรือไม่
+    //ตรวจสอบว่าเป็น Multipart หรือไม่
     $is_multipart = (stripos($content_type, 'multipart/form-data') !== false);
     
     if ($is_multipart) {
-        // ✅ สร้าง Multipart Body ใหม่
+        //สร้าง Multipart Body ใหม่
         $multipart = buildMultipartBody();
         
         if ($multipart === null) {
@@ -324,7 +321,7 @@ try {
         $body = $multipart['body'];
         $headers = getForwardHeaders(true); // บล็อก Content-Type เดิม
         
-        // ✅ ใส่ Content-Type ใหม่พร้อม Boundary ที่ถูกต้อง
+        //ใส่ Content-Type ใหม่พร้อม Boundary ที่ถูกต้อง
         $headers[] = "Content-Type: multipart/form-data; boundary=" . $multipart['boundary'];
         
         if ($APP_ENV === 'development') {
@@ -334,7 +331,7 @@ try {
             error_log("Body size: " . strlen($body) . " bytes");
         }
     } else {
-        // ✅ ข้อมูลปกติ (JSON, URL-encoded)
+        //ข้อมูลปกติ (JSON, URL-encoded)
         $body = file_get_contents('php://input');
         $headers = getForwardHeaders(false);
         
@@ -355,10 +352,10 @@ try {
         }
     }
 
-    // 4. Proxy Request
+    // Proxy Request
     $result = proxyRequest($target_url, $method, $body, $headers);
 
-    // 5. Handle Response
+    // Handle Response
     if (!$result['success']) {
         logAccess('ERROR', $result['error'], 502);
         sendError(502, 'Gateway Connection Failed', $result['error']);
