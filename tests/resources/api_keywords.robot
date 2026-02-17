@@ -8,8 +8,23 @@ ${BASE_URL}     http://localhost:3000
 ${ADMIN_EMAIL}  admin@example.com
 ${ADMIN_PASS}   123456789
 ${TOKEN}        ${EMPTY}
+${DB_NAME}        postgres
+${DB_USER}        postgres
+${DB_PASS}        123
+${DB_HOST}        localhost
+${DB_PORT}        5432
 
 *** Keywords ***
+เตรียมสภาพแวดล้อมการทดสอบ
+    [Documentation]    เชื่อมต่อทั้ง Database และ API Session
+    Connect To Database    psycopg2    ${DB_NAME}    ${DB_USER}    ${DB_PASS}    ${DB_HOST}    ${DB_PORT}
+    #ต่อ API (สร้าง mysession) - เรียก Keyword จาก api_keywords.robot
+    เชื่อมต่อระบบ API
+
+Connect To Postgres DB
+    [Documentation]    เชื่อมต่อ Postgres Database
+    Connect To Database    psycopg2    ${DB_NAME}    ${DB_USER}    ${DB_PASS}    ${DB_HOST}    ${DB_PORT}
+
 เชื่อมต่อระบบ API
     Create Session    mysession    ${BASE_URL}    disable_warnings=1
 

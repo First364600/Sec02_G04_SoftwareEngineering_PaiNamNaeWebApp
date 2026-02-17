@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    resources/api_keywords.robot
+Resource    ../resources/api_keywords.robot
 Suite Setup    เชื่อมต่อระบบ API
 
 *** Test Cases ***
