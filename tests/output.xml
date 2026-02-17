@@ -1,385 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.1 (Python 3.14.2 on darwin)" generated="2026-02-17T02:40:04.653214" rpa="false" schemaversion="5">
-<suite id="s1" name="User Log Tests" source="/Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/user_log_tests.robot">
-<kw name="Open Browser And Login" owner="keywords" type="SETUP">
-<kw name="Evaluate" owner="BuiltIn">
-<msg time="2026-02-17T02:40:04.742241" level="INFO">${chrome options} = &lt;selenium.webdriver.chrome.options.Options object at 0x1053c2900&gt;</msg>
-<var>${chrome options}</var>
-<arg>sys.modules['selenium.webdriver'].ChromeOptions()</arg>
-<arg>sys, selenium.webdriver</arg>
-<doc>Evaluates the given expression in Python and returns the result.</doc>
-<status status="PASS" start="2026-02-17T02:40:04.742072" elapsed="0.000185"/>
-</kw>
-<kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2026-02-17T02:40:04.742520" level="INFO">${prefs} = {'download.default_directory': '/Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads', 'download.prompt_for_download': False, 'download.directory...</msg>
-<var>${prefs}</var>
-<arg>download.default_directory=${DOWNLOAD_DIR}</arg>
-<arg>download.prompt_for_download=${False}</arg>
-<arg>download.directory_upgrade=${True}</arg>
-<arg>safebrowsing.enabled=${True}</arg>
-<doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2026-02-17T02:40:04.742316" elapsed="0.000217"/>
-</kw>
-<kw name="Call Method" owner="BuiltIn">
-<arg>${chrome options}</arg>
-<arg>add_experimental_option</arg>
-<arg>prefs</arg>
-<arg>${prefs}</arg>
-<doc>Calls the named method of the given object with the provided arguments.</doc>
-<status status="PASS" start="2026-02-17T02:40:04.742579" elapsed="0.000094"/>
-</kw>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2026-02-14T21:58:34.511436" rpa="false" schemaversion="5">
+<suite id="s1" name="Delete Account" source="C:\Users\NITRO\project\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\delete_account.robot">
+<kw name="เปิดเว็บ" owner="common_keywords" type="SETUP">
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:04.742808" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:3001/login'.</msg>
-<arg>${BASE_URL}/login</arg>
-<arg>Chrome</arg>
-<arg>options=${chrome options}</arg>
+<msg time="2026-02-14T21:58:34.697255" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:3001'.</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2026-02-17T02:40:04.742719" elapsed="1.001130"/>
+<status status="PASS" start="2026-02-14T21:58:34.697077" elapsed="2.061300"/>
 </kw>
 <kw name="Maximize Browser Window" owner="SeleniumLibrary">
 <doc>Maximizes current browser window.</doc>
-<status status="PASS" start="2026-02-17T02:40:05.744762" elapsed="0.349490"/>
+<status status="PASS" start="2026-02-14T21:58:36.758595" elapsed="0.028257"/>
 </kw>
+<status status="PASS" start="2026-02-14T21:58:34.696629" elapsed="2.090338"/>
+</kw>
+<test id="s1-t1" name="ผู้ใช้ลบบัญชีได้หลัง Login" line="7">
+<kw name="ไปหน้า Login" owner="common_keywords">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:36.787937" level="INFO">Opening url 'http://localhost:3001/login'</msg>
+<arg>${BASE_URL}/login</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-14T21:58:36.787848" elapsed="0.194875"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เข้าสู่ระบบ</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-14T21:58:36.982995" elapsed="0.030528"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:36.787688" elapsed="0.226026"/>
+</kw>
+<kw name="กรอกข้อมูล Login" owner="common_keywords">
 <kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
 <arg>id=identifier</arg>
-<arg>20s</arg>
+<arg>${TIMEOUT}</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.094577" elapsed="0.012592"/>
+<status status="PASS" start="2026-02-14T21:58:37.014461" elapsed="0.022482"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:06.107510" level="INFO">Typing text 'admin@example.com' into text field 'id=identifier'.</msg>
+<msg time="2026-02-14T21:58:37.037298" level="INFO">Typing text 'ohm123' into text field 'id=identifier'.</msg>
 <arg>id=identifier</arg>
-<arg>${ADMIN_EMAIL}</arg>
+<arg>${USERNAME}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.107307" elapsed="0.075589"/>
+<status status="PASS" start="2026-02-14T21:58:37.037098" elapsed="0.064317"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:06.183132" level="INFO">Typing text '123456789' into text field 'id=password'.</msg>
+<msg time="2026-02-14T21:58:37.101887" level="INFO">Typing text 'namidablack1' into text field 'id=password'.</msg>
 <arg>id=password</arg>
-<arg>${ADMIN_PASSWORD}</arg>
+<arg>${PASSWORD}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.182996" elapsed="0.025163"/>
+<status status="PASS" start="2026-02-14T21:58:37.101614" elapsed="0.054014"/>
 </kw>
+<status status="PASS" start="2026-02-14T21:58:37.014132" elapsed="0.141596"/>
+</kw>
+<kw name="กดปุ่ม Login" owner="common_keywords">
 <kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:06.208385" level="INFO">Clicking button 'xpath=//button[@type="submit"]'.</msg>
-<arg>xpath=//button[@type="submit"]</arg>
+<msg time="2026-02-14T21:58:37.156360" level="INFO">Clicking button 'css=button[type="submit"]'.</msg>
+<arg>css=button[type="submit"]</arg>
 <doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.208267" elapsed="0.025540"/>
+<status status="PASS" start="2026-02-14T21:58:37.156198" elapsed="0.050283"/>
 </kw>
+<kw name="Wait Until Page Does Not Contain" owner="SeleniumLibrary">
+<arg>เข้าสู่ระบบ</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` disappears from the current page.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.206633" elapsed="0.218851"/>
+</kw>
+<status status="PASS" start="2026-02-14T21:58:37.156013" elapsed="0.269594"/>
+</kw>
+<kw name="ต้องอยู่หน้า Home" owner="common_keywords">
 <kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>Dashboard</arg>
-<arg>20s</arg>
+<arg>เดินทางร่วมกัน</arg>
+<arg>${TIMEOUT}</arg>
 <doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.233932" elapsed="0.216085"/>
+<status status="PASS" start="2026-02-14T21:58:37.426216" elapsed="0.011508"/>
 </kw>
-<status status="PASS" start="2026-02-17T02:40:04.741789" elapsed="1.708309"/>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-14T21:58:37.451409" level="INFO">Current page contains text 'ค้นหาเส้นทาง'.</msg>
+<arg>ค้นหาเส้นทาง</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-14T21:58:37.437946" elapsed="0.013567"/>
 </kw>
-<test id="s1-t1" name="TC-01 Access User Log Page" line="13">
-<kw name="Go To User Management Page" owner="keywords">
+<status status="PASS" start="2026-02-14T21:58:37.425921" elapsed="0.025686"/>
+</kw>
+<kw name="ไปหน้าโปรไฟล์ผู้ใช้" owner="common_keywords">
 <kw name="Go To" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:06.450731" level="INFO">Opening url 'http://localhost:3001/admin/users'</msg>
-<arg>${BASE_URL}/admin/users</arg>
+<msg time="2026-02-14T21:58:37.452365" level="INFO">Opening url 'http://localhost:3001/profile'</msg>
+<arg>${BASE_URL}/profile</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.450668" elapsed="0.205246"/>
+<status status="PASS" start="2026-02-14T21:58:37.452242" elapsed="0.174274"/>
 </kw>
 <kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>User Management</arg>
+<arg>บัญชีผู้ใช้</arg>
+<arg>${TIMEOUT}</arg>
 <doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.656227" elapsed="0.017022"/>
+<status status="PASS" start="2026-02-14T21:58:37.626712" elapsed="0.014085"/>
 </kw>
-<status status="PASS" start="2026-02-17T02:40:06.450534" elapsed="0.222887"/>
+<status status="PASS" start="2026-02-14T21:58:37.451978" elapsed="0.188964"/>
 </kw>
-<kw name="Click User Log Button" owner="keywords">
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>xpath=//table</arg>
-<arg>20s</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.674399" elapsed="0.018401"/>
-</kw>
+<kw name="กดปุ่มลบบัญชีจากหน้าโปรไฟล์" owner="common_keywords">
 <kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>${email}</arg>
-<arg>20s</arg>
+<msg time="2026-02-14T21:58:42.837356" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-12.png"&gt;&lt;img src="selenium-screenshot-12.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-02-14T21:58:42.837560" level="FAIL">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</msg>
+<arg>การลบบัญชีผู้ใช้</arg>
+<arg>${TIMEOUT}</arg>
 <doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.692915" elapsed="0.216653"/>
+<status status="FAIL" start="2026-02-14T21:58:37.641464" elapsed="5.198197">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</status>
 </kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:06.909801" level="INFO">Clicking element 'xpath=//tr[td[contains(.,"admin@example.com")]]//button[contains(@title,"Log")]'.</msg>
-<arg>xpath=//tr[td[contains(.,"${email}")]]//button[contains(@title,"Log")]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.909668" elapsed="0.020541"/>
+<status status="FAIL" start="2026-02-14T21:58:37.641244" elapsed="5.198633">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</status>
 </kw>
-<arg>${ADMIN_EMAIL}</arg>
-<status status="PASS" start="2026-02-17T02:40:06.673760" elapsed="0.256526"/>
+<kw name="ต้องอยู่หน้าลบบัญชี" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840178" elapsed="0.000049"/>
 </kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>Log Event</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:06.930509" elapsed="0.225753"/>
+<kw name="กรอกข้อมูลยืนยันการลบ" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840421" elapsed="0.000031"/>
 </kw>
-<kw name="Capture Page Screenshot" owner="SeleniumLibrary" type="TEARDOWN">
-<msg time="2026-02-17T02:40:07.321897" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-1.png"&gt;&lt;img src="selenium-screenshot-1.png" width="800px"&gt;&lt;/a&gt;</msg>
-<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.156558" elapsed="0.165401"/>
+<kw name="ยืนยันลบบัญชี" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840603" elapsed="0.000025"/>
 </kw>
-<status status="PASS" start="2026-02-17T02:40:06.450182" elapsed="0.871842"/>
+<kw name="ต้องเห็น popup ลบสำเร็จ" owner="common_keywords">
+<status status="NOT RUN" start="2026-02-14T21:58:42.840920" elapsed="0.000031"/>
+</kw>
+<status status="FAIL" start="2026-02-14T21:58:36.787045" elapsed="6.054091">Text 'การลบบัญชีผู้ใช้' did not appear in 5 seconds.</status>
 </test>
-<test id="s1-t2" name="TC-02 Verify User Log Data Correctness" line="19">
-<kw name="Go To User Management Page" owner="keywords">
-<kw name="Go To" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.322497" level="INFO">Opening url 'http://localhost:3001/admin/users'</msg>
-<arg>${BASE_URL}/admin/users</arg>
-<doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.322433" elapsed="0.050650"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>User Management</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.373552" elapsed="0.013892"/>
-</kw>
-<status status="PASS" start="2026-02-17T02:40:07.322330" elapsed="0.065324"/>
-</kw>
-<kw name="Click User Log Button" owner="keywords">
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>xpath=//table</arg>
-<arg>20s</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.388039" elapsed="0.012045"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>${email}</arg>
-<arg>20s</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.400188" elapsed="0.006372"/>
-</kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.406806" level="INFO">Clicking element 'xpath=//tr[td[contains(.,"admin@example.com")]]//button[contains(@title,"Log")]'.</msg>
-<arg>xpath=//tr[td[contains(.,"${email}")]]//button[contains(@title,"Log")]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.406662" elapsed="0.015893"/>
-</kw>
-<arg>${ADMIN_EMAIL}</arg>
-<status status="PASS" start="2026-02-17T02:40:07.387821" elapsed="0.034801"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>Log Event</arg>
-<arg>20s</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.422828" elapsed="0.215342"/>
-</kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.648153" level="INFO">Current page contains text 'admin@example.com'.</msg>
-<arg>${ADMIN_EMAIL}</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.638389" elapsed="0.009823"/>
-</kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.656858" level="INFO">Current page contains text 'Date'.</msg>
-<arg>Date</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.648347" elapsed="0.008571"/>
-</kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.665328" level="INFO">Current page contains text 'Event'.</msg>
-<arg>Event</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.657052" elapsed="0.008322"/>
-</kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.673856" level="INFO">Current page contains text 'User Id'.</msg>
-<arg>User Id</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.665478" elapsed="0.008442"/>
-</kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.682140" level="INFO">Current page contains text 'IP Adddress'.</msg>
-<arg>IP Adddress</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.674060" elapsed="0.008124"/>
-</kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.689851" level="INFO">Current page contains text 'Log on - Log off'.</msg>
-<arg>Log on - Log off</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.682286" elapsed="0.007616"/>
-</kw>
-<kw name="Capture Page Screenshot" owner="SeleniumLibrary" type="TEARDOWN">
-<msg time="2026-02-17T02:40:07.819976" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-2.png"&gt;&lt;img src="selenium-screenshot-2.png" width="800px"&gt;&lt;/a&gt;</msg>
-<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.690082" elapsed="0.129956"/>
-</kw>
-<status status="PASS" start="2026-02-17T02:40:07.322160" elapsed="0.497947"/>
-</test>
-<test id="s1-t3" name="TC-03 Export CSV File" line="31">
-<kw name="Go To User Management Page" owner="keywords">
-<kw name="Go To" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.820541" level="INFO">Opening url 'http://localhost:3001/admin/users'</msg>
-<arg>${BASE_URL}/admin/users</arg>
-<doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.820481" elapsed="0.054664"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>User Management</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.875473" elapsed="0.012604"/>
-</kw>
-<status status="PASS" start="2026-02-17T02:40:07.820383" elapsed="0.067768"/>
-</kw>
-<kw name="Click User Log Button" owner="keywords">
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>xpath=//table</arg>
-<arg>20s</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.889005" elapsed="0.014665"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>${email}</arg>
-<arg>20s</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.903819" elapsed="0.004432"/>
-</kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:07.908458" level="INFO">Clicking element 'xpath=//tr[td[contains(.,"admin@example.com")]]//button[contains(@title,"Log")]'.</msg>
-<arg>xpath=//tr[td[contains(.,"${email}")]]//button[contains(@title,"Log")]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.908344" elapsed="0.016079"/>
-</kw>
-<arg>${ADMIN_EMAIL}</arg>
-<status status="PASS" start="2026-02-17T02:40:07.888450" elapsed="0.036037"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>Log Event</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:07.924679" elapsed="0.219953"/>
-</kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:08.145065" level="INFO">Clicking element 'xpath=//button[contains(.,"Export")]'.</msg>
-<arg>xpath=//button[contains(.,"Export")]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.144869" elapsed="0.031523"/>
-</kw>
-<kw name="Wait Until Keyword Succeeds" owner="BuiltIn">
-<kw name="Directory Should Not Be Empty" owner="OperatingSystem">
-<msg time="2026-02-17T02:40:08.177077" level="INFO" html="true">Listing contents of directory '&lt;a href="file:///Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads"&gt;/Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads&lt;/a&gt;'.</msg>
-<msg time="2026-02-17T02:40:08.177783" level="INFO" html="true">Directory '&lt;a href="file:///Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads"&gt;/Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads&lt;/a&gt;' contains 2 items.</msg>
-<arg>${DOWNLOAD_DIR}</arg>
-<doc>Fails if the specified directory is empty.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.176967" elapsed="0.000858"/>
-</kw>
-<arg>20s</arg>
-<arg>2s</arg>
-<arg>Directory Should Not Be Empty</arg>
-<arg>${DOWNLOAD_DIR}</arg>
-<doc>Runs the specified keyword and retries if it fails.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.176561" elapsed="0.001300"/>
-</kw>
-<kw name="List Files In Directory" owner="OperatingSystem">
-<msg time="2026-02-17T02:40:08.178022" level="INFO" html="true">Listing contents of directory '&lt;a href="file:///Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads"&gt;/Users/mone/Documents/SoftwareEngineer_Sprint/Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp/tests/downloads&lt;/a&gt;'.</msg>
-<msg time="2026-02-17T02:40:08.178095" level="INFO">2 files:
-.DS_Store
-ยังไม่ยืนยัน 471266.crdownload</msg>
-<msg time="2026-02-17T02:40:08.178145" level="INFO">${files} = ['.DS_Store', 'ยังไม่ยืนยัน 471266.crdownload']</msg>
-<var>${files}</var>
-<arg>${DOWNLOAD_DIR}</arg>
-<doc>Wrapper for `List Directory` that returns only files.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.177941" elapsed="0.000216"/>
-</kw>
-<kw name="Should Not Be Empty" owner="BuiltIn">
-<msg time="2026-02-17T02:40:08.178416" level="INFO">Length is 2.</msg>
-<arg>${files}</arg>
-<doc>Verifies that the given item is not empty.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.178224" elapsed="0.000213"/>
-</kw>
-<kw name="Capture Page Screenshot" owner="SeleniumLibrary" type="TEARDOWN">
-<msg time="2026-02-17T02:40:08.314356" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-3.png"&gt;&lt;img src="selenium-screenshot-3.png" width="800px"&gt;&lt;/a&gt;</msg>
-<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.178537" elapsed="0.135902"/>
-</kw>
-<status status="PASS" start="2026-02-17T02:40:07.820232" elapsed="0.494279"/>
-</test>
-<test id="s1-t4" name="TC-04 Log Retention Policy" line="45">
-<kw name="Go To User Management Page" owner="keywords">
-<kw name="Go To" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:08.314957" level="INFO">Opening url 'http://localhost:3001/admin/users'</msg>
-<arg>${BASE_URL}/admin/users</arg>
-<doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.314897" elapsed="0.052402"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>User Management</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.367411" elapsed="0.016204"/>
-</kw>
-<status status="PASS" start="2026-02-17T02:40:08.314804" elapsed="0.068876"/>
-</kw>
-<kw name="Click User Log Button" owner="keywords">
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>xpath=//table</arg>
-<arg>20s</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.383981" elapsed="0.014430"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>${email}</arg>
-<arg>20s</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.398505" elapsed="0.004634"/>
-</kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:08.403383" level="INFO">Clicking element 'xpath=//tr[td[contains(.,"admin@example.com")]]//button[contains(@title,"Log")]'.</msg>
-<arg>xpath=//tr[td[contains(.,"${email}")]]//button[contains(@title,"Log")]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.403240" elapsed="0.021106"/>
-</kw>
-<arg>${ADMIN_EMAIL}</arg>
-<status status="PASS" start="2026-02-17T02:40:08.383826" elapsed="0.040582"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>Log Event</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.424509" elapsed="0.218369"/>
-</kw>
-<kw name="Get Text" owner="SeleniumLibrary">
-<msg time="2026-02-17T02:40:08.654807" level="INFO">${log_date} = System Administrator
--</msg>
-<var>${log_date}</var>
-<arg>xpath=(//table//tr[1]/td[1])</arg>
-<doc>Returns the text value of the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.643099" elapsed="0.011738"/>
-</kw>
-<kw name="Log" owner="BuiltIn">
-<msg time="2026-02-17T02:40:08.655189" level="INFO">Latest Log Date: System Administrator
--</msg>
-<arg>Latest Log Date: ${log_date}</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.654989" elapsed="0.000226"/>
-</kw>
-<kw name="Should Not Be Empty" owner="BuiltIn">
-<msg time="2026-02-17T02:40:08.655410" level="INFO">Length is 22.</msg>
-<arg>${log_date}</arg>
-<doc>Verifies that the given item is not empty.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.655286" elapsed="0.000146"/>
-</kw>
-<kw name="Capture Page Screenshot" owner="SeleniumLibrary" type="TEARDOWN">
-<msg time="2026-02-17T02:40:08.790729" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-4.png"&gt;&lt;img src="selenium-screenshot-4.png" width="800px"&gt;&lt;/a&gt;</msg>
-<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.655534" elapsed="0.135260"/>
-</kw>
-<status status="PASS" start="2026-02-17T02:40:08.314634" elapsed="0.476238"/>
-</test>
-<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<kw name="ปิดเว็บ" owner="common_keywords" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
 <doc>Closes the current browser.</doc>
-<status status="PASS" start="2026-02-17T02:40:08.791153" elapsed="0.092169"/>
+<status status="PASS" start="2026-02-14T21:58:42.842009" elapsed="2.177636"/>
 </kw>
-<status status="PASS" start="2026-02-17T02:40:04.653634" elapsed="4.229740"/>
+<status status="PASS" start="2026-02-14T21:58:42.841852" elapsed="2.177926"/>
+</kw>
+<status status="FAIL" start="2026-02-14T21:58:34.512504" elapsed="10.507316"/>
 </suite>
 <statistics>
 <total>
-<stat pass="4" fail="0" skip="0">All Tests</stat>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat name="User Log Tests" id="s1" pass="4" fail="0" skip="0">User Log Tests</stat>
+<stat name="Delete Account" id="s1" pass="0" fail="1" skip="0">Delete Account</stat>
 </suite>
 </statistics>
 <errors>

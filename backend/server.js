@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-const logger = require('./src/middlewares/logger');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -32,8 +31,6 @@ app.use(cookieParser());
 
 app.use(xss());
 app.use(hpp());
-
-app.use(logger); //catch all request and log to database
 
 //Rate Limiting
 const limiter = rateLimit({

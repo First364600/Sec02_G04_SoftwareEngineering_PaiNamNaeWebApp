@@ -32,7 +32,6 @@ export default defineNuxtConfig({
   },
 
   css: [
-    '@fortawesome/fontawesome-free/css/all.min.css',
     'leaflet/dist/leaflet.css',
     '~/assets/css/input.css',
   ],

@@ -7,26 +7,6 @@ const { protect, requireAdmin } = require('../middlewares/auth');
 const { authMiddleware } = require('../middlewares/auth.js');
 const router = express.Router();
 // --- Admin Routes ---
-
-// GET /api/admin/logs
-router.get('/logs', async (req, res) => {
-    try {
-        const result = await db.query(`
-            SELECT * 
-            FROM system_logs 
-            ORDER BY created_at DESC 
-            LIMIT 1000
-        `);
-
-        res.status(200).json(result.rows);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
-
-
 // GET /api/users/admin
 router.get(
     '/admin',
