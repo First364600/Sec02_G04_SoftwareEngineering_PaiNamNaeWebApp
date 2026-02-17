@@ -477,6 +477,7 @@ const cancelRoute = asyncHandler(async (req, res) => {
 });
 
 const updateRouteProgress = asyncHandler(async (req, res) => {
+  console.log("updateRouteProgress received payload:", JSON.stringify(req.body, null, 2));
   const { id } = req.params;
   const { currentStep, status } = req.body;
   const driverId = req.user.sub;
