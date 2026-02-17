@@ -24,11 +24,8 @@
     "express-async-handler": "^1.2.0",
     "express-rate-limit": "^7.5.1",
     "helmet": "^7.2.0",
-<<<<<<< HEAD
     "hpp": "^0.2.3",
-=======
     "json2csv": "^6.0.0-alpha.2",
->>>>>>> origin/Piyatida508-7
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "pg": "^8.18.0",

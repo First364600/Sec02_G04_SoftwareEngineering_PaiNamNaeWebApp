@@ -8,27 +8,26 @@ datasource db {
 }
 
 model User {
-  id                      String                 @id @default(cuid())
-  username                String                 @unique
-  email                   String                 @unique
-  password                String
-  firstName               String?
-  lastName                String?
-  gender                  String?
-  phoneNumber             String?
-  profilePicture          String?
-  nationalIdNumber        String?                @unique
-  nationalIdPhotoUrl      String?                @unique
-  nationalIdExpiryDate    DateTime?
-  selfiePhotoUrl          String?
-  role                    Role                   @default(PASSENGER)
-  isVerified              Boolean                @default(false)
-  isActive                Boolean                @default(true)
-  otpCode                 String?
-  lastLogin               DateTime?
-  createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
-  driverSuspendedUntil    DateTime?
+  id                    String   @id @default(cuid())
+  username              String   @unique
+  email                 String   @unique
+  password              String
+  firstName             String?
+  lastName              String?
+  gender                String?
+  phoneNumber           String?
+  profilePicture        String?
+  nationalIdNumber      String?  @unique
+  nationalIdPhotoUrl    String?  @unique
+  nationalIdExpiryDate  DateTime?
+  selfiePhotoUrl        String?
+  role                  Role     @default(PASSENGER)
+  isVerified            Boolean  @default(false)
+  isActive              Boolean  @default(true)
+  otpCode               String?
+  lastLogin             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
   passengerSuspendedUntil DateTime?
   bookings                Booking[]              @relation("PassengerBookings")
   DeleteAccountRequest    DeleteAccountRequest[]
@@ -36,6 +35,7 @@ model User {
   notification            Notification[]
   createdRoutes           Route[]                @relation("DriverRoutes")
   vehicles                Vehicle[]
+  systemLogs            SystemLog[]  
 
   @@index([role])
   @@index([isActive])
@@ -227,161 +227,6 @@ enum NotificationType {
   VERIFICATION
   BOOKING
   ROUTE
-<<<<<<< HEAD
-=======
-}
-
-model User {
-  id                    String   @id @default(cuid())
-  username              String   @unique
-  email                 String   @unique
-  password              String
-  firstName             String?
-  lastName              String?
-  gender                String?
-  phoneNumber           String?
-  profilePicture        String?
-  nationalIdNumber      String?  @unique
-  nationalIdPhotoUrl    String?  @unique
-  nationalIdExpiryDate  DateTime?
-  selfiePhotoUrl        String?
-  role                  Role     @default(PASSENGER)
-  isVerified            Boolean  @default(false)
-  isActive              Boolean  @default(true)
-  otpCode               String?
-  lastLogin             DateTime?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  passengerSuspendedUntil DateTime?
-  bookings                Booking[]              @relation("PassengerBookings")
-  DeleteAccountRequest    DeleteAccountRequest[]
-  driverVerification      DriverVerification?
-  notification            Notification[]
-  createdRoutes           Route[]                @relation("DriverRoutes")
-  vehicles                Vehicle[]
-  systemLogs            SystemLog[]  
-
-  @@index([role])
-  @@index([isActive])
-  @@index([isVerified])
-  @@index([createdAt])
-}
-
-model DriverVerification {
-  id                  String             @id @default(cuid())
-  userId              String             @unique
-  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  licenseNumber       String             @unique
-  firstNameOnLicense  String
-  lastNameOnLicense   String
-  licenseIssueDate    DateTime
-  licenseExpiryDate   DateTime
-  licensePhotoUrl     String
-  selfiePhotoUrl      String
-  typeOnLicense       LicenseType
-  status              VerificationStatus @default(PENDING)
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-
-  @@index([status])
-  @@index([createdAt])
-  @@index([licenseIssueDate])
-  @@index([licenseExpiryDate])
-}
-
-model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  type      NotificationType @default(SYSTEM)
-  title     String
-  body      String
-  link      String?
-  metadata  Json?            @db.Json
-
-  readAt    DateTime?
-  createdAt DateTime         @default(now())
-  adminReviewedAt DateTime?
-
-  @@index([userId, createdAt])
-  @@index([userId, readAt])
-  @@index([adminReviewedAt])
-}
-
-model Vehicle {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vehicleModel  String
-  licensePlate  String   @unique
-  vehicleType   String
-  color         String
-  seatCapacity  Int
-  amenities     String[]
-  photos        Json?    @db.Json
-  isDefault     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  routes        Route[]
-
-  @@index([userId])
-  @@index([createdAt])
-  @@index([vehicleType])
-  @@index([seatCapacity])
-}
-
-model Route {
-  id              String      @id @default(cuid())
-  driverId        String
-  driver          User        @relation("DriverRoutes", fields: [driverId], references: [id], onDelete: Cascade)
-  vehicleId       String
-  vehicle         Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  startLocation   Json        @db.Json
-  endLocation     Json        @db.Json
-  departureTime   DateTime
-  availableSeats  Int
-  pricePerSeat    Float
-  conditions      String?
-  status          RouteStatus @default(AVAILABLE)
-  cancelledAt     DateTime?
-  cancelledBy     String?     // 'DRIVER' | 'ADMIN'
-  routePolyline String?
-  distanceMeters Int?
-  durationSeconds Int?
-  routeSummary    String?
-  distance        String?
-  duration        String?
-  waypoints       Json?        @db.Json
-  landmarks       Json?       @db.Json
-  steps           Json?       @db.Json
-  createdAt       DateTime    @default(now())
-  updatedAt     DateTime @updatedAt
-
-  bookings        Booking[]
-
-  @@index([driverId])
-  @@index([vehicleId])
-  @@index([status])
-  @@index([createdAt])
-  @@index([departureTime])
-}
-
-model Booking {
-  id              String        @id @default(cuid())
-  routeId         String
-  route           Route         @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  passengerId     String
-  passenger       User          @relation("PassengerBookings", fields: [passengerId], references: [id], onDelete: Cascade)
-  numberOfSeats   Int
-  status          BookingStatus @default(PENDING)
-  cancelledAt     DateTime?
-  cancelledBy     String?       // 'PASSENGER' | 'DRIVER' | 'ADMIN'
-  cancelReason    CancelReason?
-  pickupLocation  Json          @db.Json
-  dropoffLocation Json          @db.Json
-  createdAt       DateTime      @default(now())
 }
 
 model SystemLog {
@@ -398,5 +243,4 @@ model SystemLog {
     created_at  DateTime @default(now())
 
     @@index([user_id, created_at])
->>>>>>> origin/Piyatida508-7
 }

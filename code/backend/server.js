@@ -15,9 +15,12 @@ const routes = require('./src/routes');
 const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
+const ensureAdmin = require('./src/bootstrap/ensureAdmin');
 
+const prisma = require('./src/utils/prisma'); // Moved prisma import to the top
 const app = express();
 promClient.collectDefaultMetrics();
+
 
 app.set('trust proxy', 1);
 
@@ -25,10 +28,22 @@ app.disable('x-powered-by');
 
 app.use(helmet());
 
-app.use(cors({
-    origin: '*',
+const corsOptions = {
+    origin: [
+        'http://localhost:3001',
+        process.env.ALLOWED_ORIGINS,
+        'https://amazing-crisp-9bcb1a.netlify.app'],
     credentials: true,
-}));
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Gateway-Key', 'x-gateway-key']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+// app.use(cors({
+//     origin: '*',
+//     credentials: true,
+// }));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -83,9 +98,17 @@ app.use(errorHandler);
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+(async () => {
+    try {
+        await ensureAdmin();
+    } catch (e) {
+        console.error('Admin bootstrap failed:', e);
+    }
+
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
+})();
 
 // Graceful Shutdown
 process.on('unhandledRejection', (err) => {
