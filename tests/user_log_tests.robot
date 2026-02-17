@@ -18,7 +18,7 @@ TC-01 Access User Log Page
     Wait Until Page Contains    Log Event
 
 
-# ตรวจสอบว่าในหน้า User Log มีข้อมูลสำคัญแสดงครบ
+# ตรวจสอบว่าในหน้า User Log มีตารางข้อมูลสำคัญแสดงครบ
 TC-02 Verify User Log Data Correctness
     Go To User Management Page
     Click User Log Button    ${ADMIN_EMAIL}
