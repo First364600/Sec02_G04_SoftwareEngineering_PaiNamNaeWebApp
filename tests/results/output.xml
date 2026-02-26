@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.2 on win32)" generated="2026-02-16T19:24:28.277008" rpa="false" schemaversion="5">
+<suite id="s1" name="My Route Test" source="C:\Users\Lenovo\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\my_route_test.robot">
+<kw name="Run Keywords" owner="BuiltIn" type="SETUP">
+<kw name="เปิดแอปและไปที่หน้า Login" owner="navigation_keywords">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:28.543598" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:3001/login'.</msg>
+<arg>${BASE_URL}/login</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-16T19:24:28.543197" elapsed="3.083423"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-16T19:24:31.627328" elapsed="0.049898"/>
+</kw>
+<kw name="Set Selenium Speed" owner="SeleniumLibrary">
+<arg>0.2 seconds</arg>
+<doc>Sets the delay that is waited after each Selenium command.</doc>
+<status status="PASS" start="2026-02-16T19:24:31.677569" elapsed="0.000592"/>
+</kw>
+<doc>เปิด Browser และเตรียมความพร้อม</doc>
+<status status="PASS" start="2026-02-16T19:24:28.542830" elapsed="3.135444"/>
+</kw>
+<kw name="Login ด้วยบัญชีของฉัน" owner="navigation_keywords">
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:31.680735" level="INFO">Typing text 'first2547' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${USERNAME}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:31.679277" elapsed="0.867633"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:32.547803" level="INFO">Typing text '888Frist19' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${PASSWORD}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:32.547310" elapsed="0.885123"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:33.434275" level="INFO">Clicking button 'css=button[type="submit"]'.</msg>
+<arg>css=button[type="submit"]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:33.433026" elapsed="1.183059"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>เดินทางร่วมกัน</arg>
+<arg>timeout=${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:34.616477" elapsed="0.307025"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:34.925145" level="INFO">Opening url 'http://localhost:3001/myRoute'</msg>
+<arg>${BASE_URL}/myRoute</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-16T19:24:34.924343" elapsed="0.633368"/>
+</kw>
+<doc>ใช้สำหรับ Login เข้าสู่ระบบโดยตรง</doc>
+<status status="PASS" start="2026-02-16T19:24:31.678528" elapsed="3.879481"/>
+</kw>
+<arg>เปิดแอปและไปที่หน้า Login</arg>
+<arg>AND</arg>
+<arg>Login ด้วยบัญชีของฉัน</arg>
+<doc>Executes all the given keywords in a sequence.</doc>
+<status status="PASS" start="2026-02-16T19:24:28.541630" elapsed="7.016532"/>
+</kw>
+<test id="s1-t1" name="TC-01: ตรวจสอบการแสดงผลข้อมูลและหมุดบนแผนที่ (Success)" line="11">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:35.562153" level="INFO">Opening url 'http://localhost:3001/myRoute'</msg>
+<arg>${BASE_URL}/myRoute</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-16T19:24:35.561789" elapsed="0.466574"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//button[contains(text(), 'เส้นทางของฉัน')]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-16T19:24:36.029078" elapsed="0.447177"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:36.477625" level="INFO">Clicking element 'xpath=//button[contains(text(), 'เส้นทางของฉัน')]'.</msg>
+<arg>xpath=//button[contains(text(), 'เส้นทางของฉัน')]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:36.477140" elapsed="0.663114"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${TRIP_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-16T19:24:37.141079" elapsed="0.430325"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:37.573082" level="INFO">Clicking element 'css=.trip-card'.</msg>
+<arg>${TRIP_CARD}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:37.572374" elapsed="0.552332"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Toyota (Sedan)</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:38.125322" elapsed="0.223301"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>-</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:38.350557" elapsed="0.240617"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:39.032491" level="INFO">Element 'id=map' is displayed.</msg>
+<arg>id=map</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-16T19:24:38.592100" elapsed="0.440812"/>
+</kw>
+<doc>ตรวจสอบ UI เริ่มต้นและการแสดงผล carDetails</doc>
+<status status="PASS" start="2026-02-16T19:24:35.558383" elapsed="3.476894"/>
+</test>
+<test id="s1-t2" name="TC-02: เริ่มต้นการเดินทาง (Success Flow)" line="22">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-02-16T19:24:39.048559" level="INFO">${PURE_XPATH} = (//button[.//span[contains(text(), 'เริ่มต้นการเดินทาง')]])[1]</msg>
+<var>${PURE_XPATH}</var>
+<arg>(//button[.//span[contains(text(), 'เริ่มต้นการเดินทาง')]])[1]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-02-16T19:24:39.046624" elapsed="0.002041"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>xpath=${PURE_XPATH}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:39.049243" elapsed="0.232671"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:39.284621" level="INFO">Executing JavaScript:
+document.evaluate("(//button[.//span[contains(text(), 'เริ่มต้นการเดินทาง')]])[1]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()
+Without any arguments.</msg>
+<arg>document.evaluate("${PURE_XPATH}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-16T19:24:39.283069" elapsed="0.228346"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//button[contains(., 'เริ่มเดินทาง')]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-16T19:24:39.512976" elapsed="0.446841"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:39.961953" level="INFO">Clicking element 'xpath=//button[contains(., 'เริ่มเดินทาง')]'.</msg>
+<arg>xpath=//button[contains(., 'เริ่มเดินทาง')]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:39.961098" elapsed="0.568630"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>กำลังเดินทาง</arg>
+<arg>timeout=${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:40.530889" elapsed="1.111942"/>
+</kw>
+<doc>กดเริ่มเดินทางและยืนยัน สถานะต้องเปลี่ยนเป็นกำลังเดินทาง</doc>
+<status status="PASS" start="2026-02-16T19:24:39.038301" elapsed="2.605475"/>
+</test>
+<test id="s1-t3" name="TC-03: Check-in ไม่ผ่านเพราะพิกัดอยู่ห่างเกิน 500 เมตร (Failed)" line="31">
+<kw name="จำลองพิกัด GPS" owner="navigation_keywords">
+<kw name="Get Library Instance" owner="BuiltIn">
+<msg time="2026-02-16T19:24:41.653706" level="INFO">${selenium} = &lt;SeleniumLibrary.SeleniumLibrary object at 0x000001B0E6AA6660&gt;</msg>
+<var>${selenium}</var>
+<arg>SeleniumLibrary</arg>
+<doc>Returns the currently active instance of the specified library.</doc>
+<status status="PASS" start="2026-02-16T19:24:41.651454" elapsed="0.002363"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-16T19:24:41.655378" level="INFO">${lat_float} = 15.0</msg>
+<var>${lat_float}</var>
+<arg>float(${lat})</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-16T19:24:41.654089" elapsed="0.001352"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-16T19:24:41.656347" level="INFO">${lng_float} = 101.0</msg>
+<var>${lng_float}</var>
+<arg>float(${lng})</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-16T19:24:41.655646" elapsed="0.000762"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T19:24:41.662927" level="INFO">${location_params} = {'latitude': 15.0, 'longitude': 101.0, 'accuracy': 100}</msg>
+<var>${location_params}</var>
+<arg>latitude=${lat_float}</arg>
+<arg>longitude=${lng_float}</arg>
+<arg>accuracy=${100}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T19:24:41.656644" elapsed="0.006365"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${selenium.driver}</arg>
+<arg>execute_cdp_cmd</arg>
+<arg>Emulation.setGeolocationOverride</arg>
+<arg>${location_params}</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-02-16T19:24:41.663266" elapsed="0.214577"/>
+</kw>
+<arg>${LOC_FAR_LAT}</arg>
+<arg>${LOC_FAR_LNG}</arg>
+<status status="PASS" start="2026-02-16T19:24:41.649283" elapsed="0.228903"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:41.880041" level="INFO">Clicking button 'xpath=//button[contains(text(), 'Checkpoint')]'.</msg>
+<arg>${BTN_CHECKPOINT}</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:41.879526" elapsed="1.239547"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>คุณไม่อยู่ในพื้นที่</arg>
+<arg>${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.119628" elapsed="0.223077"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:43.760223" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-8.png"&gt;&lt;img src="selenium-screenshot-8.png" width="800px"&gt;&lt;/a&gt;</msg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.343337" elapsed="0.417171"/>
+</kw>
+<status status="PASS" start="2026-02-16T19:24:41.645917" elapsed="2.115055"/>
+</test>
+<test id="s1-t4" name="TC-04: Check-in จุดเริ่มต้นสำเร็จและระบบนำทางไปจุดถัดไป (Success)" line="37">
+<kw name="จำลองพิกัด GPS" owner="navigation_keywords">
+<kw name="Get Library Instance" owner="BuiltIn">
+<msg time="2026-02-16T19:24:43.765511" level="INFO">${selenium} = &lt;SeleniumLibrary.SeleniumLibrary object at 0x000001B0E6AA6660&gt;</msg>
+<var>${selenium}</var>
+<arg>SeleniumLibrary</arg>
+<doc>Returns the currently active instance of the specified library.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.764754" elapsed="0.000827"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-16T19:24:43.766857" level="INFO">${lat_float} = 16.4795586</msg>
+<var>${lat_float}</var>
+<arg>float(${lat})</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.765827" elapsed="0.001072"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-16T19:24:43.767886" level="INFO">${lng_float} = 102.8230013</msg>
+<var>${lng_float}</var>
+<arg>float(${lng})</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.767431" elapsed="0.000514"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T19:24:43.769439" level="INFO">${location_params} = {'latitude': 16.4795586, 'longitude': 102.8230013, 'accuracy': 100}</msg>
+<var>${location_params}</var>
+<arg>latitude=${lat_float}</arg>
+<arg>longitude=${lng_float}</arg>
+<arg>accuracy=${100}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.768138" elapsed="0.001375"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${selenium.driver}</arg>
+<arg>execute_cdp_cmd</arg>
+<arg>Emulation.setGeolocationOverride</arg>
+<arg>${location_params}</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.769765" elapsed="0.206866"/>
+</kw>
+<arg>${LOC_ORIGIN_LAT}</arg>
+<arg>${LOC_ORIGIN_LNG}</arg>
+<status status="PASS" start="2026-02-16T19:24:43.763507" elapsed="0.213507"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_CHECKPOINT}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-16T19:24:43.977659" elapsed="0.425454"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:44.404614" level="INFO">Clicking button 'xpath=//button[contains(text(), 'Checkpoint')]'.</msg>
+<arg>${BTN_CHECKPOINT}</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-16T19:24:44.403915" elapsed="1.136254"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Check-in สำเร็จ</arg>
+<arg>timeout=${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:45.541076" elapsed="1.118041"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Central Khonkaen</arg>
+<arg>timeout=${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:46.660156" elapsed="0.245788"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:47.358680" level="INFO">Element 'xpath=//span[contains(text(), 'กำลังเดินทาง')]' is displayed.</msg>
+<arg>xpath=//span[contains(text(), 'กำลังเดินทาง')]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-16T19:24:46.907512" elapsed="0.451622"/>
+</kw>
+<status status="PASS" start="2026-02-16T19:24:43.761395" elapsed="3.598800"/>
+</test>
+<test id="s1-t5" name="TC-05: เช็คอินจุดแวะสำเร็จและนำทางสู่ปลายทาง (Success)" line="45">
+<kw name="จำลองพิกัด GPS" owner="navigation_keywords">
+<kw name="Get Library Instance" owner="BuiltIn">
+<msg time="2026-02-16T19:24:47.368630" level="INFO">${selenium} = &lt;SeleniumLibrary.SeleniumLibrary object at 0x000001B0E6AA6660&gt;</msg>
+<var>${selenium}</var>
+<arg>SeleniumLibrary</arg>
+<doc>Returns the currently active instance of the specified library.</doc>
+<status status="PASS" start="2026-02-16T19:24:47.367591" elapsed="0.001192"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-16T19:24:47.370450" level="INFO">${lat_float} = 16.441865</msg>
+<var>${lat_float}</var>
+<arg>float(${lat})</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-16T19:24:47.369282" elapsed="0.001268"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-16T19:24:47.371944" level="INFO">${lng_float} = 102.82766</msg>
+<var>${lng_float}</var>
+<arg>float(${lng})</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-16T19:24:47.370961" elapsed="0.001082"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T19:24:47.374461" level="INFO">${location_params} = {'latitude': 16.441865, 'longitude': 102.82766, 'accuracy': 100}</msg>
+<var>${location_params}</var>
+<arg>latitude=${lat_float}</arg>
+<arg>longitude=${lng_float}</arg>
+<arg>accuracy=${100}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T19:24:47.372402" elapsed="0.002161"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${selenium.driver}</arg>
+<arg>execute_cdp_cmd</arg>
+<arg>Emulation.setGeolocationOverride</arg>
+<arg>${location_params}</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-02-16T19:24:47.374948" elapsed="0.210635"/>
+</kw>
+<arg>16.441865</arg>
+<arg>102.827660</arg>
+<status status="PASS" start="2026-02-16T19:24:47.366369" elapsed="0.219506"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-16T19:24:50.588479" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-16T19:24:47.587000" elapsed="3.001732"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-02-16T19:24:50.590654" level="INFO">${BTN_ACTION} = xpath=//button[contains(@class, 'w-full') and (contains(., 'Checkpoint') or contains(., 'ยืนยันการถึงปลายทาง'))]</msg>
+<var>${BTN_ACTION}</var>
+<arg>xpath=//button[contains(@class, 'w-full') and (contains(., 'Checkpoint') or contains(., 'ยืนยันการถึงปลายทาง'))]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-02-16T19:24:50.589566" elapsed="0.001158"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>${BTN_ACTION}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:50.591336" elapsed="0.250121"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-16T19:24:50.845445" level="INFO">Executing JavaScript:
+document.evaluate("//button[contains(@class, 'w-full') and (contains(., 'Checkpoint') or contains(., 'ยืนยันการถึงปลายทาง'))]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()
+Without any arguments.</msg>
+<arg>document.evaluate("${BTN_ACTION.replace('xpath=', '')}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-16T19:24:50.843082" elapsed="0.232520"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Check-in สำเร็จ</arg>
+<arg>timeout=${TIMEOUT}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-16T19:24:51.078168" elapsed="0.232780"/>
+</kw>
+<doc>เช็คอินที่ Central Khonkaen</doc>
+<status status="PASS" start="2026-02-16T19:24:47.363220" elapsed="3.949159"/>
+</test>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-16T19:24:51.315377" elapsed="3.199050"/>
+</kw>
+<status status="PASS" start="2026-02-16T19:24:28.280012" elapsed="26.234710"/>
+</suite>
+<statistics>
+<total>
+<stat pass="5" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="My Route Test" id="s1" pass="5" fail="0" skip="0">My Route Test</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
