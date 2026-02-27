@@ -8,43 +8,50 @@ const logger = (req, res, next) => {
 
     res.on('finish', async () => {
         try {
-            let userId = null;
-            if (req.user) {
-                userId = req.user.sub || req.user.id || null;
-            }
-
-            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-            const method = req.method;
-            const url = req.originalUrl;
-            const userAgent = req.get('User-Agent') || 'unknown';
+            const userId = req.user?.id || req.user?.sub || null;
+            const { method, originalUrl: url } = req;
             const statusCode = res.statusCode;
-            const duration = Date.now() - start;
-            
-            const action = res.locals.logAction || `${method} ${url}`;
 
-            const rawData = `${userId}|${action}|${method}|${url}|${ip}|${userAgent}|${statusCode}|${requestTime.toISOString()}`;
-            const logHash = crypto.createHash('sha256').update(rawData).digest('hex');
+            // log type classification
+            let logType = 'TRANSACTION';
+            if (url.includes('/auth') || url.includes('/login')) logType = 'AUTH';
+            else if (statusCode >= 400 || url.includes('/admin')) logType = 'SECURITY';
+            else if (method === 'GET') logType = 'BEHAVIOR';
+
+            const rawDataObj = {
+                userId,
+                logType,
+                method,
+                endpoint: url,
+                statusCode,
+                ip: req.ip,
+                timestamp: requestTime.toISOString()
+            };
+            const rawDataString = JSON.stringify(rawDataObj);
+
+            const hmac = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
+                               .update(rawDataString)
+                               .digest('hex');
 
             await prisma.systemLog.create({
                 data: {
-                    user_id: userId,
-                    action: action,
+                    userId: userId,
+                    logType: logType,
+                    action: `${method} ${url}`,
                     method: method,
                     endpoint: url,
-                    ip_address: ip,
-                    user_agent: userAgent,
-                    status_code: statusCode,
-                    log_hash: logHash,
-                    created_at: requestTime
+                    ipAddress: req.ip,
+                    userAgent: req.get('User-Agent') || 'unknown',
+                    statusCode: statusCode,
+                    details: rawDataObj, // raw data
+                    logHash: hmac,       // HMAC hash of the log entry
+                    createdAt: requestTime
                 }
             });
-            console.log(`Log Saved: ${method} ${url} (${statusCode}) - User: ${userId || 'Guest'}`);
-
         } catch (err) {
-            console.error('Logger Error:', err.message);
+            console.error('Logging Error:', err);
         }
     });
-
     next();
 };
 

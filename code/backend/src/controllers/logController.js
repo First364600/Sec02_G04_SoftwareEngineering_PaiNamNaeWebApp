@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { Parser } = require('json2csv');
+const crypto = require('crypto');
 
 
 const getLogs = async (req, res) => {
@@ -114,4 +115,28 @@ const exportLogs = async (req, res) => {
     }
 };
 
-module.exports = { getLogs ,exportLogs };
+const verifyLogIntegrity = async (req, res) => {
+    const { id } = req.params;
+    const log = await prisma.systemLog.findUnique({ 
+        where: { id: parseInt(id) } 
+    });
+
+    if (!log) return res.status(404).json({ message: "Log not found" });
+
+    const rawDataString = JSON.stringify(log.details);
+
+    const computedHash = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
+                               .update(rawDataString)
+                               .digest('hex');
+
+    const isValid = (computedHash === log.logHash);
+
+    res.json({
+        logId: id,
+        isValid: isValid,
+        status: isValid ? "Verified (No tampering)" : "Tampered (Data changed!)",
+        timestamp: new Date()
+    });
+};
+
+module.exports = { getLogs, exportLogs, verifyLogIntegrity };
