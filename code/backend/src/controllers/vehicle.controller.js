@@ -4,6 +4,13 @@ const ApiError = require("../utils/ApiError");
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const userService = require("../services/user.service");
 
+const getFiles = (files) => {
+  if (!files) return [];
+  if (Array.isArray(files)) return files;
+  if (files.photos) return files.photos;
+  return Object.values(files).flat();
+};
+
 const listMyVehicles = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const result = await vehicleService.searchMyVehicles(ownerId, req.query);
@@ -60,10 +67,11 @@ const getVehicleByIdAdmin = asyncHandler(async (req, res) => {
 const createVehicle = asyncHandler(async (req, res) => {
   const ownerId = req.user.sub;
   const payload = { ...req.body };
-
-  if (req.files?.photos) {
+  console.log('request', payload, payload.photos);
+  const files = getFiles(req.files);
+  if (files.length > 0) {
     const uploads = await Promise.all(
-      req.files.photos.map(file =>
+      files.map(file =>
         uploadToCloudinary(file.buffer, 'painamnae/vehicles')
       )
     );
@@ -84,9 +92,10 @@ const updateVehicle = asyncHandler(async (req, res) => {
   const { id } = req.params
   const payload = { ...req.body };
 
-  if (req.files?.photos) {
+  const files = getFiles(req.files);
+  if (files.length > 0) {
     const uploads = await Promise.all(
-      req.files.photos.map(file =>
+      files.map(file =>
         uploadToCloudinary(file.buffer, 'painamnae/vehicles')
       )
     );
@@ -150,9 +159,10 @@ const adminCreateVehicle = asyncHandler(async (req, res) => {
 
   await userService.getUserById(userId)
 
-  if (req.files?.photos) {
+  const files = getFiles(req.files);
+  if (files.length > 0) {
     const uploads = await Promise.all(
-      req.files.photos.map(file =>
+      files.map(file =>
         uploadToCloudinary(file.buffer, 'painamnae/vehicles')
       )
     );
@@ -176,9 +186,10 @@ const adminUpdateVehicle = asyncHandler(async (req, res) => {
     await userService.getUserById(payload.userId);
   }
 
-  if (req.files?.photos) {
+  const files = getFiles(req.files);
+  if (files.length > 0) {
     const uploads = await Promise.all(
-      req.files.photos.map(file => uploadToCloudinary(file.buffer, 'painamnae/vehicles'))
+      files.map(file => uploadToCloudinary(file.buffer, 'painamnae/vehicles'))
     );
     payload.photos = uploads.map(u => u.url);
   }

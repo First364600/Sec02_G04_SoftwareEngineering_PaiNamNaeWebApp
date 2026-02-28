@@ -16,6 +16,7 @@ const { errorHandler } = require('./src/middlewares/errorHandler');
 const ApiError = require('./src/utils/ApiError')
 const { metricsMiddleware } = require('./src/middlewares/metrics');
 const ensureAdmin = require('./src/bootstrap/ensureAdmin');
+const requireGatewayKey = require('./src/middlewares/gateway');
 
 const prisma = require('./src/utils/prisma'); // Moved prisma import to the top
 const app = express();
@@ -85,6 +86,10 @@ app.get('/metrics', async (req, res) => {
 
 // Swagger Documentation Route
 app.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Gateway Key Protection
+
+// app.use(requireGatewayKey);
 
 // Main API Routes
 app.use('/api', routes);
