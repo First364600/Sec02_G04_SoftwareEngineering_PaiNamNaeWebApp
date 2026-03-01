@@ -363,6 +363,7 @@
                             </div>
                             <div>
                                 <label class="block mb-2 text-sm font-medium text-gray-700">เลือกจุดขึ้นรถ</label>
+                                <p class="mb-2 text-[10px] text-blue-600">* ต้องอยู่ห่างจากจุดจอดในเส้นทางไม่เกิน 500 เมตร</p>
                                 <div class="relative">
                                     <input ref="pickupInputEl" v-model="pickupPoint" type="text"
                                         placeholder="พิมพ์ชื่อสถานที่..."
@@ -462,6 +463,33 @@
             </div>
         </transition>
     </div>
+
+   <ConfirmModal 
+    :show="showErrorModal" 
+    :title="errorModalContent.title" 
+    confirm-text="รับทราบ"
+    :cancel-text="null" 
+    variant="primary" 
+    @confirm="closeErrorModal"
+>
+    <div class="flex flex-col items-center justify-center w-full min-h-[200px] text-center">
+        
+        <div class="flex items-center justify-center w-20 h-20 mb-4 bg-red-50 rounded-full mx-auto">
+            <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        
+        <div class="w-full">
+            <p class="text-lg text-gray-800 font-semibold mb-2 text-center">
+                {{ errorModalContent.title }}
+            </p>
+            <p class="text-sm text-gray-600 whitespace-pre-line leading-relaxed text-center mx-auto max-w-[280px]">
+                {{ errorModalContent.message }}
+            </p>
+        </div>
+    </div>
+</ConfirmModal>
 </template>
 
 
@@ -488,6 +516,15 @@ const pickupInputEl = ref(null)
 const dropoffInputEl = ref(null)
 let pickupAutocomplete = null
 let dropoffAutocomplete = null
+
+// add สำหรับ Modal แจ้งเตือนความผิดพลาด (รัศมีเกิน 500ม.) 
+const showErrorModal = ref(false);
+const errorModalContent = ref({ title: '', message: '' });
+
+// add ฟังก์ชันปิด Modal แจ้งเตือน
+const closeErrorModal = () => {
+    showErrorModal.value = false;
+};
 
 // โครงสร้างเต็มที่จะส่งให้ API
 const pickupData = ref({ lat: null, lng: null, placeId: null, address: null, name: null })
@@ -560,6 +597,18 @@ const bookingRoute = ref(null)
 const bookingSeats = ref(1)
 const pickupPoint = ref('')
 const dropoffPoint = ref('')
+
+//คำนวณระยะห่างจากจุดจอด
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371e3; // รัศมีโลก (เมตร)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; 
+};
 
 const bookingTotalPrice = computed(() => {
     if (!bookingRoute.value) return 0
@@ -961,23 +1010,90 @@ function closeModal() {
 async function confirmBooking() {
     if (!bookingRoute.value) return;
 
-    // ถ้าผู้ใช้พิมพ์เองแต่ยังไม่มีพิกัด ให้ geocode จากข้อความ
+    // ถ้าผู้ใช้พิมพ์เองแต่ยังไม่มีพิกัด ให้ geocode จากข้อความก่อน
     if (pickupPoint.value && !pickupData.value.lat) {
-        const g1 = await geocodeText(pickupPoint.value)
-        if (g1) pickupData.value = g1
+        const g1 = await geocodeText(pickupPoint.value);
+        if (g1) pickupData.value = g1;
     }
     if (dropoffPoint.value && !dropoffData.value.lat) {
-        const g2 = await geocodeText(dropoffPoint.value)
-        if (g2) dropoffData.value = g2
+        const g2 = await geocodeText(dropoffPoint.value);
+        if (g2) dropoffData.value = g2;
     }
 
+    // 2ตรวจสอบว่ามีข้อมูลพิกัดครบไหม
     if (!pickupData.value.lat || !dropoffData.value.lat) {
-        toast.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกจุดขึ้นรถและจุดลงรถจากรายการหรือปักหมุดบนแผนที่');
+        toast.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกจุดขึ้นรถและจุดลงรถ');
         return;
     }
 
+    
+    const route = bookingRoute.value;
+    // Checkpoint ตามลำดับจริงของคนขับ
+    const driverCheckpoints = [
+        { lat: route.start.lat, lng: route.start.lng },
+        ...route.stopsCoords.map(s => ({ lat: s.lat, lng: s.lng })),
+        { lat: route.end.lat, lng: route.end.lng }
+    ]
+
+    const getNearestCheckpointIndex = (target) => {
+        let minDist = Infinity
+        let minIdx = 0
+        driverCheckpoints.forEach((p, i) => {
+            const d = calculateDistance(target.lat, target.lng, p.lat, p.lng)
+            if (d < minDist) { minDist = d; minIdx = i }
+        })
+        return minIdx
+    }
+
+    const pickupIdx = getNearestCheckpointIndex(pickupData.value)
+    const dropoffIdx = getNearestCheckpointIndex(dropoffData.value)
+
+    if (dropoffIdx < pickupIdx) {
+        errorModalContent.value = {
+            title: 'จุดลงรถไม่ถูกต้อง',
+            message: 'จุดลงรถต้องอยู่ถัดจากจุดขึ้นรถในเส้นทาง\n\nกรุณาเลือกจุดขึ้น-ลงรถใหม่ให้ถูกต้อง'
+        }
+        showErrorModal.value = true
+        return
+    }
+
+    // ตรวจสอบรัศมี 500 เมตร
+    const validPoints = [
+        { lat: route.start.lat, lng: route.start.lng, name: 'จุดเริ่มต้น' },
+        ...route.stopsCoords,
+        { lat: route.end.lat, lng: route.end.lng, name: 'จุดปลายทาง' }
+    ]
+
+    // ตรวจสอบทั้ง Pickup และ Dropoff
+    const checkRadius = (targetPoint, label) => {
+        let minDistance = Infinity;
+        validPoints.forEach(p => {
+            const dist = calculateDistance(targetPoint.lat, targetPoint.lng, p.lat, p.lng);
+            if (dist < minDistance) minDistance = dist;
+        });
+        return { valid: minDistance <= 500, distance: Math.round(minDistance) };
+    };
+
+    const pickupCheck = checkRadius(pickupData.value, 'จุดขึ้นรถ');
+    const dropoffCheck = checkRadius(dropoffData.value, 'จุดลงรถ');
+
+    // 4. ถ้าจุดใดจุดหนึ่งไม่อยู่ในเงื่อนไข ให้โชว์ Modal แจ้งเตือน (แทน Toast)
+    if (!pickupCheck.valid || !dropoffCheck.valid) {
+        let errMsg = "";
+        if (!pickupCheck.valid) errMsg += `จุดขึ้นรถห่างจากเส้นทางเกินไป (${pickupCheck.distance} เมตร)\n`;
+        if (!dropoffCheck.valid) errMsg += `จุดลงรถห่างจากเส้นทางเกินไป (${dropoffCheck.distance} เมตร)`;
+
+        errorModalContent.value = {
+            title: 'ตำแหน่งไม่อยู่ในเส้นทาง',
+            message: errMsg + '\n\nกรุณาเลือกจุดรับ-ส่งที่อยู่ห่างจากจุดจอดของคนขับไม่เกิน 500 เมตรค่ะ'
+        };
+        showErrorModal.value = true;
+        return; // หยุดการจอง
+    }
+
+    // 5. ถ้าผ่านเงื่อนไขทั้งหมด ค่อยส่ง API
     const payload = {
-        routeId: bookingRoute.value.id,
+        routeId: route.id,
         numberOfSeats: bookingSeats.value,
         pickupLocation: pickupData.value,
         dropoffLocation: dropoffData.value
@@ -986,11 +1102,10 @@ async function confirmBooking() {
     try {
         await $api('/bookings', { method: 'POST', body: payload });
         closeModal();
-        toast.success('ส่งคำขอจองสำเร็จ!', 'คำขอของคุณถูกส่งไปให้ผู้ขับแล้ว โปรดรอการยืนยัน');
+        toast.success('ส่งคำขอจองสำเร็จ!', 'โปรดรอการยืนยันจากผู้ขับ');
         setTimeout(() => navigateTo('/myTrip'), 1500);
     } catch (error) {
-        console.error("Failed to create booking:", error);
-        toast.error('เกิดข้อผิดพลาดในการจอง', error.data?.message || 'โปรดลองใหม่อีกครั้งในภายหลัง');
+        toast.error('เกิดข้อผิดพลาดในการจอง', error.data?.message || 'โปรดลองใหม่ในภายหลัง');
     }
 }
 
@@ -1275,22 +1390,58 @@ async function resolveBookingPicked(latlng) {
     bookingPicked.value = { name, lat, lng, placeId, address }
 }
 function applyBookingPicked() {
-    if (!bookingPickingTarget.value || !bookingPicked.value.name) return
+    if (!bookingPickingTarget.value || !bookingPicked.value.name) return;
+
+    // --- ส่วนที่เพิ่มเข้ามา: ตรวจสอบความห่างจากจุดจอดบนเส้นทาง ---
+    const route = bookingRoute.value;
+    if (!route) return;
+
+    // รวบรวมจุดที่เป็นไปได้ทั้งหมดในเส้นทาง (Start + Stops + End)
+    const validPoints = [
+        { lat: route.start.lat, lng: route.start.lng, name: route.originName },
+        ...route.stopsCoords,
+        { lat: route.end.lat, lng: route.end.lng, name: route.destinationName }
+    ];
+
+    // หาจุดที่ใกล้ที่สุดจากตำแหน่งที่เลือก
+    let minDistance = Infinity;
+    let closestPointName = "";
+
+    validPoints.forEach(p => {
+        const dist = calculateDistance(bookingPicked.value.lat, bookingPicked.value.lng, p.lat, p.lng);
+        if (dist < minDistance) {
+            minDistance = dist;
+            closestPointName = p.name;
+        }
+    });
+
+    // ตรวจสอบเงื่อนไข 500 เมตร
+    if (minDistance > 500) {
+        toast.error(
+            'ตำแหน่งไม่อยู่ในเส้นทาง', 
+            `จุดที่เลือกต้องห่างจากจุดจอดไม่เกิน 500 เมตร (จุดที่ใกล้ที่สุดคือ ${closestPointName} ห่างประมาณ ${Math.round(minDistance)} เมตร)`
+        );
+        return; // หยุดทำงาน ไม่ให้ใช้ตำแหน่งนี้
+    }
+    // --------------------------------------------------
+
     const data = {
         lat: bookingPicked.value.lat,
         lng: bookingPicked.value.lng,
         placeId: bookingPicked.value.placeId,
         address: bookingPicked.value.address,
         name: bookingPicked.value.name
-    }
+    };
+
     if (bookingPickingTarget.value === 'pickup') {
-        pickupPoint.value = data.name || data.address || ''
-        pickupData.value = data
+        pickupPoint.value = data.name || data.address || '';
+        pickupData.value = data;
     } else {
-        dropoffPoint.value = data.name || data.address || ''
-        dropoffData.value = data
+        dropoffPoint.value = data.name || data.address || '';
+        dropoffData.value = data;
     }
-    stopBookingPicker()
+    stopBookingPicker();
+    toast.success('เลือกตำแหน่งสำเร็จ', 'ตำแหน่งนี้อยู่ในรัศมีที่กำหนด');
 }
 
 function geocodeText(text) {
@@ -1464,5 +1615,17 @@ body,
 .modal-fade-enter-from .modal-content,
 .modal-fade-leave-to .modal-content {
     transform: scale(0.9) translateY(1rem);
+}
+
+/* ค้นหาคลาสของรูปภาพไอคอน */
+.alert-icon { /* แทนที่ด้วยคลาสจริงของไอคอน */
+    display: block; /* หรือ inline-block หากกำหนดความกว้างไว้ */
+    margin-left: auto; /* กำหนดมาร์จิ้นซ้ายเป็นอัตโนมัติ */
+    margin-right: auto; /* กำหนดมาร์จิ้นขวาเป็นอัตโนมัติ */
+}
+
+/* ค้นหาคลาสของข้อความแจ้งเตือน */
+.alert-message { /* แทนที่ด้วยคลาสจริงของข้อความ */
+    text-align: center; /* จัดข้อความให้อยู่ตรงกลางแนวนอนภายในตัวเอง */
 }
 </style>

@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const bookingService = require("../services/booking.service");
 const ApiError = require("../utils/ApiError");
+const prisma = require('../utils/prisma');
 
 const adminListBookings = asyncHandler(async (req, res) => {
   const result = await bookingService.searchBookingsAdmin(req.query);
@@ -97,6 +98,247 @@ const adminDeleteBooking = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: result });
 });
 
+// คนขับกดรับผู้โดยสาร → แจ้ง passenger ว่าคนขับมาถึง
+const driverArrivedPickup = asyncHandler(async (req, res) => {
+  const driverId = req.user.sub;
+  const { id } = req.params; // booking id
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.route.driverId !== driverId) throw new ApiError(403, 'Forbidden');
+
+  // อัพเดต passengerStatus เป็น WAITING_PICKUP
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: { passengerStatus: 'WAITING_PICKUP' }
+  });
+
+  // ส่ง Notification ไปหาผู้โดยสาร
+  await prisma.notification.create({
+    data: {
+      userId: booking.passengerId,
+      type: 'BOOKING',
+      title: 'คนขับมาถึงจุดรับคุณแล้ว!',
+      body: `คนขับได้มาถึงจุดรับของคุณแล้ว กรุณากดเริ่มต้นการเดินทางเพื่อยืนยัน`,
+      link: `/my-trips`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+// ผู้โดยสารกดเริ่มต้นการเดินทาง
+const passengerStartTrip = asyncHandler(async (req, res) => {
+  const passengerId = req.user.sub;
+  const { id } = req.params;
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+  if (booking.passengerStatus !== 'WAITING_PICKUP') {
+    throw new ApiError(400, 'ไม่สามารถเริ่มการเดินทางได้ในขณะนี้');
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: { passengerStatus: 'IN_TRANSIT' }
+  });
+
+  // แจ้งคนขับ
+  await prisma.notification.create({
+    data: {
+      userId: booking.route.driverId,
+      type: 'BOOKING',
+      title: 'ผู้โดยสารขึ้นรถแล้ว',
+      body: `คุณ ${booking.passenger.firstName} ได้ยืนยันการเดินทางแล้ว`,
+      link: `/my-route`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+// ผู้โดยสารปฏิเสธการรับ
+const passengerRejectPickup = asyncHandler(async (req, res) => {
+  const passengerId = req.user.sub;
+  const { id } = req.params;
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: { passengerStatus: 'REJECTED_PICKUP' }
+  });
+
+  // แจ้งคนขับ
+  await prisma.notification.create({
+    data: {
+      userId: booking.route.driverId,
+      type: 'BOOKING',
+      title: 'ผู้โดยสารปฏิเสธการรับ',
+      body: `คุณ ${booking.passenger.firstName} ได้ปฏิเสธการรับผู้โดยสารของคุณ กรุณาติดต่อผู้โดยสาร`,
+      link: `/my-route`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+// คนขับขอยกเลิกการเดินทาง
+const driverRequestCancel = asyncHandler(async (req, res) => {
+  const driverId = req.user.sub;
+  const { id } = req.params;
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.route.driverId !== driverId) throw new ApiError(403, 'Forbidden');
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: { driverCancelRequest: true }
+  });
+
+  // แจ้งผู้โดยสาร
+  await prisma.notification.create({
+    data: {
+      userId: booking.passengerId,
+      type: 'BOOKING',
+      title: 'คนขับแจ้งขอยกเลิกการเดินทาง',
+      body: `คนขับขอยกเลิกการเดินทางของคุณ กรุณาติดต่อคนขับ`,
+      link: `/my-trips`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+// ผู้โดยสารยืนยันยกเลิก
+const passengerConfirmCancel = asyncHandler(async (req, res) => {
+  const passengerId = req.user.sub;
+  const { id } = req.params;
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: {
+      status: 'CANCELLED',
+      passengerStatus: 'CANCELLED',
+      cancelledAt: new Date(),
+      cancelledBy: passengerId,
+      driverCancelRequest: false
+    }
+  });
+
+  // แจ้งคนขับ
+  await prisma.notification.create({
+    data: {
+      userId: booking.route.driverId,
+      type: 'BOOKING',
+      title: 'ยืนยันการยกเลิก',
+      body: `คุณ ${booking.passenger.firstName} ได้ยืนยันการยกเลิกการเดินทางแล้ว`,
+      link: `/my-route`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+// ผู้โดยสารปฏิเสธการยกเลิก
+const passengerRejectCancel = asyncHandler(async (req, res) => {
+  const passengerId = req.user.sub;
+  const { id } = req.params;
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: { driverCancelRequest: false }
+  });
+
+  // แจ้งคนขับ
+  await prisma.notification.create({
+    data: {
+      userId: booking.route.driverId,
+      type: 'BOOKING',
+      title: 'ผู้โดยสารปฏิเสธการยกเลิกการเดินทาง',
+      body: `คุณ ${booking.passenger.firstName} ปฏิเสธการยกเลิกการเดินทาง กรุณาติดต่อผู้โดยสาร`,
+      link: `/my-route`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+//  คนขับถึงจุดส่งของผู้โดยสาร
+const driverReachedDropoff = asyncHandler(async (req, res) => {
+  const driverId = req.user.sub;
+  const { id } = req.params;
+
+  const booking = await bookingService.getBookingById(id);
+  if (!booking) throw new ApiError(404, 'Booking not found');
+  if (booking.route.driverId !== driverId) throw new ApiError(403, 'Forbidden');
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: { reachedDropoff: true }
+  });
+
+  // แจ้งผู้โดยสาร
+  await prisma.notification.create({
+    data: {
+      userId: booking.passengerId,
+      type: 'BOOKING',
+      title: 'ถึงจุดหมายของคุณแล้ว!',
+      body: `คนขับได้นำส่งคุณถึงจุดหมายแล้ว กรุณากดสิ้นสุดการเดินทาง`,
+      link: `/my-trips`,
+      metadata: { bookingId: id, routeId: booking.routeId }
+    }
+  });
+
+  res.status(200).json({ success: true, data: updated });
+});
+
+const getMyTripStatus = asyncHandler(async (req, res) => {
+    const passengerId = req.user.sub
+
+    // ดึงแค่ field ที่จำเป็นสำหรับ polling 
+    const bookings = await prisma.booking.findMany({
+        where: { 
+            passengerId,
+            status: 'CONFIRMED' // เฉพาะที่ confirmed เท่านั้น
+        },
+        select: {
+            id: true,
+            passengerStatus: true,
+            driverCancelRequest: true,
+            reachedDropoff: true,
+            status: true,
+            route: {
+                select: {
+                    id: true,
+                    status: true,
+                    currentStep: true
+                }
+            }
+        }
+    })
+
+    res.status(200).json({ success: true, data: bookings })
+})
+
 module.exports = {
   adminListBookings,
   createBooking,
@@ -108,5 +350,13 @@ module.exports = {
   adminGetBookingById,
   adminCreateBooking,
   adminUpdateBooking,
-  adminDeleteBooking
+  adminDeleteBooking,
+  driverArrivedPickup,
+  passengerStartTrip,
+  passengerRejectPickup,
+  driverRequestCancel,
+  passengerConfirmCancel,
+  passengerRejectCancel,
+  driverReachedDropoff,
+  getMyTripStatus
 };

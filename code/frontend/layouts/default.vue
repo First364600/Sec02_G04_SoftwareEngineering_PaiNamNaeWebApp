@@ -395,11 +395,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRuntimeConfig, useCookie } from '#app'
 import { useAuth } from '~/composables/useAuth'
 
 const { token, user, logout } = useAuth()
+
+
+
 
 /* ====== เมนูบนสุดเดิม ====== */
 const isMobileMenuOpen = ref(false)
@@ -435,6 +438,9 @@ const notifications = ref([])  // [{ id, title, body, createdAt, readAt }]
 
 const unreadCount = computed(() => notifications.value.filter(n => !n.readAt).length)
 
+let notifPollingInterval = null
+let lastKnownCount = 0
+
 function toggleNotif() {
     openNotif.value = !openNotif.value
     if (!openNotif.value) openMenuId.value = null
@@ -446,6 +452,47 @@ async function onBellClick() {
         await fetchUserNotifications()
     }
 }
+
+async function pollNotifications() {
+    if (!token.value) return
+    try {
+        const apiBase = useRuntimeConfig().public.apiBase || 'http://localhost:3000/api'
+        const tk = useCookie('token')?.value || (process.client ? localStorage.getItem('token') : '')
+        
+        const res = await $fetch('/notifications/unread-count', {
+            baseURL: apiBase,
+            headers: { Authorization: `Bearer ${tk}` }
+        })
+        
+        const currentCount = res?.data?.unread ?? 0
+        
+        
+        if (currentCount > lastKnownCount) {
+            lastKnownCount = currentCount
+            await fetchUserNotifications()
+        }
+    } catch (e) {
+        
+    }
+}
+
+watch(token, (newToken) => {
+    if (!import.meta.client) return  // guard ไม่ให้รันบน server
+    if (newToken) {
+        fetchUserNotifications()
+        if (!notifPollingInterval) {
+            notifPollingInterval = setInterval(pollNotifications, 15000)
+        }
+    } else {
+        notifications.value = []
+        lastKnownCount = 0
+        if (notifPollingInterval) {
+            clearInterval(notifPollingInterval)
+            notifPollingInterval = null
+        }
+    }
+})
+
 
 /** GET /notifications (ผู้ใช้ทั่วไป: แสดงทั้งหมด ไม่กรอง initiatedBy) */
 async function fetchUserNotifications() {
@@ -548,13 +595,18 @@ onMounted(() => {
     window.addEventListener('resize', handleResize)
     document.addEventListener('click', onClickOutside)
     document.addEventListener('keydown', onKey)
-    if (token.value) fetchUserNotifications()
+    if (token.value) {
+        fetchUserNotifications()
+        // เริ่ม polling ทุก 15 วินาที
+        notifPollingInterval = setInterval(pollNotifications, 15000)
+    }
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', handleResize)
     document.removeEventListener('click', onClickOutside)
     document.removeEventListener('keydown', onKey)
+    if (notifPollingInterval) clearInterval(notifPollingInterval)
 })
 
 /* ใส่ฟอนต์ Kanit แบบเดิม */
