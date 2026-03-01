@@ -5,10 +5,11 @@ ${BASE_URL}            http://localhost:3000
 
 ${LOGIN_URL}        ${BASE_URL}/api/auth/login
 ${REGISTER_URL}        ${BASE_URL}/api//users
+${BOOKING_ROUTE_URL}      ${BASE_URL}/api/bookings
 
 # คนขับ
 ${DRIVER_VERIFICATION_URL}    ${BASE_URL}/api/driver-verifications
-${CREATE_ROUTE_URL}    ${BASE_URL}/api/routes
+${ROUTE_URL}    ${BASE_URL}/api/routes
 ${CREATE_VEHICLE_URL}    ${BASE_URL}/api/vehicles
 
 # แอดมิน

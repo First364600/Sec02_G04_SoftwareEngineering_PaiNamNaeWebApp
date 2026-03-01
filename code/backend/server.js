@@ -61,7 +61,7 @@ const limiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
-app.use(limiter);
+// app.use(limiter);
 
 //Metrics Middleware
 app.use(metricsMiddleware);

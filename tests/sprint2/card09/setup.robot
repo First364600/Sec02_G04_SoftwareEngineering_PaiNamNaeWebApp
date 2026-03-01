@@ -2,10 +2,17 @@
 Library    RequestsLibrary
 Library    Collections
 Library    String
-Resource    ../resources/service.robot
-Resource    ../resources/variables.robot
+Resource    ${CURDIR}/../../resources/services/admin_serive.robot
+Resource    ${CURDIR}/../../resources/services/driver_service.robot
+Resource    ${CURDIR}/../../resources/services/passenger_service.robot
+Resource    ${CURDIR}/../../resources/services/guest_service.robot
+Resource    ${CURDIR}/../../resources/variables.robot
 
 *** Variables ***
+
+# Global variables
+@{ROUTES_LIST}
+@{USERS_ID}
 
 # ผู้โดยสาร
 ${PASSENGER_EMAIL}                   passsenger@test.com
@@ -60,67 +67,89 @@ ${ROUTE_PRICE_PER_SEAT}         150
 ${ROUTE_CONDITIONS}             No smoking
 
 &{ROUTE_START_LOCATION}
-...    lat=${14.108182436681442}
-...    lng=${100.16139548950197}
-...    name=Hin Mun
-...    address=Hin Mun, Bang Len District, Nakhon Pathom
+...    lat=${16.43215376414419}
+...    lng=${102.82355787126158}
+...    name=เทศบาลนครขอนแก่น อำเภอเมืองขอนแก่น ขอนแก่น 40000
+...    address=เทศบาลนครขอนแก่น อำเภอเมืองขอนแก่น ขอนแก่น 40000
 &{ROUTE_END_LOCATION}
-...    lat=${15.552506592383347}
-...    lng=${102.71022361450197}
-...    name=Nong Phluang
-...    address=Nong Phluang, Prathai District, Nakhon Ratchasima 30180
+...    lat=${13.75632914260191}
+...    lng=${100.50175864165533}
+...    name=กรุงเทพมหานคร
+...    address=กรุงเทพมหานคร
 &{WAYPOINT_1}
-...    lat=${15.48899241771736}
-...    lng=${101.45778220825197}
-...    name=Watabaek
-...    address=Watabaek, Thep Sathit District, Chaiyaphum 36230
+...    lat=${14.973849056783576}
+...    lng=${102.08365192790052}
+...    name=เทศบาลนครนครราชสีมา ตำบลในเมือง อำเภอเมืองนครราชสีมา นครราชสีมา 30000
+...    address=เทศบาลนครนครราชสีมา ตำบลในเมือง อำเภอเมืองนครราชสีมา นครราชสีมา 30000
 # ${WAYPOINT_2}
 # ...
 
 @{ROUTE_WAYPOINTS}    ${WAYPOINT_1}    # ${WAYPOINT_2}
+
+# ผู้ใช้จองการเดินทาง
+${BOOKINGS_NUMBER_OF_SEATS}        ${1}
+
+&{BOOKINGS_PICKUP_LOCATION}
+...    lat=${14.9739015}
+...    lng=${102.0836593}
+...    address=Nai Mueang, Mueang Nakhon Ratchasima District, Nakhon Ratchasima 30000, Thailand
+...    name=Nai Mueang
+...    placeId=ChIJhbHNZrhMGTERgOLeyM9pBAQ
+
+&{BOOKINGS_DROPOFF_LOCATION}
+...    lat=${16.432153}
+...    lng=${102.8235572}
+...    address=Khon Kaen, Mueang Khon Kaen District, Khon Kaen 40000, Thailand
+...    name=Khon Kaen
+...    placeId=ChIJL46YkStgIjERxpx5zwUIPwk
+
+# คนขับยืนยันการจองของผู้ใช้
+${DRIVER_CONFIRM_BOOKING_STATUS}        CONFIRMED
 
 *** Keywords ***
 Setup All Sessions
     [Documentation]    Login ทั้งคนขับและผู้โดยสาร
 
     # # Passenger Register
-    # Log To Console    Creating Passenger: ${PASSENGER_USERNAME}
+    Log To Console    Creating Passenger: ${PASSENGER_USERNAME}
 
-    # ${response}=    Create User
-    # ...    username=${PASSENGER_USERNAME}
-    # ...    email=${PASSENGER_EMAIL}
-    # ...    password=${PASSENGER_PASSWORD}
-    # ...    firstName=${PASSENGER_FIRSTNAME}
-    # ...    lastName=${PASSENGER_LASTNAME}
-    # ...    role=${PASSENGER_ROLE}
-    # ...    phoneNumber=${PASSENGER_PHONE_NUMBER}
-    # ...    gender=${PASSENGER_GENDER}
-    # ...    nationalIdNumber=${PASSENGER_NATIONAL_ID_NUMBER}
-    # ...    nationalIdExpiryDate=${PASSENGER_NATIONAL_ID_EXPIRY_DATE}
+    ${response}=    Create User
+    ...    username=${PASSENGER_USERNAME}
+    ...    email=${PASSENGER_EMAIL}
+    ...    password=${PASSENGER_PASSWORD}
+    ...    firstName=${PASSENGER_FIRSTNAME}
+    ...    lastName=${PASSENGER_LASTNAME}
+    ...    role=${PASSENGER_ROLE}
+    ...    phoneNumber=${PASSENGER_PHONE_NUMBER}
+    ...    gender=${PASSENGER_GENDER}
+    ...    nationalIdNumber=${PASSENGER_NATIONAL_ID_NUMBER}
+    ...    nationalIdExpiryDate=${PASSENGER_NATIONAL_ID_EXPIRY_DATE}
 
-    # # Driver Register
-    # Log To Console    Creating Driver: ${DRIVER_USERNAME}
-    # ${response}=    Create User
-    # ...    username=${DRIVER_USERNAME}
-    # ...    email=${DRIVER_EMAIL}
-    # ...    password=${DRIVER_PASSWORD}
-    # ...    firstName=${DRIVER_FIRSTNAME}
-    # ...    lastName=${DRIVER_LASTNAME}
-    # ...    role=${DRIVER_ROLE}
-    # ...    phoneNumber=${DRIVER_PHONE_NUMBER}
-    # ...    gender=${DRIVER_GENDER}
-    # ...    nationalIdNumber=${DRIVER_NATIONAL_ID_NUMBER}
-    # ...    nationalIdExpiryDate=${DRIVER_NATIONAL_ID_EXPIRY_DATE}
+    # Driver Register
+    Log To Console    Creating Driver: ${DRIVER_USERNAME}
+    ${response}=    Create User
+    ...    username=${DRIVER_USERNAME}
+    ...    email=${DRIVER_EMAIL}
+    ...    password=${DRIVER_PASSWORD}
+    ...    firstName=${DRIVER_FIRSTNAME}
+    ...    lastName=${DRIVER_LASTNAME}
+    ...    role=${DRIVER_ROLE}
+    ...    phoneNumber=${DRIVER_PHONE_NUMBER}
+    ...    gender=${DRIVER_GENDER}
+    ...    nationalIdNumber=${DRIVER_NATIONAL_ID_NUMBER}
+    ...    nationalIdExpiryDate=${DRIVER_NATIONAL_ID_EXPIRY_DATE}
 
     # Driver Login
     ${driver_token}    ${driver_id}=    Login And Get Token    user_email=${DRIVER_EMAIL}    user_password=${DRIVER_PASSWORD}
     &{driver_headers}=    Create Dictionary    Authorization=Bearer ${driver_token}    x-gateway-key=${X-GATEWAY-KEY}
     Create Session    DriverSession    ${BASE_URL}    headers=${driver_headers}
+    Append To List    ${USERS_ID}    ${driver_id}
     
     # Passenger Login
     ${passenger_token}    ${passenger_id}=    Login And Get Token    user_email=${PASSENGER_EMAIL}    user_password=${PASSENGER_PASSWORD}
     &{passenger_headers}=    Create Dictionary    Authorization=Bearer ${passenger_token}    x-gateway-key=${X-GATEWAY-KEY}
     Create Session    PassengerSession    ${BASE_URL}    headers=${passenger_headers}
+    Append To List    ${USERS_ID}    ${passenger_id}
 
     # Admin Login
     ${admin_token}    ${admin_id}=    Login And Get Token    user_email=${ADMIN_EMAIL}    user_password=${ADMIN_PASSWORD}
@@ -129,7 +158,7 @@ Setup All Sessions
     
     # # Driver Create Vehicle
     Log To Console    Creating Vehicle
-    ${response}=    Create Vehicle
+    ${response}=    Driver Create Vehicle
     ...    sessionName=DriverSession
     ...    vehicleModel=${VEHICLE_MODEL}
     ...    licensePlate=${VEHICLE_LICENSE_PLATE}
@@ -143,6 +172,7 @@ Setup All Sessions
     # ...    sideImagePath=
     # ...    inSideImagePath=
     ${data}=    Get From Dictionary    ${response}[data]    id
+    Log To Console    data: ${data}
     Set Global Variable    ${ROUTE_VEHICLE_ID}    ${data}
 
     # Driver Verification
@@ -165,7 +195,7 @@ Setup All Sessions
 
     # Driver Create Route
     Log To Console    Creating Route
-    ${response}=    Create Route
+    ${response}=    Driver Create Route
     ...    sessionName=DriverSession
     ...    vehicleId=${ROUTE_VEHICLE_ID}
     ...    startLocation=${ROUTE_START_LOCATION}
@@ -176,4 +206,46 @@ Setup All Sessions
     ...    price=${ROUTE_PRICE_PER_SEAT}
     ...    conditions=${ROUTE_CONDITIONS}
 
+    ${ROUTE_ID}=    Get From Dictionary    ${response}[data]    id
+    
+    Append To List    ${ROUTES_LIST}    ${response}[data]
+    # # Passenger Bookings Route
+    # Log To Console    Passenger Bookings Route
+    # ${response}=    Passenger Bookings Route
+    # ...    sessionName=PassengerSession
+    # ...    routeId=${ROUTE_ID}
+    # ...    numberOfSeats=${BOOKINGS_NUMBER_OF_SEATS}
+    # ...    pickupLocation=${BOOKINGS_PICKUP_LOCATION}
+    # ...    dropoffLocation=${BOOKINGS_DROPOFF_LOCATION}
+
+    # ${BOOKING_ID}=    Get From Dictionary    ${response}[data]    id
+
+    # # Driver Confirm user bookings
+    # Log To Console    Driver comfirm bookings
+    # ${response}=    Driver Confirm User Bookings
+    # ...    sessionName=DriverSession
+    # ...    bookingId=${BOOKING_ID}
+    # ...    status=${DRIVER_CONFIRM_BOOKING_STATUS}
+
+    # # Driver Start Trip
+    # Log To Console    Driver Start Trip
+    # ${response}=    Driver Update Trip (start trip, checkpoint, end trip)
+    # ...    sessionName=DriverSession
+    # ...    routeId=${ROUTE_ID}
+    # ...    currentStep=0
+    # ...    status=IN_TRANSIT
+
+    
+    
+    
     Log To Console    Setup Completed
+# // DELETE /api/users/admin/:id
+    
+Delete All Users
+    # Log To Console    users id: @{USERS_ID}
+    FOR    ${user_id}    IN    @{USERS_ID}
+        # Log To Console    user id: ${user_id}
+        DELETE On Session    AdminSession    ${BASE_URL}/api/users/admin/${user_id}
+    END
+    Delete All Sessions
+    

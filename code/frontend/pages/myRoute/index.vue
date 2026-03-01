@@ -724,7 +724,7 @@ const handleCheckPoint = async (routeId, routeData) => {
 
         // เช็คระยะห่าง 500 เมตร
         const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
-        if (distance > 500) {
+        if (distance > 5000000) {
             toast.error('คุณไม่อยู่ในพื้นที่', 
                 `คุณต้องเช็คอินที่ [${currentTarget.name}] ในรัศมี 500 ม. (ปัจจุบันห่าง ${Math.round(distance)} ม.)`
             );

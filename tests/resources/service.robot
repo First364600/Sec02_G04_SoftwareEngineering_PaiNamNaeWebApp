@@ -3,6 +3,8 @@ Library    RequestsLibrary
 Library    OperatingSystem
 Library    Collections
 Library    String
+Library    DateTime
+
 Resource    variables.robot
 
 *** Keywords ***
@@ -70,7 +72,7 @@ Login And Get Token
     # Log    Logged in - token acquired
     RETURN    ${token}    ${user_id}
 
-Create Route
+Driver Create Route
     [Arguments]    ${sessionName}    ${vehicleId}    ${startLocation}    ${endLocation}    ${waypoints}    ${departureTime}    ${seats}    ${price}    ${conditions}
     [Documentation]    Keyword สำหรับสร้างเส้นทาง (route) โดยคนขับ
 
@@ -87,12 +89,12 @@ Create Route
 
     ${response}=    POST On Session    
     ...    ${sessionName}    
-    ...    ${CREATE_ROUTE_URL}    
+    ...    ${ROUTE_URL}    
     ...    json=${payload}
     
     RETURN    ${response.json()}
 
-Create Vehicle
+Driver Create Vehicle
     [Arguments]    ${sessionName}    ${vehicleModel}    ${licensePlate}    ${vehicleType}    ${color}    ${seatCapacity}    ${isDefault}    ${amenities}    
     ...    ${frontImagePath}=${CURDIR}/vehicleImage/front.png
     ...    ${sideImagePath}=${CURDIR}/vehicleImage/side.png
@@ -166,5 +168,68 @@ Admin Verifired Driver
     ...    ${sessionName}
     ...    ${ADMIN_VERIFIED_DRIVER_URL}/${userId}/status
     ...    json=${data}
+
+    RETURN    ${response.json()}
+
+Passenger Bookings Route
+    [Arguments]    ${sessionName}    ${routeId}    ${numberOfSeats}    ${pickupLocation}    ${dropoffLocation}  
+    [Documentation]    ผู้ใช้จองการเดินทาง  
+    ${data}=    Create Dictionary
+    ...    routeId=${routeId}
+    ...    numberOfSeats=${numberOfSeats}
+    ...    pickupLocation=${pickupLocation}
+    ...    dropoffLocation=${dropoffLocation}
+
+    ${response}=    POST On Session
+    ...    ${sessionName}
+    ...    ${BOOKING_ROUTE_URL}
+    ...    json=${data}
+
+    RETURN    ${response.json()}
+
+Driver Confirm User Bookings
+    [Arguments]    ${sessionName}    ${bookingId}    ${status}
+    [Documentation]    คนขับยืนยันคำขอ หรือปฏิเสธ
+    ${data}=    Create Dictionary
+    ...    status=${status}
+    
+    ${response}=    PATCH On Session
+    ...    ${sessionName}
+    ...    ${BOOKING_ROUTE_URL}/${bookingId}/status
+    ...    json=${data}
+
+    RETURN    ${response.json()}
+
+Driver Begin the Journey
+    [Arguments]    ${sessionName}    ${routeId}    ${currentStep}=${0}    ${status}=IN_TRANSIT
+    [Documentation]    คนขับเริ่มต้นการเดินทาง
+    ${data}=    Create Dictionary
+    ...    currentStep=${currentStep}
+    ...    status=${status}
+
+    ${response}=    PATCH On Session
+    ...    ${sessionName}
+    ...    ${ROUTE_URL}/${routeId}/progress
+    ...    json=${data}
+
+    RETURN    ${response.json()}
+
+Driver Arrived (pickup passenger)
+    [Arguments]    ${sessionName}    ${bookingId}
+    [Documentation]    คนขับมาถึงจุดรับผู้โดยสาร
+    
+    ${response}=    PATCH On Session
+    ...    ${sessionName}
+    ...    ${BOOKING_ROUTE_URL}/${bookingId}/driver-arrived
+
+    RETURN    ${response.json()}
+
+Passenger Begin the Journey
+    [Arguments]    ${sessionName}    ${bookingId}
+    [Documentation]    ผู้โดยสารเริ่มต้นการเดินทาง
+
+    ${response}=    PATCH On Session
+    ...    ${sessionName}
+    ...    ${BOOKING_ROUTE_URL}/${bookingId}/passenger-start
 
     RETURN    ${response.json()}

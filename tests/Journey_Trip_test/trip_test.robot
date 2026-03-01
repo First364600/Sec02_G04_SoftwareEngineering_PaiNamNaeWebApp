@@ -1,7 +1,7 @@
 *** Settings ***
 Library         SeleniumLibrary
-Resource        test_data.robot
-Resource        keywords.robot
+Resource        resources/test_data.robot
+Resource        resources/keywords.robot
 Suite Setup     Setup Browsers
 Suite Teardown  Close All Browsers
 
