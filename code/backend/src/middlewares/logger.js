@@ -18,6 +18,16 @@ const logger = (req, res, next) => {
             else if (statusCode >= 400 || url.includes('/admin')) logType = 'SECURITY';
             else if (method === 'GET') logType = 'BEHAVIOR';
 
+            const sanitize = (data) => {
+                if (!data) return null;
+                const cleanData = { ...data };
+                if (cleanData.password) cleanData.password = '***REDACTED***';
+                if (cleanData.oldPassword) cleanData.oldPassword = '***REDACTED***';
+                return cleanData;
+            };
+
+            const payload = method === 'GET' ? req.query : sanitize(req.body);
+
             const rawDataObj = {
                 userId,
                 logType,
@@ -25,7 +35,8 @@ const logger = (req, res, next) => {
                 endpoint: url,
                 statusCode,
                 ip: req.ip,
-                timestamp: requestTime.toISOString()
+                timestamp: requestTime.toISOString(),
+                details: payload
             };
             const rawDataString = JSON.stringify(rawDataObj);
 

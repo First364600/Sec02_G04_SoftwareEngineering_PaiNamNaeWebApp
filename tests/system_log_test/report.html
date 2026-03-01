@@ -1881,22 +1881,22 @@ storage = function () {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[1,0,765],[],[[4,0,5,[],[1,198,448],[]],[6,0,7,[],[1,647,8],[]],[8,0,9,[],[1,655,108],[]]],[],[3,3,0,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,3525],[],[[4,0,5,[],[1,302,1087],[]],[6,0,7,[],[1,1390,1009],[]],[8,0,9,[],[1,2400,12],[]],[10,0,11,[],[1,2413,1009],[]],[12,0,13,[],[1,3422,10],[]],[14,0,0,[],[1,3433,14],[]],[15,0,16,[],[1,3448,12],[]],[17,0,18,[],[0,3461,7,19],[]],[20,0,21,[],[1,3469,11],[]],[22,0,0,[],[0,3481,23,23],[]],[24,0,25,[],[1,3504,19],[]]],[],[11,9,2,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*System Log Tests","*Z:\\SE\\scrum\\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\\tests\\system_log_tests.robot","*system_log_tests.robot","*Admin ดึงข้อมูล System Logs ได้สำเร็จ","*<p>ทดสอบกรณี Happy Path (Login -&gt; Get Logs)\x3c/p>","*ดึงข้อมูล System Logs ไม่ได้ถ้าไม่มี Token","*<p>ทดสอบกรณีความปลอดภัย (No Token)\x3c/p>","*Admin สามารถ Export Logs เป็นไฟล์ CSV ได้","*<p>ทดสอบ API Export\x3c/p>"]);
+window.output["strings"] = window.output["strings"].concat(["*","*System Log Tests 2","*Z:\\GIT\\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp#\\tests\\system_log_test\\system_log_tests_2.robot","*system_log_tests_2.robot","*TC-1.1: Verify AUTH Log Generation","*<p>ทดสอบว่าการ Login จะสร้าง Log ประเภท AUTH\x3c/p>","*TC-1.2: Verify BEHAVIOR Log Generation","*<p>ทดสอบว่าการเรียกดูข้อมูล (GET) สร้าง Log ประเภท BEHAVIOR\x3c/p>","*TC-1.3: Verify TRANSACTION Log and Password Sanitization","*<p>ทดสอบว่าการทำ PUT สร้าง TRANSACTION Log และเซ็นเซอร์รหัสผ่าน\x3c/p>","*TC-1.4: Verify SECURITY Log on Unauthorized Access","*<p>ทดสอบว่าเข้าถึงโดยไม่มีสิทธิ์ จะเกิด SECURITY Log\x3c/p>","*TC-2.1: Admin Can Get All Logs","*<p>แอดมินดึงข้อมูล Log ได้ และดึง ID ล่าสุดมาใช้ใน TC ถัดไป\x3c/p>","*TC-2.2: Filter Logs by Type","*TC-3.1: User Cannot Access Admin Logs","*<p>จำกัดสิทธิ์ User ไม่ให้เข้าถึง API ของแอดมิน (RBAC Test)\x3c/p>","*TC-3.2: Verify Valid Log HMAC","*<p>ทดสอบ Verify ข้อมูล Log ที่ยังไม่ถูกแก้ไข (ต้องผ่าน)\x3c/p>","*'False' should be true.","*TC-3.3 &amp; 3.4: Tamper Detection (HMAC Catching DB Modification)","*<p>จำลองการแฮกแก้ข้อมูลใน DB และเช็คว่า API ตรวจจับได้หรือไม่\x3c/p>","*TC-3.5: Verify All Logs in First Page","*Log ID 515 has been tampered!","*TC-4.1: Admin Can Export Logs to CSV","*<p>ทดสอบการดาวน์โหลดไฟล์ Log และตรวจสอบเนื้อหา\x3c/p>"]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:00:01","fail":0,"label":"All Tests","pass":3,"skip":0}],[],[{"elapsed":"00:00:01","fail":0,"id":"s1","label":"System Log Tests","name":"System Log Tests","pass":3,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:00:03","fail":2,"label":"All Tests","pass":9,"skip":0}],[],[{"elapsed":"00:00:04","fail":2,"id":"s1","label":"System Log Tests 2","name":"System Log Tests 2","pass":9,"skip":0}]];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1771237560513;
+window.output["baseMillis"] = 1772384379359;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 791;
+window.output["generated"] = 3556;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;

@@ -19,7 +19,7 @@ const getLogs = async (req, res) => {
                 skip: skip,
                 take: limit,
                 orderBy: {
-                    created_at: 'desc'
+                    createdAt: 'desc'
                 },
                 include: {
                     user: {
@@ -65,13 +65,13 @@ const exportLogs = async (req, res) => {
         // 2. ดึงข้อมูลจาก
         const logs = await prisma.systemLog.findMany({
             where: {
-                created_at: {
+                createdAt: {
                     gte: startDate,
                     lte: endDate
                 }
             },
             orderBy: {
-                created_at: 'desc'
+                createdAt: 'desc'
             },
             include: {
                 user: {
@@ -92,10 +92,10 @@ const exportLogs = async (req, res) => {
             Action: log.action,
             Method: log.method,
             Endpoint: log.endpoint,
-            IP_Address: log.ip_address,
-            Status: log.status_code,
-            Date: log.created_at.toISOString().split('T')[0],
-            Time: log.created_at.toISOString().split('T')[1].split('.')[0]
+            IP_Address: log.ipAddress,
+            Status: log.statusCode,
+            Date: log.createdAt.toISOString().split('T')[0],
+            Time: log.createdAt.toISOString().split('T')[1].split('.')[0]
         }));
 
         // 4. JSON -> CSV
