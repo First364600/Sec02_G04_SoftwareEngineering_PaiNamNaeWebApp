@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.13.1 on win32)" generated="2026-02-16T17:26:00.510873" rpa="false" schemaversion="5">
+<suite id="s1" name="System Log Tests" source="Z:\SE\scrum\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\system_log_tests.robot">
+<kw name="เชื่อมต่อระบบ API" owner="api_keywords" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-02-16T17:26:00.710470" level="INFO">Creating Session using : alias=mysession, url=http://localhost:3000, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>mysession</arg>
+<arg>${BASE_URL}</arg>
+<arg>disable_warnings=1</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-02-16T17:26:00.710210" elapsed="0.000470"/>
+</kw>
+<status status="PASS" start="2026-02-16T17:26:00.709698" elapsed="0.001066"/>
+</kw>
+<test id="s1-t1" name="Admin ดึงข้อมูล System Logs ได้สำเร็จ" line="6">
+<kw name="Admin เข้าสู่ระบบเพื่อขอ Token" owner="api_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:00.712400" level="INFO">&amp;{headers} = { Content-Type=application/json }</msg>
+<var>&amp;{headers}</var>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:00.711977" elapsed="0.000453"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:00.712895" level="INFO">&amp;{body} = { email=admin@example.com | password=123456789 }</msg>
+<var>&amp;{body}</var>
+<arg>email=${ADMIN_EMAIL}</arg>
+<arg>password=${ADMIN_PASS}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:00.712534" elapsed="0.000387"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-16T17:26:01.011517" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+ path_url=/api/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '55', 'Content-Type': 'application/json'} 
+ body=b'{"email": "admin@example.com", "password": "123456789"}' 
+ </msg>
+<msg time="2026-02-16T17:26:01.011649" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '444', 'ETag': 'W/"1bc-N1yukhVYADU6BpPOWhSWzciH09s"', 'Date': 'Mon, 16 Feb 2026 10:26:01 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Login successful","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4","user":{"id":"cmlkpxt160000m62aw5muawr6","firstName":"System","lastName":"Administrator","profilePicture":null,"role":"ADMIN","passengerSuspendedUntil":null,"driverSuspendedUntil":null}}} 
+ </msg>
+<msg time="2026-02-16T17:26:01.011787" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>mysession</arg>
+<arg>/api/auth/login</arg>
+<arg>json=${body}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-16T17:26:00.713014" elapsed="0.298799"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.012570" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.011972" elapsed="0.000678"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.013449" level="INFO">${json_response} = {'success': True, 'message': 'Login successful', 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHA...</msg>
+<var>${json_response}</var>
+<arg>${response.json()}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.012774" elapsed="0.000714"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2026-02-16T17:26:01.013918" level="INFO">${data_part} = {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWI...</msg>
+<var>${data_part}</var>
+<arg>${json_response}</arg>
+<arg>data</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.013642" elapsed="0.000310"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2026-02-16T17:26:01.014259" level="INFO">${token_value} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</msg>
+<var>${token_value}</var>
+<arg>${data_part}</arg>
+<arg>token</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.014078" elapsed="0.000210"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.014774" level="INFO">${TOKEN} = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</msg>
+<arg>${TOKEN}</arg>
+<arg>Bearer ${token_value}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.014426" elapsed="0.000390"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.015151" level="INFO">Token ที่ได้คือ: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</msg>
+<arg>Token ที่ได้คือ: ${TOKEN}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.014923" elapsed="0.000277"/>
+</kw>
+<doc>ยิง API Login และเก็บ Token ไว้ในตัวแปร </doc>
+<status status="PASS" start="2026-02-16T17:26:00.711765" elapsed="0.303502"/>
+</kw>
+<kw name="ดึงข้อมูล System Logs" owner="api_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.016235" level="INFO">&amp;{headers} = { Authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-Z...</msg>
+<var>&amp;{headers}</var>
+<arg>Authorization=${TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.015875" elapsed="0.000391"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-16T17:26:01.154052" level="INFO">GET Request : url=http://localhost:3000/api/logs 
+ path_url=/api/logs 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4'} 
+ body=None 
+ </msg>
+<msg time="2026-02-16T17:26:01.154151" level="INFO">GET Response : url=http://localhost:3000/api/logs 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '6163', 'ETag': 'W/"1813-CsSh8ZisDn6KJ9U9GYA4UsIwXtI"', 'Date': 'Mon, 16 Feb 2026 10:26:01 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":48,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"fed4264686b0c7df99bdbbaa6a65ea7e80de7559daa644127e158e4205185d49","created_at":"2026-02-16T10:26:00.722Z","user":null},{"id":47,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"55009e8753462e97c5d2267e66a9207ee0b7951f6f1f0b9d066c95e2195b4e1e","created_at":"2026-02-16T10:24:06.893Z","user":null},{"id":46,"user_id":null,"action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":401,"log_hash":"3d1dc52644ebfa528a1cd2387662fdefc7ca0bf4987c42a25c8f94abc63b38fc","created_at":"2026-02-16T10:24:06.884Z","user":null},{"id":45,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"1e333113bc5f831ed2d38c11b4446bb449d4570036b356b8cee00a267f861213","created_at":"2026-02-16T10:24:06.812Z","user":null},{"id":44,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"44d1402d623ba2553d417fc1682657fd8526ee92bab4035f590de5a8b1cf588b","created_at":"2026-02-16T10:20:58.142Z","user":null},{"id":43,"user_id":null,"action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":401,"log_hash":"2c7808f54514dc01082d40143856dd90b8ec61e3cd811c111255029ec1a6bdc3","created_at":"2026-02-16T10:20:58.132Z","user":null},{"id":42,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"1bacff88606c0bca7ce9b5bf0f08bf044a8639cc1d67500152838718f42f39af","created_at":"2026-02-16T10:20:58.061Z","user":null},{"id":40,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"3f80e79258e3c5822bb78c2d59d350d2bd4072863b1fac8cb53fa54d25b9c01e","created_at":"2026-02-16T10:20:50.043Z","user":null},{"id":41,"user_id":null,"action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":401,"log_hash":"18bac90b60d9be361a59d9ac48bfaf7f547e6aa632f4abf6a539539752cd8e3a","created_at":"2026-02-16T10:20:50.031Z","user":null},{"id":39,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"687e6c5b0aaaf8496b036be444c8779fbc318bd15eb4c718003431cd5bec3cec","created_at":"2026-02-16T10:20:49.952Z","user":null},{"id":37,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"c539b0e5f1829d7b8d9f11922b9ae5e72a88e6675a01c88b42f6a87081ebf07c","created_at":"2026-02-16T10:20:22.664Z","user":null},{"id":38,"user_id":null,"action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":401,"log_hash":"db241305c83d6710f21de4410994d5a6b06433f72efec8fbb3d14318bb9173c8","created_at":"2026-02-16T10:20:22.653Z","user":null},{"id":36,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"f1f713ca1cc025a1e3a996b04c1f7daf3c936f1c9ad7c082e9df5035347d38f0","created_at":"2026-02-16T10:20:22.516Z","user":null},{"id":35,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"90d9626b42a533704f009e71204fcfff2784cd920b47a021ec8b638f4017fdb9","created_at":"2026-02-16T10:17:12.702Z","user":null},{"id":34,"user_id":null,"action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":401,"log_hash":"293ba5272c6154f1397453fb2cd7fe84e853004ad441865efd707ac87cbba1d3","created_at":"2026-02-16T10:17:12.690Z","user":null},{"id":33,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"ce3a6104060509aa28f233d4ead7cdb62de739dd7b625bdf9797a4cb10094ebc","created_at":"2026-02-16T10:17:12.615Z","user":null},{"id":32,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"c77c18defdf742ff88db4d59e4a3cc9a10127993c6512ab6ab2950189d4cc531","created_at":"2026-02-16T10:13:17.673Z","user":null},{"id":31,"user_id":null,"action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":401,"log_hash":"6f98568fe4fe53a88b4f3e091048e133b69996161234583f28ef8c523fbb6057","created_at":"2026-02-16T10:13:17.661Z","user":null},{"id":30,"user_id":null,"action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ip_address":"::1","user_agent":"python-requests/2.32.5","status_code":200,"log_hash":"ba3d0a825759bb68cdd808e997bd5015f310acff2e6b596a1afb764588574861","created_at":"2026-02-16T10:13:17.578Z","user":null},{"id":29,"user_id":null,"action":"GET /api/logs/export","method":"GET","endpoint":"/api/logs/export","ip_address":"::1","user_agent":"PostmanRuntime/7.51.1","status_code":401,"log_hash":"87f63f252a016fd8df899c7eee47f9c62e596fbba92148d810dfb5e5eaf75cef","created_at":"2026-02-14T20:13:41.752Z","user":null}],"meta":{"total_items":48,"total_pages":3,"current_page":1,"items_per_page":20}} 
+ </msg>
+<msg time="2026-02-16T17:26:01.154299" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>mysession</arg>
+<arg>/api/logs</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=any</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.016478" elapsed="0.137845"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.154884" level="INFO">${RESPONSE} = &lt;Response [200]&gt;</msg>
+<arg>${RESPONSE}</arg>
+<arg>${response}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.154557" elapsed="0.000368"/>
+</kw>
+<status status="PASS" start="2026-02-16T17:26:01.015632" elapsed="0.139349"/>
+</kw>
+<kw name="ตรวจสอบสถานะต้องเป็น" owner="api_keywords">
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.156313" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${RESPONSE.status_code}</arg>
+<arg>${expected_status}</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.155518" elapsed="0.000860"/>
+</kw>
+<arg>200</arg>
+<status status="PASS" start="2026-02-16T17:26:01.155295" elapsed="0.001150"/>
+</kw>
+<kw name="ตรวจสอบว่ามีข้อมูล Logs กลับมา" owner="api_keywords">
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${RESPONSE.json()}</arg>
+<arg>data</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.156980" elapsed="0.000429"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2026-02-16T17:26:01.157973" level="INFO">${data_list} = [{'id': 48, 'user_id': None, 'action': 'POST /api/auth/login', 'method': 'POST', 'endpoint': '/api/auth/login', 'ip_address': '::1', 'user_agent': 'python-requests/2.32.5', 'status_code': 200, 'log_ha...</msg>
+<var>${data_list}</var>
+<arg>${RESPONSE.json()}</arg>
+<arg>data</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.157505" elapsed="0.000495"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.158428" level="INFO">Length is 20.</msg>
+<arg>${data_list}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.158089" elapsed="0.000382"/>
+</kw>
+<status status="PASS" start="2026-02-16T17:26:01.156748" elapsed="0.001775"/>
+</kw>
+<doc>ทดสอบกรณี Happy Path (Login -&gt; Get Logs)</doc>
+<status status="PASS" start="2026-02-16T17:26:00.710823" elapsed="0.447939"/>
+</test>
+<test id="s1-t2" name="ดึงข้อมูล System Logs ไม่ได้ถ้าไม่มี Token" line="13">
+<kw name="ดึงข้อมูล System Logs แบบไม่ใส่ Token" owner="api_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.161240" level="INFO">&amp;{headers} = { Content-Type=application/json }</msg>
+<var>&amp;{headers}</var>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.160910" elapsed="0.000359"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-16T17:26:01.165103" level="INFO">GET Request : url=http://localhost:3000/api/logs 
+ path_url=/api/logs 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json'} 
+ body=None 
+ </msg>
+<msg time="2026-02-16T17:26:01.165193" level="INFO">GET Response : url=http://localhost:3000/api/logs 
+ status=401, reason=Unauthorized 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '66', 'ETag': 'W/"42-VIvuqXCkSos5B2HjVRGsrV8/u7s"', 'Date': 'Mon, 16 Feb 2026 10:26:01 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"message":"Not authorized, no token","data":null} 
+ </msg>
+<msg time="2026-02-16T17:26:01.165314" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<var>${response}</var>
+<arg>mysession</arg>
+<arg>/api/logs</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=any</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.161369" elapsed="0.003969"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.165800" level="INFO">${RESPONSE} = &lt;Response [401]&gt;</msg>
+<arg>${RESPONSE}</arg>
+<arg>${response}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.165475" elapsed="0.000375"/>
+</kw>
+<status status="PASS" start="2026-02-16T17:26:01.160644" elapsed="0.005271"/>
+</kw>
+<kw name="ตรวจสอบสถานะต้องเป็น" owner="api_keywords">
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.167129" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${RESPONSE.status_code}</arg>
+<arg>${expected_status}</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.166556" elapsed="0.000637"/>
+</kw>
+<arg>401</arg>
+<status status="PASS" start="2026-02-16T17:26:01.166277" elapsed="0.001012"/>
+</kw>
+<doc>ทดสอบกรณีความปลอดภัย (No Token)</doc>
+<status status="PASS" start="2026-02-16T17:26:01.159554" elapsed="0.008023"/>
+</test>
+<test id="s1-t3" name="Admin สามารถ Export Logs เป็นไฟล์ CSV ได้" line="18">
+<kw name="Admin เข้าสู่ระบบเพื่อขอ Token" owner="api_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.169730" level="INFO">&amp;{headers} = { Content-Type=application/json }</msg>
+<var>&amp;{headers}</var>
+<arg>Content-Type=application/json</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.169412" elapsed="0.000348"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.170227" level="INFO">&amp;{body} = { email=admin@example.com | password=123456789 }</msg>
+<var>&amp;{body}</var>
+<arg>email=${ADMIN_EMAIL}</arg>
+<arg>password=${ADMIN_PASS}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.169873" elapsed="0.000381"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-02-16T17:26:01.235816" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+ path_url=/api/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '55', 'Content-Type': 'application/json'} 
+ body=b'{"email": "admin@example.com", "password": "123456789"}' 
+ </msg>
+<msg time="2026-02-16T17:26:01.235935" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '444', 'ETag': 'W/"1bc-N1yukhVYADU6BpPOWhSWzciH09s"', 'Date': 'Mon, 16 Feb 2026 10:26:01 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Login successful","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4","user":{"id":"cmlkpxt160000m62aw5muawr6","firstName":"System","lastName":"Administrator","profilePicture":null,"role":"ADMIN","passengerSuspendedUntil":null,"driverSuspendedUntil":null}}} 
+ </msg>
+<msg time="2026-02-16T17:26:01.236142" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>mysession</arg>
+<arg>/api/auth/login</arg>
+<arg>json=${body}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.170355" elapsed="0.065814"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.236859" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.236307" elapsed="0.000615"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.237634" level="INFO">${json_response} = {'success': True, 'message': 'Login successful', 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHA...</msg>
+<var>${json_response}</var>
+<arg>${response.json()}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.237042" elapsed="0.000626"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2026-02-16T17:26:01.238001" level="INFO">${data_part} = {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWI...</msg>
+<var>${data_part}</var>
+<arg>${json_response}</arg>
+<arg>data</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.237793" elapsed="0.000235"/>
+</kw>
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2026-02-16T17:26:01.238281" level="INFO">${token_value} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</msg>
+<var>${token_value}</var>
+<arg>${data_part}</arg>
+<arg>token</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.238127" elapsed="0.000179"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.238708" level="INFO">${TOKEN} = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</msg>
+<arg>${TOKEN}</arg>
+<arg>Bearer ${token_value}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.238407" elapsed="0.000343"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.239076" level="INFO">Token ที่ได้คือ: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</msg>
+<arg>Token ที่ได้คือ: ${TOKEN}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.238856" elapsed="0.000266"/>
+</kw>
+<doc>ยิง API Login และเก็บ Token ไว้ในตัวแปร Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4</doc>
+<status status="PASS" start="2026-02-16T17:26:01.169185" elapsed="0.069994"/>
+</kw>
+<kw name="สั่ง Export System Logs" owner="api_keywords">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.240048" level="INFO">&amp;{headers} = { Authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-Z...</msg>
+<var>&amp;{headers}</var>
+<arg>Authorization=${TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.239686" elapsed="0.000391"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-02-16T17:26:01.271882" level="INFO">GET Request : url=http://localhost:3000/api/logs/export 
+ path_url=/api/logs/export 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcxMjM3NTYxLCJleHAiOjE3NzEyNDExNjF9.CAVwUdaffCs6YZIuTUznjaC2T-ZzcGR1yH8RzWIHeZ4'} 
+ body=None 
+ </msg>
+<msg time="2026-02-16T17:26:01.271981" level="INFO">GET Response : url=http://localhost:3000/api/logs/export 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="system_logs_2026-02-09_to_2026-02-16.csv"', 'Content-Length': '5872', 'ETag': 'W/"16f0-yZZhSfC/e1LCsrRaYocXj+/6H20"', 'Date': 'Mon, 16 Feb 2026 10:26:01 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body="ID","User","Role","Action","Method","Endpoint","IP_Address","Status","Date","Time"
+51,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:26:01"
+50,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:26:01"
+49,"admin@example.com","ADMIN","GET /api/logs","GET","/api/logs","::1",200,"2026-02-16","10:26:01"
+48,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:26:00"
+47,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:24:06"
+46,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:24:06"
+45,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:24:06"
+44,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:20:58"
+43,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:20:58"
+42,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:20:58"
+40,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:20:50"
+41,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:20:50"
+39,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:20:49"
+37,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:20:22"
+38,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:20:22"
+36,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:20:22"
+35,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:17:12"
+34,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:17:12"
+33,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:17:12"
+32,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:13:17"
+31,"Guest","-","GET /api/logs","GET","/api/logs","::1",401,"2026-02-16","10:13:17"
+30,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-16","10:13:17"
+29,"Guest","-","GET /api/logs/export","GET","/api/logs/export","::1",401,"2026-02-14","20:13:41"
+28,"Guest","-","GET /api/logs/export","GET","/api/logs/export","::1",401,"2026-02-14","20:13:02"
+27,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-14","20:12:26"
+26,"Guest","-","GET /api/logs/export","GET","/api/logs/export","::1",401,"2026-02-14","20:09:15"
+25,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-14","20:08:53"
+24,"Guest","-","GET /api/logs/export","GET","/api/logs/export","::1",401,"2026-02-14","20:07:27"
+23,"admin@example.com","ADMIN","GET /api/notifications?page=1&amp;limit=20","GET","/api/notifications?page=1&amp;limit=20","::1",200,"2026-02-14","20:07:01"
+21,"admin@example.com","ADMIN","GET /api/users/admin?page=1&amp;limit=20","GET","/api/users/admin?page=1&amp;limit=20","::1",200,"2026-02-14","20:05:05"
+22,"admin@example.com","ADMIN","GET /api/notifications/admin?page=1&amp;limit=20","GET","/api/notifications/admin?page=1&amp;limit=20","::1",200,"2026-02-14","20:05:05"
+20,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-14","20:05:00"
+19,"Guest","-","GET /api/users/admin?page=1&amp;limit=20","GET","/api/users/admin?page=1&amp;limit=20","::1",401,"2026-02-14","20:03:54"
+18,"Guest","-","GET /api/notifications/admin?page=1&amp;limit=20","GET","/api/notifications/admin?page=1&amp;limit=20","::1",401,"2026-02-14","20:03:54"
+17,"Guest","-","GET /api/notifications?page=1&amp;limit=20","GET","/api/notifications?page=1&amp;limit=20","::1",401,"2026-02-14","20:03:52"
+14,"Guest","-","GET /api/notifications?page=1&amp;limit=20","GET","/api/notifications?page=1&amp;limit=20","::1",401,"2026-02-14","20:02:57"
+16,"Guest","-","GET /api/users/admin?page=1&amp;limit=20","GET","/api/users/admin?page=1&amp;limit=20","::1",401,"2026-02-14","20:02:57"
+15,"Guest","-","GET /api/notifications/admin?page=1&amp;limit=20","GET","/api/notifications/admin?page=1&amp;limit=20","::1",401,"2026-02-14","20:02:56"
+13,"admin@example.com","ADMIN","GET /api/logs/","GET","/api/logs/","::1",200,"2026-02-14","18:47:05"
+12,"Guest","-","GET /api/logs/action/login","GET","/api/logs/action/login","::1",404,"2026-02-14","18:46:47"
+11,"admin@example.com","ADMIN","GET /api/logs?page=1&amp;limit=10","GET","/api/logs?page=1&amp;limit=10","::1",200,"2026-02-14","18:31:18"
+10,"admin@example.com","ADMIN","GET /api/logs?page=1&amp;limit=10","GET","/api/logs?page=1&amp;limit=10","::1",200,"2026-02-14","18:30:27"
+9,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",200,"2026-02-14","18:28:10"
+8,"Guest","-","POST /api/auth/login","POST","/api/auth/login","::1",400,"2026-02-14","18:26:02"
+6,"admin@example.com","ADMIN","GET /api/users/admin?page=1&amp;limit=20","GET","/api/users/admin?page=1&amp;limit=20","::1",200,"2026-02-14","18:11:29"
+5,"admin@example.com","ADMIN","GET /api/notifications?page=1&amp;limit=20","GET","/api/notifications?page=1&amp;limit=20","::1",304,"2026-02-14","18:11:29"
+7,"admin@example.com","ADMIN","GET /api/notifications/admin?page=1&amp;limit=20","GET","/api/notifications/admin?page=1&amp;limit=20","::1",304,"2026-02-14","18:11:29"
+4,"admin@example.com","ADMIN","PATCH /api//users/admin/cmlmmf8670000qix171z5sg5l/status","PATCH","/api//users/admin/cmlmmf8670000qix171z5sg5l/status","::1",200,"2026-02-14","18:07:49"
+3,"admin@example.com","ADMIN","GET /api/users/admin?page=1&amp;limit=20","GET","/api/users/admin?page=1&amp;limit=20","::1",304,"2026-02-14","18:07:23"
+2,"admin@example.com","ADMIN","GET /api/notifications/admin?page=1&amp;limit=20","GET","/api/notifications/admin?page=1&amp;limit=20","::1",304,"2026-02-14","18:07:23"
+1,"admin@example.com","ADMIN","GET /api/notifications?page=1&amp;limit=20","GET","/api/notifications?page=1&amp;limit=20","::1",304,"2026-02-14","18:07:12" 
+ </msg>
+<msg time="2026-02-16T17:26:01.272286" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>mysession</arg>
+<arg>/api/logs/export</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=any</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.240173" elapsed="0.032142"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.272800" level="INFO">${RESPONSE} = &lt;Response [200]&gt;</msg>
+<arg>${RESPONSE}</arg>
+<arg>${response}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.272461" elapsed="0.000393"/>
+</kw>
+<status status="PASS" start="2026-02-16T17:26:01.239470" elapsed="0.033450"/>
+</kw>
+<kw name="ตรวจสอบสถานะต้องเป็น" owner="api_keywords">
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2026-02-16T17:26:01.274604" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${RESPONSE.status_code}</arg>
+<arg>${expected_status}</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.274030" elapsed="0.000640"/>
+</kw>
+<arg>200</arg>
+<status status="PASS" start="2026-02-16T17:26:01.273707" elapsed="0.001031"/>
+</kw>
+<kw name="ตรวจสอบว่าเป็นไฟล์ CSV" owner="api_keywords">
+<kw name="Get From Dictionary" owner="Collections">
+<msg time="2026-02-16T17:26:01.275746" level="INFO">${content_type} = text/csv; charset=utf-8</msg>
+<var>${content_type}</var>
+<arg>${RESPONSE.headers}</arg>
+<arg>Content-Type</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.275314" elapsed="0.000459"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${content_type}</arg>
+<arg>text/csv</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-02-16T17:26:01.275891" elapsed="0.000306"/>
+</kw>
+<status status="PASS" start="2026-02-16T17:26:01.275070" elapsed="0.001192"/>
+</kw>
+<doc>ทดสอบ API Export</doc>
+<status status="PASS" start="2026-02-16T17:26:01.168227" elapsed="0.108212"/>
+</test>
+<status status="PASS" start="2026-02-16T17:26:00.512589" elapsed="0.764825"/>
+</suite>
+<statistics>
+<total>
+<stat pass="3" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="System Log Tests" id="s1" pass="3" fail="0" skip="0">System Log Tests</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
