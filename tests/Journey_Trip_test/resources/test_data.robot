@@ -14,10 +14,22 @@ ${GPS_ORIGIN_LNG}           100.5018
 ${GPS_OUT_OF_RANGE_LAT}     14.0000
 ${GPS_OUT_OF_RANGE_LNG}     100.0000
 
+# ================= Additional GPS coordinates =================
+# ปลายทาง (Destination) ใกล้ Origin เล็กน้อย
+${GPS_DESTINATION_LAT}     13.7570
+${GPS_DESTINATION_LNG}     100.5020
+
+# Checkpoint 1 & 2 (a few hundred meters from origin)
+${GPS_CP1_LAT}             13.7568
+${GPS_CP1_LNG}             100.5015
+${GPS_CP2_LAT}             13.7565
+${GPS_CP2_LNG}             100.5025
+
 # ================= Locators: ฝั่งคนขับ (Driver) =================
 ${TAB_MY_ROUTES}            xpath=//button[contains(@class, 'tab-button') and contains(., 'เส้นทางของฉัน')]
 ${TAB_PENDING}              xpath=//button[contains(@class, 'tab-button') and contains(., 'รอดำเนินการ')]
 ${TRIP_CARD}                css=.trip-card
+${TRIP_CARD_2_PAX}           xpath=(//div[contains(@class,'trip-card')])[2]
 ${BTN_START_TRIP}           xpath=//button[contains(., 'เริ่มต้นการเดินทาง') and not(@disabled)]
 ${BTN_STARTED_DISABLED}     xpath=//button[contains(., 'กำลังเดินทาง...')]
 ${BTN_EDIT_ROUTE}           xpath=//a[contains(., 'แก้ไขเส้นทาง')]

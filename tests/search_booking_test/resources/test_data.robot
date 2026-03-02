@@ -46,6 +46,7 @@ ${C2_EXPECTED_MODAL_MSG}    กรุณาเลือกจุดรับ-ส
 # ขึ้น = stop2 (index 2), ลง = stop1 (index 1) ผิดลำดับ
 ${C3_PICKUP_LATER_STOP}     หมูกระทะริมคลอง ชุมแพ
 ${C3_DROPOFF_EARLIER_STOP}  โตโยต้า สาขาชุมแพ
+${C3_CHECK}                 โรงเรียนชุมแพศึกษา
 ${C3_EXPECTED_MODAL_TITLE}  จุดลงรถไม่ถูกต้อง
 ${C3_EXPECTED_MODAL_MSG}    จุดลงรถต้องอยู่ถัดจากจุดขึ้นรถในเส้นทาง
 
