@@ -97,14 +97,16 @@
     </div>
   </div>
 
-  
+  <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ -->
   <ConfirmModal
-    :show="showSuccessPopup"
-    title="ลบบัญชีสำเร็จ"
-    confirm-text="ตกลง"
-    cancel-text=" "
-    @confirm="handleAfterDelete"
-  />
+  :show="showSuccessPopup"
+  title="ลบบัญชีสำเร็จ"
+  message="เราได้ทำการลบข้อมูลของบัญชีเรียบร้อยแล้ว คุณต้องการดำเนินการต่อหรือไม่?"
+  confirm-text="ตกลง"
+  :cancel-text="null"
+  variant="danger"
+  @confirm="handleAfterDelete"
+/>
 
   
   <div class="fixed top-5 right-5 z-[1001] pointer-events-none">
