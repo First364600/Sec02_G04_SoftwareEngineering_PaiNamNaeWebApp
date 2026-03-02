@@ -17,6 +17,8 @@
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "nuxt": "^3.17.4",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "swiper": "^11.2.8",
     "tailwindcss": "^4.1.8",
     "vue": "^3.5.15",
