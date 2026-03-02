@@ -30,7 +30,7 @@ ${PASSENGER_ID_CARD_IMAGE_PATH}      tests/esources/serImage/id_card.png
 ${PASSENGER_SELFIE_IMAGE_PATH}      tests/esources/serImage/selfie_image.png
 
 # คนขับ
-${DRIVER_EMAIL}                   driver@test.com
+${DRIVER_EMAIL}                   firstt99000@gmail.com
 ${DRIVER_USERNAME}                driver
 ${DRIVER_PASSWORD}                Driver1234567
 ${DRIVER_FIRSTNAME}               driver_firstname

@@ -35,20 +35,20 @@
 
         <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ -->
         <div class="p-4 mb-6 border rounded-md bg-gray-50">
-          <p class="mb-3 font-medium">ข้อมูลส่วนบุคคลที่จะถูกลบ</p>
+          <p class="mb-3 font-medium">ข้อมูลส่วนบุคคลที่ต้องการจะรับ (ระบบจะส่งข้อมูลไปที่อีเมลของคุณ)</p>
 
           <label class="flex items-center gap-2 mb-2">
-            <input type="checkbox" v-model="deleteProfile" />
+            <input type="checkbox" v-model="selectProfileData" />
             <span>ประวัติส่วนตัว</span>
           </label>
 
           <label class="flex items-center gap-2 mb-2">
-            <input type="checkbox" v-model="deleteTripHistory" />
+            <input type="checkbox" v-model="selectTripHistoryData" />
             <span>ประวัติการเดินทาง</span>
           </label>
 
           <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="deleteVehicleData" />
+            <input type="checkbox" v-model="selectRouteAndVehicleData" />
             <span>ประวัติการสร้างเส้นทางและข้อมูลรถยนต์ (กรณีเป็นผู้ขับขี่)</span>
           </label>
 
@@ -126,16 +126,18 @@ import ProfileSidebar from '~/components/ProfileSidebar.vue'
 import ConfirmModal from '~/components/ConfirmModal.vue'
 import { useAuth } from '~/composables/useAuth'
 import Notification from '~/components/ToastNotification.vue'
+import { errorMessages } from 'vue/compiler-sfc'
 
 definePageMeta({ middleware: 'auth' })
 
 const router = useRouter()
 const { user, logout, deleteAccount } = useAuth()
+const { sendUserDataToEmail } = useUser()
 
 /* <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ --> */
-const deleteProfile = ref(false)
-const deleteTripHistory = ref(false)
-const deleteVehicleData = ref(false)
+const selectProfileData = ref(false)
+const selectTripHistoryData = ref(false)
+const selectRouteAndVehicleData = ref(false)
 
 
 const accepted = ref(false)
@@ -152,9 +154,9 @@ const profileImage = computed(() =>
 
 
 const hasSelectedData = computed(() =>
-  deleteProfile.value ||
-  deleteTripHistory.value ||
-  deleteVehicleData.value
+  selectProfileData.value ||
+  selectTripHistoryData.value ||
+  selectRouteAndVehicleData.value
 )
 
 const canDelete = computed(() =>
@@ -172,11 +174,14 @@ async function handleDeleteAccount() {
 
   isLoading.value = true
   try {
-    await deleteAccount({
-      deleteProfile: deleteProfile.value,
-      deleteTripHistory: deleteTripHistory.value,
-      deleteVehicleData: deleteVehicleData.value
-    })
+    await sendToUserEmail()
+    await deleteAccount(
+    //   {
+    //   deleteProfile: deleteProfile.value,
+    //   deleteTripHistory: deleteTripHistory.value,
+    //   deleteVehicleData: deleteVehicleData.value
+    // }
+  )
     showSuccessPopup.value = true
   } catch (e) {
     showToast('ล้มเหลว', 'ไม่สามารถลบบัญชีได้', 'error')
@@ -190,6 +195,22 @@ async function handleAfterDelete() {
   await logout()
   router.replace('/')
 }
+
+async function sendToUserEmail() {
+  try {
+    await sendUserDataToEmail({
+      selectProfileData: selectProfileData.value,
+      selectTripHistoryData: selectTripHistoryData.value,
+      selectRouteAndVehicleData: selectRouteAndVehicleData.value
+    })
+    
+    showToast("สำเร็จ", "ระบบกำลังส่งข้อมูลไปยังอีเมลของคุณ", "success")
+  } catch (e) {
+    console.error('Send email error:', e)
+    showToast("ผิดพลาด", "ไม่สามารถส่งข้อมูลไปยังอีเมลได้", "error")
+  }
+}
+
 </script>
 
 <style scoped>

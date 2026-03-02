@@ -5,7 +5,7 @@ Library    String
 Resource    ../card09/setup.robot
 
 Suite Setup    Setup All Sessions
-Suite Teardown    Delete All Users
+Suite Teardown    Delete All Sessions
 
 *** Variables ***
 &{BOOKINGS}
