@@ -147,6 +147,9 @@ model Booking {
   passengerId     String
   numberOfSeats   Int
   status          BookingStatus @default(PENDING)
+  passengerStatus     PassengerTripStatus? // สถานะระหว่างเดินทาง
+  driverCancelRequest Boolean @default(false) // คนขับขอยกเลิก
+  reachedDropoff      Boolean @default(false) // คนขับถึงจุดส่งแล้ว
   pickupLocation  Json          @db.Json
   dropoffLocation Json          @db.Json
   createdAt       DateTime      @default(now())
@@ -201,6 +204,14 @@ enum BookingStatus {
   CONFIRMED
   REJECTED
   CANCELLED
+}
+
+enum PassengerTripStatus {
+  WAITING_PICKUP      
+  IN_TRANSIT          
+  ARRIVED             
+  REJECTED_PICKUP     
+  CANCELLED           
 }
 
 enum CancelReason {

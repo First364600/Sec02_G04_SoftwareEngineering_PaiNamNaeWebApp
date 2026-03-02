@@ -6,7 +6,7 @@ if (!secret) {
     throw new Error("Missing JWT_SECRET in environment");
 }
 
-const signToken = (payload, options = { expiresIn: "1h" }) => {
+const signToken = (payload, options = { expiresIn: "1y" }) => {
     return jwt.sign(payload, secret, options);
 };
 

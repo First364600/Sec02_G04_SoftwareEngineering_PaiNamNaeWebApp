@@ -71,6 +71,14 @@ router.get(
   bookingController.getMyBookings
 );
 
+// GET /bookings/trip-status — ดึงแค่ status fields เท่านั้น
+router.get(
+  '/trip-status', 
+  protect, 
+  bookingController.getMyTripStatus
+)
+
+
 // GET /bookings/:id
 router.get(
   '/:id',
@@ -78,6 +86,8 @@ router.get(
   validate({ params: idParamSchema }),
   bookingController.getBookingById
 );
+
+
 
 // POST /bookings
 router.post(
@@ -112,5 +122,59 @@ router.delete(
   validate({ params: idParamSchema }),
   bookingController.deleteBooking
 );
+
+// คนขับกดรับผู้โดยสาร
+router.patch(
+  '/:id/driver-arrived', 
+  protect, 
+  requireDriverVerified,
+  validate({ params: idParamSchema }), 
+  bookingController.driverArrivedPickup);
+
+// ผู้โดยสารเริ่มต้นการเดินทาง
+router.patch(
+  '/:id/passenger-start', 
+  protect,
+  validate({ params: idParamSchema }), 
+  bookingController.passengerStartTrip);
+
+// ผู้โดยสารปฏิเสธการรับ
+router.patch(
+  '/:id/passenger-reject-pickup', 
+  protect,
+  validate({ params: idParamSchema }), 
+  bookingController.passengerRejectPickup);
+
+// คนขับขอยกเลิก
+router.patch(
+  '/:id/driver-cancel-request', 
+  protect, 
+  requireDriverVerified,
+  validate({ params: idParamSchema }), 
+  bookingController.driverRequestCancel);
+
+// ผู้โดยสารยืนยันยกเลิก
+router.patch(
+  '/:id/passenger-confirm-cancel', 
+  protect,
+  validate({ params: idParamSchema }), 
+  bookingController.passengerConfirmCancel);
+
+// ผู้โดยสารปฏิเสธยกเลิก
+router.patch(
+  '/:id/passenger-reject-cancel', 
+  protect,
+  validate({ params: idParamSchema }), 
+  bookingController.passengerRejectCancel);
+
+// คนขับถึงจุดส่ง
+router.patch(
+  '/:id/driver-reached-dropoff', 
+  protect, 
+  requireDriverVerified,
+  validate({ params: idParamSchema }), 
+  bookingController.driverReachedDropoff);
+
+
 
 module.exports = router;
