@@ -210,6 +210,10 @@ const deleteUser = async (id) => {
 const requestDeleteAccount = async (userId, ipAddress, userAgent) => {
     // ตรวจสอบว่า user มีอยู่
     const user = await prisma.user.findUnique({ where: { id: userId } });
+    
+    if (uncompletedRoute) {
+        throw new ApiError(400, 'Cannot delete account with uncompleted routes.');
+    }
     if (!user) {
         throw new ApiError(404, 'User not found');
     }
@@ -273,9 +277,9 @@ const processScheduledDeletions = async () => {
                 },
             });
 
-            console.log(`✓ User ${request.userId} deleted successfully`);
+            console.log('User ${request.userId} deleted successfully');
         } catch (error) {
-            console.error(`✗ Error deleting user ${request.userId}:`, error.message);
+            console.error('Error deleting user ${request.userId}:', error.message);
         }
     }
 
