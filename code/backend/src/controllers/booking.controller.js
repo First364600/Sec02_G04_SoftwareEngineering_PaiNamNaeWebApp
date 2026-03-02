@@ -1,3 +1,5 @@
+const prisma = require("../utils/prisma");
+const { LogType } = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
 const bookingService = require("../services/booking.service");
 const ApiError = require("../utils/ApiError");
@@ -15,6 +17,20 @@ const adminCreateBooking = asyncHandler(async (req, res) => {
 const adminUpdateBooking = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updated = await bookingService.adminUpdateBooking(id, req.body);
+  await prisma.systemLog.create({
+  data: {
+    userId: driverId,
+    bookingId: updated.id,
+    routeId: updated.routeId,
+    logType: LogType.TRANSACTION,
+    action: "UPDATE_BOOKING_STATUS",
+    method: req.method,
+    endpoint: req.originalUrl,
+    statusCode: 200,
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"]
+  }
+});
   res.status(200).json({ success: true, data: updated });
 });
 
@@ -28,6 +44,20 @@ const createBooking = asyncHandler(async (req, res) => {
   };
 
   const booking = await bookingService.createBooking(payload, passengerId);
+  await prisma.systemLog.create({
+    data: {
+      userId: passengerId,
+      bookingId: booking.id,
+      routeId: booking.routeId,
+      logType: LogType.TRANSACTION,
+      action: "CREATE_BOOKING",
+      method: req.method,
+      endpoint: req.originalUrl,
+      statusCode: 201,
+      ipAddress: req.ip,
+      userAgent: req.headers["user-agent"]
+    }
+  });
   res.status(201).json({ success: true, data: booking });
 });
 
@@ -81,6 +111,20 @@ const cancelBooking = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
   const cancelled = await bookingService.cancelBooking(id, passengerId, { reason });
+  await prisma.systemLog.create({
+  data: {
+    userId: passengerId,
+    bookingId: cancelled.id,
+    routeId: cancelled.routeId,
+    logType: LogType.TRANSACTION,
+    action: "CANCEL_BOOKING",
+    method: req.method,
+    endpoint: req.originalUrl,
+    statusCode: 200,
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"]
+  }
+});
   res.status(200).json({ success: true, data: cancelled });
 });
 

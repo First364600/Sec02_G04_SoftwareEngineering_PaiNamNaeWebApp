@@ -7,7 +7,10 @@ const { protect, requireAdmin } = require('../middlewares/auth');
 // GET /api/logs
 router.get('/', protect, requireAdmin, logController.getLogs);
 
-// GET /api/logs/export
+/* // GET /api/logs/export
+router.get('/', protect, requireAdmin, logController.getLogs);
+router.get('/export', protect, requireAdmin, logController.exportLogs); */
+
 router.get('/', protect, requireAdmin, logController.getLogs);
 router.get('/export', protect, requireAdmin, logController.exportLogs);
 

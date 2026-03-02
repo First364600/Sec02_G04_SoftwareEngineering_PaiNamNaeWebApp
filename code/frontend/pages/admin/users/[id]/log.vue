@@ -11,9 +11,9 @@
           <h1 class="text-2xl font-semibold text-gray-800">Log Event</h1>
 
           <button
-            @click="exportLogs"
+            @click="openExportModal"
             class="inline-flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
+          >
             Export
           </button>
         </div>
@@ -41,7 +41,7 @@
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
                     <img
-                      :src="user.profilePicture || avatarFallback"
+                      :src="getAvatarUrl(user)"
                       class="object-cover rounded-full w-9 h-9"
                     />
                     <div>
@@ -140,8 +140,8 @@
                           <td class="px-4 py-3">{{ log.event }}</td>
                           <td class="px-4 py-3">{{ log.userId }}</td>
                           <td class="px-4 py-3">{{ log.name }}</td>
-                          <td class="px-4 py-3">{{ formatDate(log.date) }}</td>
-                          <td class="px-4 py-3">{{ log.ip }}</td>
+                          <td class="px-4 py-3">{{ formatDate(log.createdAt) }}</td>
+                          <td class="px-4 py-3">{{ log.ipAddress }}</td>
                         
                           <td class="px-4 py-3">
                             <span
@@ -185,6 +185,114 @@
               </div>
             </main>
           </div>
+
+        <!-- ================= EXPORT MODAL ================= -->
+        <div
+          v-if="showExportModal"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        >
+          <div class="w-full max-w-3xl p-8 bg-white rounded-2xl shadow-xl">
+
+            <!-- Header -->
+            <h2 class="mb-6 text-3xl font-semibold text-blue-600">
+              Export log
+            </h2>
+
+            <!-- Personal Data Section -->
+            <div class="p-6 mb-6 border rounded-xl">
+              <h3 class="mb-4 font-semibold text-gray-700">
+                ข้อมูลส่วนบุคคล
+              </h3>
+
+              <div class="space-y-4">
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" v-model="exportOptions.personal" class="w-5 h-5">
+                  <span>ประวัติส่วนตัว</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" v-model="exportOptions.travel" class="w-5 h-5">
+                  <span>ประวัติการเดินทาง</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" v-model="exportOptions.routes" class="w-5 h-5">
+                  <span>ประวัติการสร้างเส้นทางและข้อมูลรถยนต์ (กรณีเป็นผู้ขับขี่)</span>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- Date Range -->
+            <div class="mb-6">
+              <h3 class="mb-3 font-semibold text-gray-700">วันที่</h3>
+
+              <div class="flex items-center gap-4">
+                <input
+                  type="date"
+                  v-model="exportOptions.dateFrom"
+                  class="px-4 py-2 border rounded-lg"
+                />
+                <span>-</span>
+                <input
+                  type="date"
+                  v-model="exportOptions.dateTo"
+                  class="px-4 py-2 border rounded-lg"
+                />
+              </div>
+            </div>
+
+            <!-- Log Type -->
+            <div class="p-6 mb-6 border rounded-xl">
+              <h3 class="mb-4 font-semibold text-gray-700">
+                ประเภทของ Log
+              </h3>
+
+              <div class="space-y-4">
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" value="AUTH" v-model="exportOptions.logTypes">
+                  <span>Authentication & Access Logs</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" value="TRANSACTION" v-model="exportOptions.logTypes">
+                  <span>Transactional & Activity Logs</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" value="BEHAVIOR" v-model="exportOptions.logTypes">
+                  <span>Navigation & Behavioral Logs</span>
+                </label>
+
+                <label class="flex items-center gap-3">
+                  <input type="checkbox" value="SECURITY" v-model="exportOptions.logTypes">
+                  <span>Security & Audit Logs</span>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex justify-end gap-4">
+              <button
+                @click="closeExportModal"
+                class="px-6 py-2 border rounded-lg"
+              >
+                Cancel
+              </button>
+
+              <button
+                @click="confirmExport"
+                class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Export
+              </button>
+            </div>
+
+          </div>
+        </div>          
         </template>
 
 
@@ -222,8 +330,31 @@ const pagination = reactive({
 })
 
 //generate รูปโปรไฟล์อัตโนมัติ
-const avatarFallback =
-  'https://ui-avatars.com/api/?name=U&background=random'
+const getAvatarUrl = (user) => {
+  return user?.profilePicture ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.firstName || 'U')}&background=random&size=64`
+}
+
+
+const showExportModal = ref(false)
+
+const exportOptions = reactive({
+  personal: false,
+  travel: false,
+  routes: false,
+  dateFrom: '',
+  dateTo: '',
+  logTypes: []
+})
+
+function openExportModal() {
+  showExportModal.value = true
+}
+
+function closeExportModal() {
+  showExportModal.value = false
+}
+
 
 function formatDate(d) {
   if (!d) return '-'
@@ -244,35 +375,31 @@ async function fetchLogs(page = 1) {
         Authorization: `Bearer ${token}`
       },
       query: {
-  page,
-  limit: pagination.limit,
-  search: search.value,
-  dateFrom: dateFrom.value,
-  dateTo: dateTo.value
-}
+        page,
+        limit: pagination.limit,
+        userId: userId   // ส่ง userId ไป backend ให้ filter ก่อน paginate
+      }
     })
 
-   rawLogs.value = res.data || []
+    rawLogs.value = res.data || []
 
-    logs.value = rawLogs.value
-      .filter(log => log.user_id === userId)
-      .map(log => ({
-        id: log.id,
-        event: log.action,
-        userId: log.user_id,
-        name: log.user?.email || 'Guest',
-        date: log.created_at,
-        ip: log.ip_address,
-        session: log.action
-      }))
+    // ไม่ต้อง filter ซ้ำใน frontend แล้ว
+    logs.value = rawLogs.value.map(log => ({
+      id: log.id,
+      event: log.action,
+      userId: log.userId,
+      name: log.user?.email || 'Guest',
+      createdAt: log.createdAt,
+      ipAddress: log.ipAddress,
+      session: log.action
+    }))
 
-    //user.value = res.user || {}
+    pagination.page = res.meta?.current_page || page
+    pagination.totalPages = res.meta?.total_pages || 1
+    pagination.total = res.meta?.total_items || 0
 
-   pagination.page = res.meta?.current_page || page
-   pagination.totalPages = res.meta?.total_pages || 1
-   pagination.total = res.meta?.total_items || logs.value.length
-
-
+  } catch (error) {
+    console.error("Fetch Logs Error:", error)
   } finally {
     isLoading.value = false
   }
@@ -331,45 +458,73 @@ function getStatusClass(session) {
 }
 
 //Export CSV
-function exportLogs() {
+async function confirmExport() {
+  try {
+    const token =
+      useCookie('token').value ||
+      localStorage.getItem('token')
 
-  if (!rawLogs.value.length) return
+    const params = new URLSearchParams()
 
-  const rows = rawLogs.value
-    .filter(log => log.user_id === userId)
-    .map(l => ({
-      user_id: l.user_id,
-      action: l.action,
-      method: l.method,
-      endpoint: l.endpoint,
-      ip_address: l.ip_address,
-      user_agent: l.user_agent,
-      status_code: l.status_code,
-      log_hash: l.log_hash,
-      created_at: formatDate(l.created_at)
-    }))
+    params.append('userId', userId)
 
-  const header = Object.keys(rows[0]).join(',')
+    if (exportOptions.dateFrom)
+      params.append('dateFrom', exportOptions.dateFrom)
 
-  const body = rows
-    .map(r =>
-      Object.values(r)
-        .map(v => `"${String(v ?? '').replace(/"/g, '""')}"`)
-        .join(',')
-    )
-    .join('\n')
+    if (exportOptions.dateTo)
+      params.append('dateTo', exportOptions.dateTo)
 
-  const csv = header + '\n' + body
+    if (exportOptions.logTypes.length) {
+      exportOptions.logTypes.forEach(t =>
+        params.append('logType', t)
+      )
+    }
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    // personal options
+    if (exportOptions.personal)
+      params.append('includePersonal', 'true')
 
-  const url = window.URL.createObjectURL(blob)
+    if (exportOptions.travel)
+      params.append('includeTravel', 'true')
 
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `user-${userId}-logs.csv`
-  a.click()
+    if (exportOptions.routes)
+      params.append('includeRoutes', 'true')
 
-  window.URL.revokeObjectURL(url)
+    const url = `${config.public.apiBase}/logs/export?${params.toString()}`
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const blob = await response.blob()
+    const downloadUrl = window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = downloadUrl
+
+    // ดึงชื่อไฟล์จาก header ที่ backend ส่งมา
+    const contentDisposition = response.headers.get("Content-Disposition")
+
+    let fileName = "export.csv"
+
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="?([^"]+)"?/)
+      if (match && match[1]) {
+        fileName = match[1]
+      }
+    }
+
+    a.download = fileName
+    a.click()
+
+    window.URL.revokeObjectURL(downloadUrl)
+
+    closeExportModal()
+
+  } catch (err) {
+    console.error('Export error:', err)
+  }
 }
 </script>

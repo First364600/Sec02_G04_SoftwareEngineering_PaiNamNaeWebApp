@@ -8,26 +8,26 @@ datasource db {
 }
 
 model User {
-  id                    String   @id @default(cuid())
-  username              String   @unique
-  email                 String   @unique
-  password              String
-  firstName             String?
-  lastName              String?
-  gender                String?
-  phoneNumber           String?
-  profilePicture        String?
-  nationalIdNumber      String?  @unique
-  nationalIdPhotoUrl    String?  @unique
-  nationalIdExpiryDate  DateTime?
-  selfiePhotoUrl        String?
-  role                  Role     @default(PASSENGER)
-  isVerified            Boolean  @default(false)
-  isActive              Boolean  @default(true)
-  otpCode               String?
-  lastLogin             DateTime?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                      String                 @id @default(cuid())
+  username                String                 @unique
+  email                   String                 @unique
+  password                String
+  firstName               String?
+  lastName                String?
+  gender                  String?
+  phoneNumber             String?
+  profilePicture          String?
+  nationalIdNumber        String?                @unique
+  nationalIdPhotoUrl      String?                @unique
+  nationalIdExpiryDate    DateTime?
+  selfiePhotoUrl          String?
+  role                    Role                   @default(PASSENGER)
+  isVerified              Boolean                @default(false)
+  isActive                Boolean                @default(true)
+  otpCode                 String?
+  lastLogin               DateTime?
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
   passengerSuspendedUntil DateTime?
   bookings                Booking[]              @relation("PassengerBookings")
   DeleteAccountRequest    DeleteAccountRequest[]
@@ -35,7 +35,7 @@ model User {
   notification            Notification[]
   createdRoutes           Route[]                @relation("DriverRoutes")
   vehicles                Vehicle[]
-  systemLogs            SystemLog[]  
+  systemLogs              SystemLog[]
 
   @@index([role])
   @@index([isActive])
@@ -116,7 +116,7 @@ model Route {
   pricePerSeat    Float
   conditions      String?
   status          RouteStatus @default(AVAILABLE)
-  currentStep   Int           @default(0)
+  currentStep     Int         @default(0)
   routeSummary    String?
   distance        String?
   duration        String?
@@ -133,6 +133,7 @@ model Route {
   bookings        Booking[]
   driver          User        @relation("DriverRoutes", fields: [driverId], references: [id], onDelete: Cascade)
   vehicle         Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  logs            SystemLog[]
 
   @@index([driverId])
   @@index([vehicleId])
@@ -155,6 +156,7 @@ model Booking {
   cancelReason    CancelReason?
   passenger       User          @relation("PassengerBookings", fields: [passengerId], references: [id], onDelete: Cascade)
   route           Route         @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  logs            SystemLog[]
 }
 
 model DeleteAccountRequest {
@@ -229,26 +231,32 @@ enum NotificationType {
   ROUTE
 }
 
-
 enum LogType {
-  AUTH          // Authentication & Access
-  TRANSACTION   // Transactional & Activity
-  BEHAVIOR      // Navigation & Behavioral
-  SECURITY      // Security & Audit
+  AUTH // Authentication & Access
+  TRANSACTION // Transactional & Activity
+  BEHAVIOR // Navigation & Behavioral
+  SECURITY // Security & Audit
 }
 
 model SystemLog {
-  id           Int      @id @default(autoincrement())
-  userId       String?
-  logType      LogType  @default(TRANSACTION)
-  action       String
-  method       String
-  endpoint     String
-  ipAddress    String?
-  userAgent    String?
-  statusCode   Int?
-  details      Json?
-  logHash      String?
-  createdAt    DateTime @default(now())
-  user         User?    @relation(fields: [userId], references: [id])
+  id Int @id @default(autoincrement())
+
+  routeId   String?
+  bookingId String?
+  userId    String?
+
+  logType    LogType  @default(TRANSACTION)
+  action     String
+  method     String
+  endpoint   String
+  ipAddress  String?
+  userAgent  String?
+  statusCode Int?
+  details    Json?
+  logHash    String?
+  createdAt  DateTime @default(now())
+
+  user    User?    @relation(fields: [userId], references: [id])
+  route   Route?   @relation(fields: [routeId], references: [id])
+  booking Booking? @relation(fields: [bookingId], references: [id])
 }

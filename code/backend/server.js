@@ -19,6 +19,12 @@ const ensureAdmin = require('./src/bootstrap/ensureAdmin');
 
 const prisma = require('./src/utils/prisma'); // Moved prisma import to the top
 const app = express();
+app.use(cors({
+  origin: true,
+  credentials: true,
+  exposedHeaders: ['Content-Disposition']
+}))
+
 promClient.collectDefaultMetrics();
 
 
