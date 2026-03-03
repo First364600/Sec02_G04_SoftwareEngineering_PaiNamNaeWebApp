@@ -190,11 +190,10 @@ async function handleDeleteAccount() {
 
   isLoading.value = true
   try {
-    //await sendToUserEmail()
     await deleteAccount()
-    
     confirmClose.value = false
     showSuccessPopup.value = true
+    await sendToUserEmail()
   } catch (error) {
       console.log("FULL ERROR:", error)
 
