@@ -58,3 +58,5 @@ Passenger Reject Trip Cancellation
     ${response}=    PATCH On Session
     ...    ${sessionName}
     ...    ${BOOKING_ROUTE_URL}/${bookingId}/passenger-reject-cancel
+
+    RETURN    ${response.json()}

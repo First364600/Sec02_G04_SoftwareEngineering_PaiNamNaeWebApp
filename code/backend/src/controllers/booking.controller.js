@@ -150,6 +150,11 @@ const driverArrivedPickup = asyncHandler(async (req, res) => {
   if (!booking) throw new ApiError(404, 'Booking not found');
   if (booking.route.driverId !== driverId) throw new ApiError(403, 'Forbidden');
 
+  const invalidStatuses = ['WAITING_PICKUP', 'IN_TRANSIT', 'COMPLETED', 'CANCELLED'];
+  if (invalidStatuses.includes(booking.passengerStatus) || booking.status === 'CANCELLED') {
+    throw new ApiError(400, `Cannot arrive. Current status is ${booking.passengerStatus}`);
+  }
+
   // อัพเดต passengerStatus เป็น WAITING_PICKUP
   const updated = await prisma.booking.update({
     where: { id },
@@ -179,8 +184,9 @@ const passengerStartTrip = asyncHandler(async (req, res) => {
   const booking = await bookingService.getBookingById(id);
   if (!booking) throw new ApiError(404, 'Booking not found');
   if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+
   if (booking.passengerStatus !== 'WAITING_PICKUP') {
-    throw new ApiError(400, 'ไม่สามารถเริ่มการเดินทางได้ในขณะนี้');
+    throw new ApiError(400, `Cannot start trip from status: ${booking.passengerStatus}`);
   }
 
   const updated = await prisma.booking.update({
@@ -211,6 +217,10 @@ const passengerRejectPickup = asyncHandler(async (req, res) => {
   const booking = await bookingService.getBookingById(id);
   if (!booking) throw new ApiError(404, 'Booking not found');
   if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+  
+  if (booking.passengerStatus !== 'WAITING_PICKUP') {
+    throw new ApiError(400, 'Cannot reject pickup at this stage');
+  }
 
   const updated = await prisma.booking.update({
     where: { id },
@@ -241,6 +251,12 @@ const driverRequestCancel = asyncHandler(async (req, res) => {
   if (!booking) throw new ApiError(404, 'Booking not found');
   if (booking.route.driverId !== driverId) throw new ApiError(403, 'Forbidden');
 
+  if (booking.passengerStatus === 'COMPLETED' || booking.route.status === 'COMPLETED') {
+    throw new ApiError(400, 'Journey is already completed');
+  }
+  if (booking.status === 'CANCELLED') throw new ApiError(400, 'This booking is already cancelled');
+  if (booking.driverCancelRequest === true) throw new ApiError(400, 'Cancellation request has already been sent');
+
   const updated = await prisma.booking.update({
     where: { id },
     data: { driverCancelRequest: true }
@@ -270,7 +286,10 @@ const passengerConfirmCancel = asyncHandler(async (req, res) => {
   if (!booking) throw new ApiError(404, 'Booking not found');
   if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
 
-  const updated = await prisma.booking.update({
+  if (booking.status === 'CANCELLED') throw new ApiError(400, 'Already cancelled');
+  if (!booking.driverCancelRequest) throw new ApiError(400, 'No cancellation request from driver found')
+  
+    const updated = await prisma.booking.update({
     where: { id },
     data: {
       status: 'CANCELLED',
@@ -304,7 +323,10 @@ const passengerRejectCancel = asyncHandler(async (req, res) => {
   const booking = await bookingService.getBookingById(id);
   if (!booking) throw new ApiError(404, 'Booking not found');
   if (booking.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
-
+  
+  if (booking.status === 'CANCELLED') throw new ApiError(400, 'Already cancelled');
+  if (!booking.driverCancelRequest) throw new ApiError(400, 'No cancellation request from driver found');
+  
   const updated = await prisma.booking.update({
     where: { id },
     data: { driverCancelRequest: false }
