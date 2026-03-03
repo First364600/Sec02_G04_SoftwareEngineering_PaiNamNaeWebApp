@@ -1,3 +1,5 @@
+const prisma = require("../utils/prisma");
+const { LogType } = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
 const routeService = require("../services/route.service");
 const vehicleService = require("../services/vehicle.service");
@@ -126,6 +128,19 @@ const createRoute = asyncHandler(async (req, res) => {
   }
 
   const newRoute = await routeService.createRoute(payload);
+  await prisma.systemLog.create({
+  data: {
+    userId: req.user.sub,
+    routeId: newRoute.id,
+    logType: LogType.TRANSACTION,
+    action: "CREATE_ROUTE",
+    method: req.method,
+    endpoint: req.originalUrl,
+    statusCode: 201,
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"],
+  }
+});
   res.status(201).json({
     success: true,
     message: "Route created successfully",
@@ -264,6 +279,19 @@ const deleteRoute = asyncHandler(async (req, res) => {
     throw new ApiError(400, "ไม่สามารถลบเส้นทางที่ถูกยกเลิกได้");
   }
   const result = await routeService.deleteRoute(id);
+  await prisma.systemLog.create({
+  data: {
+    userId: driverId,
+    routeId: id,
+    logType: LogType.TRANSACTION,
+    action: "DELETE_ROUTE",
+    method: req.method,
+    endpoint: req.originalUrl,
+    statusCode: 200,
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"],
+  }
+});
   res.status(200).json({
     success: true,
     message: "Route deleted successfully",
@@ -470,6 +498,19 @@ const cancelRoute = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
   const result = await routeService.cancelRoute(id, driverId, { reason });
+  await prisma.systemLog.create({
+  data: {
+    userId: driverId,
+    routeId: id,
+    logType: LogType.TRANSACTION,
+    action: "CANCEL_ROUTE",
+    method: req.method,
+    endpoint: req.originalUrl,
+    statusCode: 200,
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"],
+  }
+});
   res.status(200).json({
     success: true,
     message: "Route cancelled successfully",

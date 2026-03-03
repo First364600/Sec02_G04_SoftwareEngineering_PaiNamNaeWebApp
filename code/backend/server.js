@@ -20,6 +20,12 @@ const requireGatewayKey = require('./src/middlewares/gateway');
 
 const prisma = require('./src/utils/prisma'); // Moved prisma import to the top
 const app = express();
+app.use(cors({
+  origin: true,
+  credentials: true,
+  exposedHeaders: ['Content-Disposition']
+}))
+
 promClient.collectDefaultMetrics();
 
 
