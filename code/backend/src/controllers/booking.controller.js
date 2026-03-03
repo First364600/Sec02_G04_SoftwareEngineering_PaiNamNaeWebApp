@@ -3,7 +3,6 @@ const { LogType } = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
 const bookingService = require("../services/booking.service");
 const ApiError = require("../utils/ApiError");
-const prisma = require('../utils/prisma');
 
 const adminListBookings = asyncHandler(async (req, res) => {
   const result = await bookingService.searchBookingsAdmin(req.query);

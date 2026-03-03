@@ -280,4 +280,6 @@ module.exports = {
     deleteCurrentUser,
     setUserStatus,
     getUserDataExport, 
+    sendExportDataEmail,
+    getMyActivityHistory, 
 };
