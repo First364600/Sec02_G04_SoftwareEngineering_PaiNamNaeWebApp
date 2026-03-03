@@ -975,7 +975,8 @@ async function fetchMyRoutes() {
             );
             
             confirmedBookings.forEach(b => {
-                const pName = b.passenger?.firstName || 'ผู้โดยสาร';
+                // ใช้ชื่อจริง + นามสกุล
+                const pName = `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร';
                 if (b.pickupLocation) {
                     allPotentialStops.push({ 
                         lat: Number(b.pickupLocation.lat), 
