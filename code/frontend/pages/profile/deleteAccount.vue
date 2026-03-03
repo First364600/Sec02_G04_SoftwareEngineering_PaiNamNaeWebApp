@@ -97,7 +97,7 @@
     </div>
   </div>
 
-  <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ -->
+  <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ กรณีลบสำเร็จ-->
   <ConfirmModal
   :show="showSuccessPopup"
   title="ลบบัญชีสำเร็จ"
@@ -106,6 +106,17 @@
   :cancel-text="null"
   variant="danger"
   @confirm="handleAfterDelete"
+/>
+
+ <!--เพิ่มตรงนี้ กรณีมีการเดินทางค้างอยู่ -->
+<ConfirmModal
+  :show="showPendingTripModal"
+  title="ไม่สามารถลบบัญชีได้"
+  message="คุณยังมีการเดินทางที่กำลังดำเนินการอยู่ กรุณาสิ้นสุดหรือยกเลิกการเดินทางก่อน จึงจะสามารถลบบัญชีได้"
+  confirm-text="ตกลง"
+  :cancel-text="null"
+  variant="danger"
+  @confirm="showPendingTripModal = false"
 />
 
   
@@ -140,7 +151,7 @@ const { sendUserDataToEmail } = useUser()
 const selectProfileData = ref(false)
 const selectTripHistoryData = ref(false)
 const selectRouteAndVehicleData = ref(false)
-
+const showPendingTripModal = ref(false) //แก้ตรงนี้
 
 const accepted = ref(false)
 const confirmText = ref('')
@@ -184,10 +195,15 @@ async function handleDeleteAccount() {
     //   deleteVehicleData: deleteVehicleData.value
     // }
   )
-    showSuccessPopup.value = true
-  } catch (e) {
-    showToast('ล้มเหลว', 'ไม่สามารถลบบัญชีได้', 'error')
-  } finally {
+    showSuccessPopup.value = true 
+  } catch (e) {  //แก้ตรงนี้เป็นกรณีมีการเดินทางค้างอยู่
+
+    if (e?.code === 'ACTIVE_TRIP') { //แก้ตรงนี้เป็นกรณีมีการเดินทางค้างอยู่
+    showPendingTripModal.value = true
+    return
+  }
+  showToast('ล้มเหลว', e?.message || 'ไม่สามารถลบบัญชีได้', 'error')
+} finally {
     isLoading.value = false
   }
 }
