@@ -147,7 +147,7 @@
                                                     class="mt-4 w-full py-2 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 shadow-md transition-all flex justify-center items-center gap-2"
                                                 >
                                                     <span v-if="isProcessing" class="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full"></span>
-                                                     {{ getTripState(route.id).currentIndex === getRouteTimeline(route).length - 2 ? 'ยืนยันการถึงปลายทาง' : 'Checkpoint' }}
+                                                     {{ getRouteTimeline(route)[getTripState(route.id).currentIndex]?.type === 'destination' ? 'ยืนยันการถึงปลายทาง' : 'Checkpoint' }}
                                                 </button>
 
                                                 <div v-if="getTripState(route.id).completed" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-center text-sm text-green-700 font-medium">
@@ -459,7 +459,7 @@
                                                     class="mt-4 w-full py-2 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 shadow-md transition-all flex justify-center items-center gap-2"
                                                 >
                                                     <span v-if="isProcessing" class="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full"></span>
-                                                     {{ getTripState(route.id).currentIndex === getRouteTimeline(route).length - 2 ? 'ยืนยันการถึงปลายทาง' : 'Checkpoint' }}
+                                                     {{ getRouteTimeline(route)[getTripState(route.id).currentIndex]?.type === 'destination' ? 'ยืนยันการถึงปลายทาง' : 'Checkpoint' }}
                                                 </button>
 
                                                 <div v-if="getTripState(route.id).completed" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-center text-sm text-green-700 font-medium">
@@ -650,123 +650,124 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return R * c; 
 };
 
+
 const handleCheckPoint = async (routeId, routeData) => {
     const state = getTripState(routeId);
-    const timeline = getRouteTimeline(routeData); 
-    
-    const currentTarget = timeline[state.currentIndex];
+    const timeline = getRouteTimeline(routeData);
 
-    // เช็คว่าจุดนี้มีผู้โดยสารที่ต้องรับ และยังไม่ได้กดรับครบทุกคน
-    if (currentTarget.isPassengerPoint) {
-        const pickupPassengers = (currentTarget.passengerList || []).filter(pl => pl.action === 'pickup')
+    const currentPoint = timeline[state.currentIndex];
+    const totalPoints = timeline.length;
+
+    const isAtDestination = currentPoint.type === 'destination';
+    const nextIndex = state.currentIndex + 1;
+    const nextPoint = isAtDestination ? null : timeline[nextIndex];
+
+    if (!currentPoint) return;
+
+    const route = myRoutes.value.find(r => r.id === routeId);
+
+    const pickupsHere = (currentPoint.passengerList || []).filter(pl => pl.action === 'pickup');
+    if (pickupsHere.length > 0) {
+        const pendingPickups = pickupsHere.filter(pl => {
+            const passenger = route?.passengers?.find(p => p.name === pl.name);
+            if (!passenger) return true;
+            const st = (passenger.passengerStatus || '').toLowerCase().replace(/_/g, '');
+            return !['waitingpickup', 'intransit', 'arrived'].includes(st);
+        });
         
-        if (pickupPassengers.length > 0) {
-            const route = myRoutes.value.find(r => r.id === routeId)
-            const pendingPickups = pickupPassengers.filter(pl => {
-                const passenger = route?.passengers?.find(p => p.name === pl.name)
-                // ถ้ายังไม่ได้รับ (ไม่มี passengerStatus หรือยังเป็น REJECTED_PICKUP)
-                return !passenger || !['waiting_pickup', 'in_transit', 'arrived'].includes(
-                    (passenger.passengerStatus || '').toLowerCase()
-                )
-            })
-
-            if (pendingPickups.length > 0) {
-                toast.error(
-                    'ยังรับผู้โดยสารไม่ครบ',
-                    `กรุณากดรับผู้โดยสารก่อน: ${pendingPickups.map(p => p.name).join(', ')}`
-                )
-                return
-            }
-        }
-
-        // ถ้าจุดนี้มีผู้โดยสารที่ต้องส่ง ให้แจ้ง driver-reached-dropoff
-        const dropoffPassengers = (currentTarget.passengerList || []).filter(pl => pl.action === 'dropoff')
-        if (dropoffPassengers.length > 0) {
-            const route = myRoutes.value.find(r => r.id === routeId)
-            for (const pl of dropoffPassengers) {
-                const passenger = route?.passengers?.find(p => p.name === pl.name)
-                if (passenger && passenger.passengerStatus === 'IN_TRANSIT') {
-                    try {
-                        await $api(`/bookings/${passenger.id}/driver-reached-dropoff`, { method: 'PATCH' })
-                    } catch (e) {
-                        console.warn(`driver-reached-dropoff error for ${pl.name}:`, e)
-                    }
-                }
-            }
+        if (pendingPickups.length > 0) {
+            toast.error('ยังรับผู้โดยสารไม่ครบ',
+                `กรุณากดรับผู้โดยสารก่อนเดินทางต่อ:\n${pendingPickups.map(p => `• ${p.name}`).join('\n')}`
+            );
+            return;
         }
     }
 
-    // คำนวณพิกัดจุดเป้าหมาย
+    
     let targetLat, targetLng;
-    if (currentTarget.type === 'origin') {
+    if (currentPoint.type === 'origin') {
         targetLat = Number(routeData.coords[0][0]);
         targetLng = Number(routeData.coords[0][1]);
-    } else if (currentTarget.type === 'destination') {
+    } else if (currentPoint.type === 'destination') {
         targetLat = Number(routeData.coords[1][0]);
         targetLng = Number(routeData.coords[1][1]);
     } else {
-        const stopIndex = state.currentIndex - 1;
-        targetLat = Number(routeData.stopsCoords[stopIndex].lat);
-        targetLng = Number(routeData.stopsCoords[stopIndex].lng);
+       
+        const stopData = routeData.stopsCoords.find(s => s.name === currentPoint.name);
+        targetLat = Number(stopData?.lat);
+        targetLng = Number(stopData?.lng);
     }
 
     try {
         isProcessing.value = true;
 
-        // ดึงพิกัดปัจจุบันจาก GPS
         const position = await new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
-                enableHighAccuracy: true,
-                timeout: 10000
+                enableHighAccuracy: true, timeout: 10000
             });
         });
         const { latitude, longitude } = position.coords;
 
-        // เช็คระยะห่าง 500 เมตร
+        
         const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
-        if (distance > 5000000) {
-            toast.error('คุณไม่อยู่ในพื้นที่', 
-                `คุณต้องเช็คอินที่ [${currentTarget.name}] ในรัศมี 500 ม. (ปัจจุบันห่าง ${Math.round(distance)} ม.)`
+        if (distance > 500) {
+            toast.error('คุณไม่อยู่ในพื้นที่',
+                `ต้องอยู่ที่ [${currentPoint.name}] ในรัศมี 500 ม.\n(ปัจจุบันห่าง ${Math.round(distance)} ม.)`
             );
             return;
         }
 
-        const nextIndex = state.currentIndex + 1;
-        const isLastStep = nextIndex >= timeline.length; 
-        const nextStatus = isLastStep ? 'COMPLETED' : 'IN_TRANSIT';
+        
+        const dropoffsHere = (currentPoint.passengerList || []).filter(pl => pl.action === 'dropoff');
+        for (const pl of dropoffsHere) {
+            const freshRoute = myRoutes.value.find(r => r.id === routeId);
+            const passenger = freshRoute?.passengers?.find(p => p.name === pl.name);
+            const st = (passenger?.passengerStatus || '').toLowerCase().replace(/_/g, '');
+            if (st === 'intransit') {
+                try {
+                    await $api(`/bookings/${passenger.id}/driver-reached-dropoff`, { method: 'PATCH' });
+                } catch (e) {
+                    console.warn(`Notify dropoff failed for ${pl.name}:`, e);
+                }
+            }
+        }
+
+        
+        const nextStatus = isAtDestination ? 'COMPLETED' : 'IN_TRANSIT';
 
         await $api(`/routes/${routeId}/progress`, {
             method: 'PATCH',
             body: { 
-                currentStep: isLastStep ? state.currentIndex : nextIndex, 
+                currentStep: isAtDestination ? state.currentIndex : nextIndex, 
                 status: nextStatus 
             }
         });
 
-        if (!isLastStep) {
+        
+        if (!isAtDestination) {
             state.currentIndex = nextIndex;
             state.status = 'IN_TRANSIT';
-            toast.success('Check-in สำเร็จ', `ยืนยันพิกัดที่: ${currentTarget.name}`);
-            updateMap(routeData); 
+            toast.success('Check-in สำเร็จ', `มาถึง ${currentPoint.name} แล้ว → มุ่งหน้า ${nextPoint?.name}`);
+            updateMap(routeData);
         } else {
+            
             state.completed = true;
             state.started = false;
             state.status = 'COMPLETED';
             updateMap(routeData);
-
+            
+            
             modalMode.value = 'complete';
             pendingRouteId.value = routeId;
             isConfirmModalVisible.value = true;
-            
-            toast.success('ถึงจุดหมายปลายทางแล้ว', `สิ้นสุดการเดินทางที่: ${currentTarget.name}`);
+            toast.success('ถึงจุดหมายปลายทางแล้ว', `สิ้นสุดการเดินทางที่: ${currentPoint.name}`);
         }
-        
+
     } catch (error) {
         console.error('Checkpoint error:', error);
-        const errorMsg = error.code === 1 
-            ? 'กรุณาอนุญาตการเข้าถึงพิกัด GPS' 
-            : 'ไม่สามารถเชื่อมต่อ Server ได้';
-        toast.error('เกิดข้อผิดพลาด', errorMsg);
+        toast.error('เกิดข้อผิดพลาด',
+            error.code === 1 ? 'กรุณาอนุญาตการเข้าถึงพิกัด GPS' : 'ไม่สามารถเชื่อมต่อ Server ได้'
+        );
     } finally {
         isProcessing.value = false;
     }
@@ -971,9 +972,9 @@ async function fetchMyRoutes() {
             const confirmedBookings = (r.bookings || []).filter(
                 b => (b.status || '').toUpperCase() === 'CONFIRMED'
             );
-
+            
             confirmedBookings.forEach(b => {
-                const pName = b.passenger?.firstName || 'ผู้โดยสาร';
+                const pName = `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร';
                 if (b.pickupLocation) {
                     allPotentialStops.push({ 
                         lat: Number(b.pickupLocation.lat), 
@@ -1025,6 +1026,15 @@ async function fetchMyRoutes() {
                     });
                 }
             });
+            // วางหลัง }); ของ allPotentialStops.forEach
+                console.log('=== STOPS DEBUG ===')
+                console.log('allPotentialStops:', JSON.stringify(allPotentialStops.map(s => ({
+                    name: s.name, isPassengerPoint: s.isPassengerPoint, actionType: s.actionType
+                }))))
+                console.log('filteredStops:', JSON.stringify(filteredStops.map(s => ({
+                    name: s.name, passengerList: s.passengerList
+                }))))
+                console.log('===================')
 
                             
                                 const sortedStops = filteredStops.sort((a, b) => {
