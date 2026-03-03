@@ -1,0 +1,20 @@
+{
+  "driver": {
+    "email": "oonchira22",
+    "password": "888Frist19",
+    "origin_gps": { "lat": 16.5439, "lng": 102.0990 },
+    "destination_gps": { "lat": 16.5439, "lng": 102.0990 }, 
+    "out_of_range_gps": { "lat": 17.0, "lng": 103.0 }
+  },
+  "passenger": {
+    "email": "oonchira33",
+    "password": "888Frist"
+  },
+  "passenger2": {
+    "email": "oonchira44", 
+    "password": "888Frist19"
+  },
+  "locations": {
+    "khon_kaen": "ขอนแก่น"
+  }
+}

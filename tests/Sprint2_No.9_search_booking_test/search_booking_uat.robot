@@ -5,7 +5,7 @@ Library             Collections
 Library             String
 Resource            resources/test_data.robot
 
-Suite Setup         Open Browser และ Login ตามวิดีโอ
+Suite Setup         Open Browser และ Login 
 Suite Teardown      Close All Browsers
 
 *** Test Cases ***

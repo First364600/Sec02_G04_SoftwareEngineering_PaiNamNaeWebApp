@@ -1,0 +1,16 @@
+{
+  "name": "painamnae-uat-playwright",
+  "version": "1.0.0",
+  "description": "UAT Test Suite for PaiNamNae Web App using Playwright",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report test-results"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0"
+  }
+}
