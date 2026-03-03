@@ -11,8 +11,9 @@ Resource    ${CURDIR}/../../resources/variables.robot
 *** Variables ***
 
 # Global variables
-@{ROUTES_LIST}
+&{ROUTES_LIST}
 @{USERS_ID}
+&{BOOKINGS_LIST}
 
 # ผู้โดยสาร
 ${PASSENGER_EMAIL}                   passsenger@test.com
@@ -28,6 +29,18 @@ ${PASSENGER_NATIONAL_ID_EXPIRY_DATE}    2025-12-23T00:00:00.000Z
 # ไม่ต้องใส่ path ก็ได้ เพราะว่าทำ default ไว้ให้แล้ว
 ${PASSENGER_ID_CARD_IMAGE_PATH}      tests/esources/serImage/id_card.png
 ${PASSENGER_SELFIE_IMAGE_PATH}      tests/esources/serImage/selfie_image.png
+
+# ผู้โดยสารคนที่สอง
+${PASSENGER2_EMAIL}                   passsenger2@test.com
+${PASSENGER2_USERNAME}                passenger2
+${PASSENGER2_PASSWORD}                Passenger21234567
+${PASSENGER2_FIRSTNAME}               passenger2_firstname
+${PASSENGER2_LASTNAME}                passenger2_lastname
+${PASSENGER2_PHONE_NUMBER}            0123456789
+${PASSENGER2_GENDER}                  MALE
+${PASSENGER2_ROLE}                    PASSENGER
+${PASSENGER2_NATIONAL_ID_NUMBER}      0123456789233
+${PASSENGER2_NATIONAL_ID_EXPIRY_DATE}    2025-12-23T00:00:00.000Z
 
 # คนขับ
 ${DRIVER_EMAIL}                   firstt99000@gmail.com
@@ -86,21 +99,38 @@ ${ROUTE_CONDITIONS}             No smoking
 
 @{ROUTE_WAYPOINTS}    ${WAYPOINT_1}    # ${WAYPOINT_2}
 
-# ผู้ใช้จองการเดินทาง
-${BOOKINGS_NUMBER_OF_SEATS}        ${1}
+# ผู้โดยสาร 1 จองการเดินทาง
+${P1_BOOKINGS_NUMBER_OF_SEATS}        ${1}
 
-&{BOOKINGS_PICKUP_LOCATION}
+&{P1_BOOKINGS_PICKUP_LOCATION}
+...    lat=${16.432153}
+...    lng=${102.8235572}
+...    address=Khon Kaen, Mueang Khon Kaen District, Khon Kaen 40000, Thailand
+...    name=Khon Kaen
+...    placeId=ChIJL46YkStgIjERxpx5zwUIPwk
+
+&{P1_BOOKINGS_DROPOFF_LOCATION}
 ...    lat=${14.9739015}
 ...    lng=${102.0836593}
 ...    address=Nai Mueang, Mueang Nakhon Ratchasima District, Nakhon Ratchasima 30000, Thailand
 ...    name=Nai Mueang
 ...    placeId=ChIJhbHNZrhMGTERgOLeyM9pBAQ
 
-&{BOOKINGS_DROPOFF_LOCATION}
-...    lat=${16.432153}
-...    lng=${102.8235572}
-...    address=Khon Kaen, Mueang Khon Kaen District, Khon Kaen 40000, Thailand
-...    name=Khon Kaen
+# ผู้โดยสาร 2 จองการเดินทาง
+${P2_BOOKINGS_NUMBER_OF_SEATS}        ${2}
+
+&{P2_BOOKINGS_PICKUP_LOCATION}
+...    lat=${14.9739015}
+...    lng=${102.0836593}
+...    address=Nai Mueang, Mueang Nakhon Ratchasima District, Nakhon Ratchasima 30000, Thailand
+...    name=Nai Mueang
+...    placeId=ChIJhbHNZrhMGTERgOLeyM9pBAQ
+
+&{P2_BOOKINGS_DROPOFF_LOCATION}
+...    lat=${13.75632914260191}
+...    lng=${100.50175864165533}
+...    name=กรุงเทพมหานคร
+...    address=กรุงเทพมหานคร
 ...    placeId=ChIJL46YkStgIjERxpx5zwUIPwk
 
 # คนขับยืนยันการจองของผู้ใช้
@@ -139,17 +169,36 @@ Setup All Sessions
     ...    nationalIdNumber=${DRIVER_NATIONAL_ID_NUMBER}
     ...    nationalIdExpiryDate=${DRIVER_NATIONAL_ID_EXPIRY_DATE}
 
+    Log To Console    Creating Passenger: ${PASSENGER2_USERNAME}
+    ${response}=    Create User
+    ...    username=${PASSENGER2_USERNAME}
+    ...    email=${PASSENGER2_EMAIL}
+    ...    password=${PASSENGER2_PASSWORD}
+    ...    firstName=${PASSENGER2_FIRSTNAME}
+    ...    lastName=${PASSENGER2_LASTNAME}
+    ...    role=${PASSENGER2_ROLE}
+    ...    phoneNumber=${PASSENGER2_PHONE_NUMBER}
+    ...    gender=${PASSENGER2_GENDER}
+    ...    nationalIdNumber=${PASSENGER2_NATIONAL_ID_NUMBER}
+    ...    nationalIdExpiryDate=${PASSENGER2_NATIONAL_ID_EXPIRY_DATE}
+
     # Driver Login
     ${driver_token}    ${driver_id}=    Login And Get Token    user_email=${DRIVER_EMAIL}    user_password=${DRIVER_PASSWORD}
     &{driver_headers}=    Create Dictionary    Authorization=Bearer ${driver_token}    x-gateway-key=${X-GATEWAY-KEY}
     Create Session    DriverSession    ${BASE_URL}    headers=${driver_headers}
     Append To List    ${USERS_ID}    ${driver_id}
     
-    # Passenger Login
+    # Passenger 1 Login
     ${passenger_token}    ${passenger_id}=    Login And Get Token    user_email=${PASSENGER_EMAIL}    user_password=${PASSENGER_PASSWORD}
     &{passenger_headers}=    Create Dictionary    Authorization=Bearer ${passenger_token}    x-gateway-key=${X-GATEWAY-KEY}
-    Create Session    PassengerSession    ${BASE_URL}    headers=${passenger_headers}
+    Create Session    Passenger1Session    ${BASE_URL}    headers=${passenger_headers}
     Append To List    ${USERS_ID}    ${passenger_id}
+
+    # Passenger 2 Login
+    ${passenger2_token}    ${passenger2_id}=    Login And Get Token    user_email=${PASSENGER2_EMAIL}    user_password=${PASSENGER2_PASSWORD}
+    &{passenger2_headers}=    Create Dictionary    Authorization=Bearer ${passenger2_token}    x-gateway-key=${X-GATEWAY-KEY}
+    Create Session    Passenger2Session    ${BASE_URL}    headers=${passenger2_headers}
+    Append To List    ${USERS_ID}    ${passenger2_id}
 
     # Admin Login
     ${admin_token}    ${admin_id}=    Login And Get Token    user_email=${ADMIN_EMAIL}    user_password=${ADMIN_PASSWORD}
@@ -208,32 +257,45 @@ Setup All Sessions
 
     ${ROUTE_ID}=    Get From Dictionary    ${response}[data]    id
     
-    Append To List    ${ROUTES_LIST}    ${response}[data]
-    # # Passenger Bookings Route
-    # Log To Console    Passenger Bookings Route
-    # ${response}=    Passenger Bookings Route
-    # ...    sessionName=PassengerSession
-    # ...    routeId=${ROUTE_ID}
-    # ...    numberOfSeats=${BOOKINGS_NUMBER_OF_SEATS}
-    # ...    pickupLocation=${BOOKINGS_PICKUP_LOCATION}
-    # ...    dropoffLocation=${BOOKINGS_DROPOFF_LOCATION}
+    Set To Dictionary    ${ROUTES_LIST}    route1    ${response}[data]
+    # Passenger 1 Bookings Route
+    Log To Console    Passenger 1 Bookings Route
+    ${response}=    Passenger Bookings Route
+    ...    sessionName=Passenger1Session
+    ...    routeId=${ROUTE_ID}
+    ...    numberOfSeats=${P1_BOOKINGS_NUMBER_OF_SEATS}
+    ...    pickupLocation=${P1_BOOKINGS_PICKUP_LOCATION}
+    ...    dropoffLocation=${P1_BOOKINGS_DROPOFF_LOCATION}    
 
-    # ${BOOKING_ID}=    Get From Dictionary    ${response}[data]    id
+    ${BOOKING_ID}=    Get From Dictionary    ${response}[data]    id
+    Set To Dictionary    ${BOOKINGS_LIST}    route1_book1    ${response}[data]    
 
-    # # Driver Confirm user bookings
-    # Log To Console    Driver comfirm bookings
-    # ${response}=    Driver Confirm User Bookings
-    # ...    sessionName=DriverSession
-    # ...    bookingId=${BOOKING_ID}
-    # ...    status=${DRIVER_CONFIRM_BOOKING_STATUS}
+    # Passenger 2 Bookings Route
+    Log To Console    Passenger 2 Bookings Route
+    ${response}=    Passenger Bookings Route
+    ...    sessionName=Passenger2Session
+    ...    routeId=${ROUTE_ID}
+    ...    numberOfSeats=${P2_BOOKINGS_NUMBER_OF_SEATS}
+    ...    pickupLocation=${P2_BOOKINGS_PICKUP_LOCATION}
+    ...    dropoffLocation=${P2_BOOKINGS_DROPOFF_LOCATION}
 
-    # # Driver Start Trip
-    # Log To Console    Driver Start Trip
-    # ${response}=    Driver Update Trip (start trip, checkpoint, end trip)
-    # ...    sessionName=DriverSession
-    # ...    routeId=${ROUTE_ID}
-    # ...    currentStep=0
-    # ...    status=IN_TRANSIT
+    ${BOOKING_ID}=    Get From Dictionary    ${response}[data]    id
+    Set To Dictionary    ${BOOKINGS_LIST}    route1_book2    ${response}[data]
+    
+    # Driver Confirm user bookings
+    Log To Console    Driver comfirm bookings
+    ${response}=    Driver Confirm User Bookings
+    ...    sessionName=DriverSession
+    ...    bookingId=${BOOKING_ID}
+    ...    status=${DRIVER_CONFIRM_BOOKING_STATUS}
+
+    # Driver Start Trip
+    Log To Console    Driver Start Trip
+    ${response}=    Driver Update Trip (start trip, checkpoint, end trip)
+    ...    sessionName=DriverSession
+    ...    routeId=${ROUTE_ID}
+    ...    currentStep=0
+    ...    status=IN_TRANSIT
 
     
     

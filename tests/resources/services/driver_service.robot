@@ -132,7 +132,7 @@ Driver Arrived (pickup passenger)
     RETURN    ${response.json()}
 
 # คนขับกดปุ่ม ยกเลิกการเดินทาง
-Driver Cancel the Journey
+Driver Cancel the Passenger Journey
     [Arguments]    ${sessionName}    ${bookingId}
     [Documentation]    คนขับยกเลิกการเดินทางของผู้โดยสาร
     ${response}=    PATCH On Session
