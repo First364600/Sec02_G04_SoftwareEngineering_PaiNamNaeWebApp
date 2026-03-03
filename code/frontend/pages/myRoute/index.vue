@@ -701,6 +701,7 @@ const handleCheckPoint = async (routeId, routeData) => {
     try {
         isProcessing.value = true;
 
+        // ดึงพิกัดปัจจุบันจาก GPS
         const position = await new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
                 enableHighAccuracy: true, timeout: 10000
@@ -762,7 +763,7 @@ const handleCheckPoint = async (routeId, routeData) => {
             isConfirmModalVisible.value = true;
             toast.success('ถึงจุดหมายปลายทางแล้ว', `สิ้นสุดการเดินทางที่: ${currentPoint.name}`);
         }
-
+        
     } catch (error) {
         console.error('Checkpoint error:', error);
         toast.error('เกิดข้อผิดพลาด',
@@ -974,7 +975,7 @@ async function fetchMyRoutes() {
             );
             
             confirmedBookings.forEach(b => {
-                const pName = `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร';
+                const pName = b.passenger?.firstName || 'ผู้โดยสาร';
                 if (b.pickupLocation) {
                     allPotentialStops.push({ 
                         lat: Number(b.pickupLocation.lat), 
