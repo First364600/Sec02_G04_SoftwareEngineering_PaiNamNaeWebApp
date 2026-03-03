@@ -153,6 +153,58 @@ export function useUser() {
     }
   }
 
+  async function getAllUserDataByUserId() {
+    try {
+      return await $api(`/users/me`, {
+        method: "GET"
+      })
+
+    } catch (e) {
+      console.error('Fail to get user data', e)
+    }
+  }
+
+  async function getProfileData() {
+    try {
+      return await $api('users/me', {
+        method: "GET"
+      })
+    } catch (e) {
+      console.error('Fail to get profile data')
+    }
+  }
+
+  async function getTripHistoryData() {
+    try {
+      return await $api('users/me', {
+        method: "GET"
+      })
+    } catch (e) {
+      console.error('Fail to get trip history data')
+    }
+  }
+
+  async function getRouteAndVehicleData() {
+    try {
+      return await $api("users/me", {
+        method: "GET"
+      })
+    } catch (e) {
+      console.error('Fail to get route and vehicle data')
+    }
+  }
+
+  async function sendUserDataToEmail(preferences) {
+    try {
+      return await $api('/users/send-export-data-to-email', {
+        method: 'POST',
+        body: preferences
+      })
+    } catch (e) {
+      throw e
+    }
+  }
+
   return {
     // state
     accounts,
@@ -180,6 +232,10 @@ export function useUser() {
     confirmEdit,
     openDeleteModal,
     closeDeleteModal,
-    confirmDelete
+    confirmDelete,
+    getProfileData,
+    getTripHistoryData,
+    getRouteAndVehicleData,
+    sendUserDataToEmail
   }
 }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2026-03-02T23:06:00.948990" rpa="false" schemaversion="5">
+<suite id="s1" name="Test" source="D:\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\sprint216front\test.robot">
+<kw name="Open Passenger Browser" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-03-02T23:06:01.130133" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:3000/passenger/my-trips'.</msg>
+<arg>${PASSENGER_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-03-02T23:06:01.129954" elapsed="1.186442"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-03-02T23:06:02.316660" elapsed="0.033588"/>
+</kw>
+<kw name="Set Selenium Timeout" owner="SeleniumLibrary">
+<arg>10s</arg>
+<doc>Sets the timeout that is used by various keywords.</doc>
+<status status="PASS" start="2026-03-02T23:06:02.350457" elapsed="0.000916"/>
+</kw>
+<kw name="Set Selenium Implicit Wait" owner="SeleniumLibrary">
+<arg>5s</arg>
+<doc>Sets the implicit wait value used by Selenium.</doc>
+<status status="PASS" start="2026-03-02T23:06:02.351498" elapsed="0.000695"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<msg time="2026-03-02T23:06:07.716247" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-3.png"&gt;&lt;img src="selenium-screenshot-3.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-03-02T23:06:07.716438" level="FAIL">Element 'css=.trip-card' not visible after 5 seconds.</msg>
+<arg>${TRIP_CARD}</arg>
+<arg>timeout=${SHORT_WAIT}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="FAIL" start="2026-03-02T23:06:02.352314" elapsed="5.377187">Element 'css=.trip-card' not visible after 5 seconds.</status>
+</kw>
+<status status="FAIL" start="2026-03-02T23:06:01.129400" elapsed="6.600280">Element 'css=.trip-card' not visible after 5 seconds.</status>
+</kw>
+<test id="s1-t1" name="SCENARIO_01_Passenger_Book_1" line="42">
+<doc>Passenger มาจอง 1 คน → ต้องไปอยู่ในสถานะรอดำเนินการ</doc>
+<status status="FAIL" start="2026-03-02T23:06:07.729774" elapsed="0.000860">Parent suite setup failed:
+Element 'css=.trip-card' not visible after 5 seconds.</status>
+</test>
+<test id="s1-t2" name="SCENARIO_02_Passenger_Book_2" line="48">
+<doc>Passenger มาจอง 2 คน → ต้องไปอยู่ในสถานะรอดำเนินการ</doc>
+<status status="FAIL" start="2026-03-02T23:06:07.731147" elapsed="0.000650">Parent suite setup failed:
+Element 'css=.trip-card' not visible after 5 seconds.</status>
+</test>
+<test id="s1-t3" name="SCENARIO_03_Passenger_Book_3" line="55">
+<doc>Passenger มาจอง 3 คน → ต้องไปอยู่ในสถานะรอดำเนินการ</doc>
+<status status="FAIL" start="2026-03-02T23:06:07.732238" elapsed="0.000651">Parent suite setup failed:
+Element 'css=.trip-card' not visible after 5 seconds.</status>
+</test>
+<test id="s1-t4" name="SCENARIO_04_Passenger_Book_4" line="62">
+<doc>Passenger มาจอง 4 คน → ต้องไปอยู่ในสถานะรอดำเนินการ</doc>
+<status status="FAIL" start="2026-03-02T23:06:07.733396" elapsed="0.000783">Parent suite setup failed:
+Element 'css=.trip-card' not visible after 5 seconds.</status>
+</test>
+<kw name="Close All Browsers" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" start="2026-03-02T23:06:07.734926" elapsed="2.131288"/>
+</kw>
+<status status="FAIL" start="2026-03-02T23:06:00.950414" elapsed="8.915887">Suite setup failed:
+Element 'css=.trip-card' not visible after 5 seconds.</status>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="4" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Test" id="s1" pass="0" fail="4" skip="0">Test</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

@@ -21,14 +21,26 @@
                     </div>
                 </div>
                 <!-- เพิ่มให้ยืดหยุ่นปรับใช้ได้ -->
-                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
-                    <button  v-if="cancelText" @click="handleCancel" type="button" class="btn-secondary" >
+                <div class="px-6 pb-6 flex justify-end space-x-3">
+          
+                    <button
+                        v-if="cancelText"
+                        @click="handleCancel"
+                        type="button"
+                        class="btn-secondary"
+                    >
                         {{ cancelText }}
                     </button>
-                    <button @click="handleConfirm" type="button" :class="['btn-primary', confirmButtonClass]">
+
+                    <button
+                        @click="handleConfirm"
+                        type="button"
+                        :disabled="disabledConfirm"
+                        :class="['btn-primary', confirmButtonClass, disabledConfirm ? 'opacity-50 cursor-not-allowed' : '']"
+                    >
                         {{ confirmText }}
                     </button>
-                </div>
+                    </div>
             </div>
         </div>
     </transition>

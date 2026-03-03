@@ -54,7 +54,7 @@ User Login
     
     ${response}=    POST On Session    api_session    /auth/login    json=${login_data}    expected_status=any
     
-    RETURN    ${response}
+    RETURN    ${response.json()}
 
 Delete User Account
     [Arguments]    ${auth_token}
@@ -66,4 +66,4 @@ Delete User Account
     
     ${response}=    DELETE On Session    api_session    /users/me    headers=${headers}    expected_status=any
     
-    RETURN    ${response}
+    RETURN    ${response.json()}

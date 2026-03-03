@@ -162,7 +162,7 @@ model Booking {
 
 model DeleteAccountRequest {
   id                    String    @id @default(cuid())
-  userId                String
+  userId                String?
   requestedAt           DateTime  @default(now())
   state                 String    @default("PENDING") // PENDING, APPROVED, REJECTED, COMPLETED, EXPIRED
   ipAddress             String?
@@ -170,7 +170,7 @@ model DeleteAccountRequest {
   scheduledDeletionDate DateTime? // 90 days after request
   completedAt           DateTime?
   updatedAt             DateTime  @updatedAt
-  user                  User      @relation(fields: [userId], references: [id], onDelete: NoAction)
+  user                  User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([state])
