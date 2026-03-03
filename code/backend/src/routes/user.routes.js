@@ -5,27 +5,32 @@ const upload = require('../middlewares/upload.middleware');
 const { idParamSchema, createUserSchema, updateMyProfileSchema, updateUserByAdminSchema, updateUserStatusSchema, listUsersQuerySchema } = require('../validations/user.validation');
 const { protect, requireAdmin } = require('../middlewares/auth');
 const { authMiddleware } = require('../middlewares/auth.js');
+const logController = require("../controllers/logController");
 const router = express.Router();
 // --- Admin Routes ---
 
-// GET /api/admin/logs
-router.get('/logs', async (req, res) => {
-    try {
-        const result = await db.query(`
-            SELECT * 
-            FROM system_logs 
-            ORDER BY created_at DESC 
-            LIMIT 1000
-        `);
+// GET /api/users/admin/logs (สำหรับ Admin ดูภาพรวมและกรองวันที่)
+router.get(
+    '/admin/logs', 
+    protect, 
+    requireAdmin, 
+    logController.getLogs // ใช้ฟังก์ชันนี้แทน SQL ดิบ
+);
 
-        res.status(200).json(result.rows);
+// GET /api/users/admin/logs/:id/verify (สำหรับ Admin ตรวจสอบความสมบูรณ์ของ Log รายการเดียว)
+router.get(
+    '/admin/logs/:id/verify',
+    protect,
+    requireAdmin,
+    logController.verifyLogIntegrity // ฟังก์ชันเช็คว่าข้อมูลโดนแก้ไหม
+);
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
-
+// GET /api/users/me/activity (สำหรับ User ดูประวัติการกระทำของตัวเอง)
+router.get(
+    '/me/activity',
+    protect,
+    userController.getMyActivityHistory
+);
 
 // GET /api/users/admin
 router.get(

@@ -240,6 +240,24 @@ const getUserDataExport = asyncHandler(async (req, res) => {
     }
 });
 
+const getMyActivityHistory = asyncHandler(async (req, res) => {
+    const { startDate, endDate, type } = req.query;
+
+    const history = await prisma.systemLog.findMany({
+        where: {
+            userId: req.user.id,
+            createdAt: {
+                gte: startDate ? new Date(startDate) : undefined,
+                lte: endDate ? new Date(endDate) : undefined,
+            },
+            logType: type || undefined,
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({ success: true, data: history });
+});
+
 const sendExportDataEmail = asyncHandler(async (req, res) => {
     const userId = req.user.sub;
     const options = req.body;
@@ -262,5 +280,4 @@ module.exports = {
     deleteCurrentUser,
     setUserStatus,
     getUserDataExport, 
-    sendExportDataEmail
 };

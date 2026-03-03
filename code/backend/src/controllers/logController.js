@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { Parser } = require('json2csv');
+const crypto = require('crypto');
 
 
 const getLogs = async (req, res) => {
@@ -18,7 +19,7 @@ const getLogs = async (req, res) => {
                 skip: skip,
                 take: limit,
                 orderBy: {
-                    created_at: 'desc'
+                    createdAt: 'desc'
                 },
                 include: {
                     user: {
@@ -64,13 +65,13 @@ const exportLogs = async (req, res) => {
         // 2. ดึงข้อมูลจาก
         const logs = await prisma.systemLog.findMany({
             where: {
-                created_at: {
+                createdAt: {
                     gte: startDate,
                     lte: endDate
                 }
             },
             orderBy: {
-                created_at: 'desc'
+                createdAt: 'desc'
             },
             include: {
                 user: {
@@ -91,10 +92,10 @@ const exportLogs = async (req, res) => {
             Action: log.action,
             Method: log.method,
             Endpoint: log.endpoint,
-            IP_Address: log.ip_address,
-            Status: log.status_code,
-            Date: log.created_at.toISOString().split('T')[0],
-            Time: log.created_at.toISOString().split('T')[1].split('.')[0]
+            IP_Address: log.ipAddress,
+            Status: log.statusCode,
+            Date: log.createdAt.toISOString().split('T')[0],
+            Time: log.createdAt.toISOString().split('T')[1].split('.')[0]
         }));
 
         // 4. JSON -> CSV
@@ -114,4 +115,28 @@ const exportLogs = async (req, res) => {
     }
 };
 
-module.exports = { getLogs ,exportLogs };
+const verifyLogIntegrity = async (req, res) => {
+    const { id } = req.params;
+    const log = await prisma.systemLog.findUnique({ 
+        where: { id: parseInt(id) } 
+    });
+
+    if (!log) return res.status(404).json({ message: "Log not found" });
+
+    const rawDataString = JSON.stringify(log.details);
+
+    const computedHash = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
+                               .update(rawDataString)
+                               .digest('hex');
+
+    const isValid = (computedHash === log.logHash);
+
+    res.json({
+        logId: id,
+        isValid: isValid,
+        status: isValid ? "Verified (No tampering)" : "Tampered (Data changed!)",
+        timestamp: new Date()
+    });
+};
+
+module.exports = { getLogs, exportLogs, verifyLogIntegrity };

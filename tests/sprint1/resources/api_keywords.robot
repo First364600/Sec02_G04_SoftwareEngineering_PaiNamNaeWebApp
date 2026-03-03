@@ -2,17 +2,25 @@
 Library    RequestsLibrary
 Library    Collections
 Library    String
+Library    DatabaseLibrary
 
 *** Variables ***
-${BASE_URL}     http://localhost:3000
-${ADMIN_EMAIL}  admin@example.com
-${ADMIN_PASS}   123456789
-${TOKEN}        ${EMPTY}
+${BASE_URL}       http://localhost:3000
+${ADMIN_EMAIL}    admin@example.com
+${ADMIN_PASS}     123456789
+${ADMIN_TOKEN}    ${EMPTY}
+
+${USER_EMAIL}     user@example.com    
+${USER_PASS}      123456789
+${USER_TOKEN}     ${EMPTY}
+
 ${DB_NAME}        postgres
 ${DB_USER}        postgres
 ${DB_PASS}        123
 ${DB_HOST}        localhost
 ${DB_PORT}        5432
+
+${LATEST_LOG_ID}  ${EMPTY}
 
 *** Keywords ***
 เตรียมสภาพแวดล้อมการทดสอบ
