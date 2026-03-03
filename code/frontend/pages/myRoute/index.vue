@@ -652,54 +652,68 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 
 const handleCheckPoint = async (routeId, routeData) => {
     const state = getTripState(routeId);
-    const timeline = getRouteTimeline(routeData);
+    const timeline = getRouteTimeline(routeData); 
+    
+    const currentTarget = timeline[state.currentIndex];
 
-    const currentPoint = timeline[state.currentIndex];
-    const nextIndex = state.currentIndex + 1;
-    const nextPoint = timeline[nextIndex];
+    // เช็คว่าจุดนี้มีผู้โดยสารที่ต้องรับ และยังไม่ได้กดรับครบทุกคน
+    if (currentTarget.isPassengerPoint) {
+        const pickupPassengers = (currentTarget.passengerList || []).filter(pl => pl.action === 'pickup')
+        
+        if (pickupPassengers.length > 0) {
+            const route = myRoutes.value.find(r => r.id === routeId)
+            const pendingPickups = pickupPassengers.filter(pl => {
+                const passenger = route?.passengers?.find(p => p.name === pl.name)
+                // ถ้ายังไม่ได้รับ (ไม่มี passengerStatus หรือยังเป็น REJECTED_PICKUP)
+                return !passenger || !['waiting_pickup', 'in_transit', 'arrived'].includes(
+                    (passenger.passengerStatus || '').toLowerCase()
+                )
+            })
 
-    if (!currentPoint || !nextPoint) return;
+            if (pendingPickups.length > 0) {
+                toast.error(
+                    'ยังรับผู้โดยสารไม่ครบ',
+                    `กรุณากดรับผู้โดยสารก่อน: ${pendingPickups.map(p => p.name).join(', ')}`
+                )
+                return
+            }
+        }
 
-    const route = myRoutes.value.find(r => r.id === routeId);
-    const pickupsHere = (currentPoint.passengerList || []).filter(pl => pl.action === 'pickup');
-
-    if (pickupsHere.length > 0) {
-        const pendingPickups = pickupsHere.filter(pl => {
-            const passenger = route?.passengers?.find(p => p.name === pl.name);
-            if (!passenger) return true;
-
-
-            const st = (passenger.passengerStatus || '').toLowerCase().replace(/_/g, '');
-            const accepted = ['waitingpickup', 'intransit', 'arrived'];
-            return !accepted.includes(st);
-        });
-
-        if (pendingPickups.length > 0) {
-            toast.error(
-                'ยังรับผู้โดยสารไม่ครบ',
-                `กรุณากดรับผู้โดยสารก่อนเดินทางต่อ:\n${pendingPickups.map(p => `• ${p.name}`).join('\n')}`
-            );
-            return; 
+        // ถ้าจุดนี้มีผู้โดยสารที่ต้องส่ง ให้แจ้ง driver-reached-dropoff
+        const dropoffPassengers = (currentTarget.passengerList || []).filter(pl => pl.action === 'dropoff')
+        if (dropoffPassengers.length > 0) {
+            const route = myRoutes.value.find(r => r.id === routeId)
+            for (const pl of dropoffPassengers) {
+                const passenger = route?.passengers?.find(p => p.name === pl.name)
+                if (passenger && passenger.passengerStatus === 'IN_TRANSIT') {
+                    try {
+                        await $api(`/bookings/${passenger.id}/driver-reached-dropoff`, { method: 'PATCH' })
+                    } catch (e) {
+                        console.warn(`driver-reached-dropoff error for ${pl.name}:`, e)
+                    }
+                }
+            }
         }
     }
 
-    let currentLat, currentLng;
-
-    if (currentPoint.type === 'origin') {
-        currentLat = Number(routeData.coords[0][0]);
-        currentLng = Number(routeData.coords[0][1]);
-    } else if (currentPoint.type === 'destination') {
-        currentLat = Number(routeData.coords[1][0]);
-        currentLng = Number(routeData.coords[1][1]);
+    // คำนวณพิกัดจุดเป้าหมาย
+    let targetLat, targetLng;
+    if (currentTarget.type === 'origin') {
+        targetLat = Number(routeData.coords[0][0]);
+        targetLng = Number(routeData.coords[0][1]);
+    } else if (currentTarget.type === 'destination') {
+        targetLat = Number(routeData.coords[1][0]);
+        targetLng = Number(routeData.coords[1][1]);
     } else {
         const stopIndex = state.currentIndex - 1;
-        currentLat = Number(routeData.stopsCoords[stopIndex]?.lat);
-        currentLng = Number(routeData.stopsCoords[stopIndex]?.lng);
+        targetLat = Number(routeData.stopsCoords[stopIndex].lat);
+        targetLng = Number(routeData.stopsCoords[stopIndex].lng);
     }
 
     try {
         isProcessing.value = true;
 
+        // ดึงพิกัดปัจจุบันจาก GPS
         const position = await new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
                 enableHighAccuracy: true,
@@ -708,65 +722,55 @@ const handleCheckPoint = async (routeId, routeData) => {
         });
         const { latitude, longitude } = position.coords;
 
-        const distance = calculateDistance(latitude, longitude, currentLat, currentLng);
-        if (distance > 500) {
-            toast.error(
-                'คุณไม่อยู่ในพื้นที่',
-                `ต้องเช็คอินที่ [${currentPoint.name}] ในรัศมี 500 ม.\n(ปัจจุบันห่าง ${Math.round(distance)} ม.)`
+        // เช็คระยะห่าง 500 เมตร
+        const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
+        if (distance > 5000000) {
+            toast.error('คุณไม่อยู่ในพื้นที่', 
+                `คุณต้องเช็คอินที่ [${currentTarget.name}] ในรัศมี 500 ม. (ปัจจุบันห่าง ${Math.round(distance)} ม.)`
             );
             return;
         }
 
-        const dropoffsAtNext = (nextPoint.passengerList || []).filter(pl => pl.action === 'dropoff');
-        for (const pl of dropoffsAtNext) {
-            // ดึง route ใหม่อีกครั้งให้ได้ข้อมูลสด
-            const freshRoute = myRoutes.value.find(r => r.id === routeId);
-            const passenger = freshRoute?.passengers?.find(p => p.name === pl.name);
-            const st = (passenger?.passengerStatus || '').toLowerCase().replace(/_/g, '');
-            if (st === 'intransit') {
-                try {
-                    await $api(`/bookings/${passenger.id}/driver-reached-dropoff`, { method: 'PATCH' });
-                } catch (e) {
-                    console.warn(`driver-reached-dropoff failed for ${pl.name}:`, e);
-                }
-            }
-        }
-        const isLastStep = nextIndex >= timeline.length - 1;
+        const nextIndex = state.currentIndex + 1;
+        const isLastStep = nextIndex >= timeline.length; 
         const nextStatus = isLastStep ? 'COMPLETED' : 'IN_TRANSIT';
 
         await $api(`/routes/${routeId}/progress`, {
             method: 'PATCH',
-            body: { currentStep: nextIndex, status: nextStatus }
+            body: { 
+                currentStep: isLastStep ? state.currentIndex : nextIndex, 
+                status: nextStatus 
+            }
         });
 
         if (!isLastStep) {
             state.currentIndex = nextIndex;
             state.status = 'IN_TRANSIT';
-            toast.success('Check-in สำเร็จ', `ออกจาก ${currentPoint.name} → มุ่งหน้า ${nextPoint.name}`);
-            updateMap(routeData);
+            toast.success('Check-in สำเร็จ', `ยืนยันพิกัดที่: ${currentTarget.name}`);
+            updateMap(routeData); 
         } else {
             state.completed = true;
             state.started = false;
-            state.currentIndex = nextIndex;
             state.status = 'COMPLETED';
             updateMap(routeData);
+
             modalMode.value = 'complete';
             pendingRouteId.value = routeId;
             isConfirmModalVisible.value = true;
-            toast.success('ถึงจุดหมายปลายทางแล้ว', `สิ้นสุดการเดินทางที่: ${nextPoint.name}`);
+            
+            toast.success('ถึงจุดหมายปลายทางแล้ว', `สิ้นสุดการเดินทางที่: ${currentTarget.name}`);
         }
-
+        
     } catch (error) {
         console.error('Checkpoint error:', error);
-        const errorMsg = error.code === 1
-            ? 'กรุณาอนุญาตการเข้าถึงพิกัด GPS'
+        const errorMsg = error.code === 1 
+            ? 'กรุณาอนุญาตการเข้าถึงพิกัด GPS' 
             : 'ไม่สามารถเชื่อมต่อ Server ได้';
         toast.error('เกิดข้อผิดพลาด', errorMsg);
     } finally {
         isProcessing.value = false;
     }
 };
-
 // --- ส่วนจัดการ Modal ---
 const isConfirmModalVisible = ref(false);
 const pendingRouteId = ref(null);
@@ -969,7 +973,7 @@ async function fetchMyRoutes() {
             );
 
             confirmedBookings.forEach(b => {
-                const pName = `${b.passenger?.firstName || ''} ${b.passenger?.lastName || ''}`.trim() || 'ผู้โดยสาร';
+                const pName = b.passenger?.firstName || 'ผู้โดยสาร';
                 if (b.pickupLocation) {
                     allPotentialStops.push({ 
                         lat: Number(b.pickupLocation.lat), 

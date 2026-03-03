@@ -36,11 +36,19 @@ router.get(
     userController.adminListUsers
 );
 
+// GET /api/users/export-data
 router.get(
     '/export-data', 
     protect, 
     userController.getUserDataExport
 );
+
+// POST /api/users/send-export-data-to-email
+router.post(
+    '/send-export-data-to-email',
+    protect,
+    userController.sendExportDataEmail
+)
 
 // PUT /api/users/admin/:id
 router.put(

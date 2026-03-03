@@ -3,6 +3,7 @@ const userService = require("../services/user.service");
 const ApiError = require('../utils/ApiError');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const notifService = require('../services/notification.service');
+const exportService = require('../services/export.service')
 
 const adminListUsers = asyncHandler(async (req, res) => {
     const result = await userService.searchUsers(req.query);
@@ -239,6 +240,15 @@ const getUserDataExport = asyncHandler(async (req, res) => {
     }
 });
 
+const sendExportDataEmail = asyncHandler(async (req, res) => {
+    const userId = req.user.sub;
+    const options = req.body;
+
+    const result = await exportService.generateAndSendUserData(userId, options);
+
+    res.status(200).json({ success: true, message: `ส่งข้อมูลไปยังอีเมล ${result.email} เรียบร้อย`});
+});
+
 module.exports = {
     adminListUsers,
     getAllUsers,
@@ -252,4 +262,5 @@ module.exports = {
     deleteCurrentUser,
     setUserStatus,
     getUserDataExport, 
+    sendExportDataEmail
 };
