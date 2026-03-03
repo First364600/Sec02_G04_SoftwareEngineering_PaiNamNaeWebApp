@@ -11,7 +11,7 @@ ${TEST_EMAIL}            eeeeee5@gmail.com
 ${TEST_PASSWORD}         e123456789
 
 *** Test Cases ***
-Test Request Delete Account - From Authenticated State
+Test Request Delete Account
     [Documentation]    ทดสอบการลบบัญชี: 
     ...                Pre-condition: login อยู่แล้ว
     ...                1. ล็อกอิน
@@ -24,7 +24,6 @@ Test Request Delete Account - From Authenticated State
     
     ${auth_token}=    Get From Dictionary    ${login_response.json()['data']}    token
     ${login_user}=    Get From Dictionary    ${login_response.json()['data']}    user
-    Log    Login token received for user id: ${login_user['id']} (${login_user['firstName']} ${login_user['lastName']})
     
     ${delete_response}=    Delete User Account    ${auth_token}
     Should Be Equal As Integers    ${delete_response.status_code}    200    Failed to request delete

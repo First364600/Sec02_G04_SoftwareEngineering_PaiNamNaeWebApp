@@ -208,11 +208,49 @@ const deleteUser = async (id) => {
 };
 
 const requestDeleteAccount = async (userId, ipAddress, userAgent) => {
-    // ตรวจสอบว่า user มีอยู่
     const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    const uncompletedPassengerBooking = await prisma.booking.findFirst({
+    where: {
+        passengerId: userId,
+        AND: [
+        { status: { notIn: ['CANCELLED', 'REJECTED'] } },
+        {
+            OR: [
+            { passengerStatus: null },
+            {
+                passengerStatus: {
+                notIn: ['ARRIVED', 'CANCELLED', 'REJECTED_PICKUP']
+                }
+            }
+            ]
+        }
+        ]
+    }
+    });
+    const uncompletedRoute = await prisma.route.findFirst({
+    where: {
+        driverId: userId,
+        status: {
+        notIn: ['COMPLETED', 'CANCELLED']
+        }
+    }
+    });
     if (!user) {
         throw new ApiError(404, 'User not found');
     }
+    if (uncompletedRoute) {
+    throw new ApiError(400, 'You have active routes', {
+        code: 'ACTIVE_ROUTE'
+    });
+    }
+
+    if (uncompletedPassengerBooking) {
+    throw new ApiError(400, 'You have active bookings', {
+        code: 'ACTIVE_BOOKING'
+    });
+    }
+
 
     // คำนวณวันที่สำหรับการลบอัตโนมัติ (90 วันหลังจากวันนี้)
     const scheduledDeletionDate = new Date();
@@ -240,6 +278,45 @@ const requestDeleteAccount = async (userId, ipAddress, userAgent) => {
         id: deleteRequest.id,
         message: 'Delete account request has been submitted. Your account will be deleted on ' + scheduledDeletionDate.toLocaleDateString('th-TH'),
         scheduledDeletionDate: scheduledDeletionDate,
+    };
+};
+
+// ฟังก์ชันสำหรับลบบัญชี (เฉพาะ TEST - ลบข้อมูลหลังจาก 1 นาที) สำหรับทดสอบว่ามันลบจริงๆ
+const requestDeleteAccountForTest = async (userId, ipAddress, userAgent) => {
+    // ตรวจสอบว่า user มีอยู่
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+
+    // คำนวณวันที่สำหรับการลบอัตโนมัติ (1 นาทีหลังจากตอนนี้ - สำหรับ test เท่านั้น)
+    const scheduledDeletionDate = new Date();
+    scheduledDeletionDate.setMinutes(scheduledDeletionDate.getMinutes() + 1);
+
+    // สร้าง record ใน DeleteAccountRequest และ deactivate account พร้อมกัน
+    const [deleteRequest] = await prisma.$transaction([
+        prisma.deleteAccountRequest.create({
+            data: {
+                userId: userId,
+                state: 'PENDING',
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                scheduledDeletionDate: scheduledDeletionDate,
+            },
+        }),
+        // Deactivate account ทันทีเพื่อไม่ให้ login ได้
+        prisma.user.update({
+            where: { id: userId },
+            data: { isActive: false },
+        }),
+    ]);
+
+    return {
+        id: deleteRequest.id,
+        message: '[TEST MODE] Delete account request has been submitted. Your account will be deleted on ' + scheduledDeletionDate.toLocaleString('th-TH'),
+        scheduledDeletionDate: scheduledDeletionDate,
+        testNote: 'Data will be deleted after 1 minute'
     };
 };
 
@@ -273,9 +350,9 @@ const processScheduledDeletions = async () => {
                 },
             });
 
-            console.log(`✓ User ${request.userId} deleted successfully`);
+            console.log('User ${request.userId} deleted successfully');
         } catch (error) {
-            console.error(`✗ Error deleting user ${request.userId}:`, error.message);
+            console.error('Error deleting user ${request.userId}:', error.message);
         }
     }
 
@@ -333,6 +410,7 @@ module.exports = {
     updatePassword,
     deleteUser,
     requestDeleteAccount,
+    requestDeleteAccountForTest,//เพิ่มสำหรับทดสอบการลบอัตโนมัติหลัง 1 นาที
     processScheduledDeletions,
     updateUserProfile,
     getUserPublicById,

@@ -6,27 +6,27 @@ const userService = require('./user.service');
 const initializeSchedulers = () => {
     // เรียกทุกวันเวลา 02:00 น.
     cron.schedule('0 2 * * *', async () => {
-        console.log('🔄 Processing scheduled account deletions...');
+        console.log('Processing scheduled account deletions...');
         try {
             const deletedCount = await userService.processScheduledDeletions();
-            console.log(`✓ Processed ${deletedCount} account deletion(s)`);
+            console.log('Processed ${deletedCount} account deletion(s)');
         } catch (error) {
-            console.error('✗ Error processing scheduled deletions:', error);
+            console.error('Error processing scheduled deletions:', error);
         }
     });
 
-    console.log('✓ Schedulers initialized');
+    console.log('Schedulers initialized');
 };
 
 // สำหรับทดสอบ ให้เรียกฟังก์ชันนี้เพื่อลบทันที
 const processDeletedAccountsManually = async () => {
-    console.log('🔄 Manually processing scheduled account deletions...');
+    console.log('Manually processing scheduled account deletions...');
     try {
         const deletedCount = await userService.processScheduledDeletions();
-        console.log(`✓ Processed ${deletedCount} account deletion(s)`);
+        console.log(`Processed ${deletedCount} account deletion(s)`);
         return deletedCount;
     } catch (error) {
-        console.error('✗ Error processing scheduled deletions:', error);
+        console.error('Error processing scheduled deletions:', error);
         throw error;
     }
 };

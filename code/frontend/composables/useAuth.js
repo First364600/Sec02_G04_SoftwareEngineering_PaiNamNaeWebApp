@@ -60,6 +60,11 @@ export function useAuth() {
       const res = await $api('/users/me', {
         method: 'DELETE'
       })
+
+      if (res?.code === 'ACTIVE_ROUTE' || res?.code === 'ACTIVE_BOOKING') {
+        throw { response: { data: res } }
+      }
+
       return res
     } catch (error) {
       console.error('Delete account error:', error)

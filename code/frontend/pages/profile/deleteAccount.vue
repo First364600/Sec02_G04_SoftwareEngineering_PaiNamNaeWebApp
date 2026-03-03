@@ -99,14 +99,15 @@
 
   <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ กรณีลบสำเร็จ-->
   <ConfirmModal
-  :show="showSuccessPopup"
-  title="ลบบัญชีสำเร็จ"
-  message="เราได้ทำการลบข้อมูลของบัญชีเรียบร้อยแล้ว คุณต้องการดำเนินการต่อหรือไม่?"
-  confirm-text="ตกลง"
-  :cancel-text="null"
-  variant="danger"
-  @confirm="handleAfterDelete"
-/>
+    :show="showSuccessPopup"
+    title="ลบบัญชีสำเร็จ"
+    message="เราได้ทำการลบข้อมูลของบัญชีเรียบร้อยแล้ว"
+    confirm-text="ตกลง"
+    :cancel-text="null"
+    :closable="false"
+    variant="danger"
+    @confirm="handleAfterDelete"
+  />
 
  <!--เพิ่มตรงนี้ กรณีมีการเดินทางค้างอยู่ -->
 <ConfirmModal
@@ -116,7 +117,7 @@
   confirm-text="ตกลง"
   :cancel-text="null"
   variant="danger"
-  @confirm="showPendingTripModal = false"
+  @confirm="handleAfterCanNotDelete"
 />
 
   
@@ -157,6 +158,8 @@ const accepted = ref(false)
 const confirmText = ref('')
 const isLoading = ref(false)
 const showSuccessPopup = ref(false)
+const confirmClose = ref(false) 
+const errorMessage = ref('')
 
 const toast = ref({ show: false, title: '', message: '', type: 'info' })
 
@@ -187,29 +190,32 @@ async function handleDeleteAccount() {
 
   isLoading.value = true
   try {
-    await sendToUserEmail()
-    await deleteAccount(
-    //   {
-    //   deleteProfile: deleteProfile.value,
-    //   deleteTripHistory: deleteTripHistory.value,
-    //   deleteVehicleData: deleteVehicleData.value
-    // }
-  )
-    showSuccessPopup.value = true 
-  } catch (e) {  //แก้ตรงนี้เป็นกรณีมีการเดินทางค้างอยู่
+    //await sendToUserEmail()
+    await deleteAccount()
+    
+    confirmClose.value = false
+    showSuccessPopup.value = true
+  } catch (error) {
+      console.log("FULL ERROR:", error)
 
-    if (e?.code === 'ACTIVE_TRIP') { //แก้ตรงนี้เป็นกรณีมีการเดินทางค้างอยู่
-    showPendingTripModal.value = true
-    return
-  }
-  showToast('ล้มเหลว', e?.message || 'ไม่สามารถลบบัญชีได้', 'error')
-} finally {
+      if (error.statusCode === 400) {
+        showPendingTripModal.value = true
+      } else {
+        showToast('ล้มเหลว', error.statusMessage || 'ไม่สามารถลบบัญชีได้', 'error')
+      }
+  } finally {
     isLoading.value = false
   }
 }
 
 async function handleAfterDelete() {
   showSuccessPopup.value = false
+  await logout()
+  router.replace('/')
+}
+
+async function handleAfterCanNotDelete() {
+  showPendingTripModal.value = false
   await logout()
   router.replace('/')
 }
@@ -221,11 +227,11 @@ async function sendToUserEmail() {
       selectTripHistoryData: selectTripHistoryData.value,
       selectRouteAndVehicleData: selectRouteAndVehicleData.value
     })
-    
     showToast("สำเร็จ", "ระบบกำลังส่งข้อมูลไปยังอีเมลของคุณ", "success")
   } catch (e) {
     console.error('Send email error:', e)
     showToast("ผิดพลาด", "ไม่สามารถส่งข้อมูลไปยังอีเมลได้", "error")
+    throw e  
   }
 }
 
