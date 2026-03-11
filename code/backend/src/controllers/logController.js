@@ -101,186 +101,154 @@ const getLogs = async (req, res) => {
 
 
 const exportLogs = async (req, res) => {
-    try {
-    let {
-      userId,
-      dateFrom,
-      dateTo,
-      includePersonal,
-      includeTravel,
-      includeRoutes
-    } = req.query;
+  try {
+    const { userId, dateFrom, dateTo } = req.query;
+    // normalize เป็น boolean
+    const includePersonal = req.query.includePersonal === 'true';
+    const includeTravel   = req.query.includeTravel   === 'true';
+    const includeRoutes   = req.query.includeRoutes   === 'true';
 
-    // ถ้าไม่เลือกอะไรเลย → export ทั้งหมด
-    if (!includePersonal && !includeTravel && !includeRoutes) {
-      includePersonal = 'true';
-      includeTravel = 'true';
-      includeRoutes = 'true';
-    }
+    // ถ้าไม่เลือกอะไร → export ทั้งหมด
+    const exportAll = !includePersonal && !includeTravel && !includeRoutes;
+    const shouldExportPersonal = exportAll || includePersonal;
+    const shouldExportTravel   = exportAll || includeTravel;
+    const shouldExportRoutes   = exportAll || includeRoutes;
 
-    // Date Filter Builder 
+
+
+    // declare ก่อนใช้
     const buildDateFilter = () => {
       if (!dateFrom && !dateTo) return {};
-
       return {
         createdAt: {
-          ...(dateFrom && {
-            gte: new Date(new Date(dateFrom).setHours(0, 0, 0, 0))
-          }),
-          ...(dateTo && {
-            lte: new Date(new Date(dateTo).setHours(23, 59, 59, 999))
-          })
+          ...(dateFrom && { gte: new Date(new Date(dateFrom).setHours(0, 0, 0, 0)) }),
+          ...(dateTo   && { lte: new Date(new Date(dateTo).setHours(23, 59, 59, 999)) })
         }
       };
     };
 
-    //  LogType Filter 
+    // declare ก่อนใช้
     let logTypeFilter = [];
     if (req.query.logType) {
       const types = Array.isArray(req.query.logType)
         ? req.query.logType
         : req.query.logType.split(',');
-
-      logTypeFilter = types
-        .map(t => LogType[t])
-        .filter(Boolean);
+      logTypeFilter = types.map(t => LogType[t]).filter(Boolean);
     }
 
     let rows = [];
 
-    // PERSONAL → 1 SystemLog = 1 Row
-    if (includePersonal === 'true') {
-
+    // ใช้ shouldExportPersonal แทน
+    if (shouldExportPersonal) {
       const logs = await prisma.systemLog.findMany({
         where: {
           ...(userId && { userId }),
-          ...(logTypeFilter.length && {
-            logType: { in: logTypeFilter }
-          }),
+          ...(logTypeFilter.length && { logType: { in: logTypeFilter } }),
           ...buildDateFilter()
         },
         include: { user: true },
         orderBy: { createdAt: 'desc' }
       });
 
+      console.log('logs', logs);
+
       logs.forEach(log => {
         rows.push({
           Section: "Personal",
-
-          username: log.user?.username || "",
-          email: log.user?.email || "",
-          firstName: log.user?.firstName || "",
-          lastName: log.user?.lastName || "",
-          gender: log.user?.gender || "",
+          username:    log.user?.username    || "",
+          email:       log.user?.email       || "",
+          firstName:   log.user?.firstName   || "",
+          lastName:    log.user?.lastName    || "",
+          gender:      log.user?.gender      || "",
           phoneNumber: log.user?.phoneNumber || "",
-          role: log.user?.role || "",
-
-          LogID: log.id,
-          LogType: log.logType,
-          Action: log.action,
-          Method: log.method,
-          Endpoint: log.endpoint,
+          role:        log.user?.role        || "",
+          LogID:      log.id,
+          LogType:    log.logType,
+          Action:     log.action,
+          Method:     log.method,
+          Endpoint:   log.endpoint,
           StatusCode: log.statusCode || "",
-          DateTime: log.createdAt.toISOString()
+          DateTime:   log.createdAt.toISOString()
         });
       });
     }
 
-    //  TRAVEL → 1 Booking = 1 Row
-    if (includeTravel === 'true') {
-
+    // ใช้ shouldExportTravel แทน
+    if (shouldExportTravel) {
       const bookings = await prisma.booking.findMany({
         where: {
           ...(userId && { passengerId: userId }),
           ...buildDateFilter()
         },
-        include: {
-          passenger: true
-        },
+        include: { passenger: true },
         orderBy: { createdAt: 'desc' }
       });
 
       bookings.forEach(booking => {
         rows.push({
-          Section: "Travel",
-
-          username: booking.passenger?.username || "",
-          email: booking.passenger?.email || "",
-
-          bookingID: booking.id,
-          routeID: booking.routeId,
-          numberOfSeats: booking.numberOfSeats,
-          status: booking.status,
-          pickupLocation: booking.pickupLocation,
-          dropoffLocation: booking.dropoffLocation,
-          createdAt: booking.createdAt.toISOString(),
-          cancelledAt: booking.cancelledAt
-            ? booking.cancelledAt.toISOString()
-            : ""
+          Section:         "Travel",
+          username:        booking.passenger?.username || "",
+          email:           booking.passenger?.email   || "",
+          bookingID:       booking.id,
+          routeID:         booking.routeId,
+          numberOfSeats:   booking.numberOfSeats,
+          status:          booking.status,
+          pickupLocation:  JSON.stringify(booking.pickupLocation),
+          dropoffLocation: JSON.stringify(booking.dropoffLocation),
+          createdAt:       booking.createdAt.toISOString(),
+          cancelledAt:     booking.cancelledAt?.toISOString() ?? ""
         });
       });
     }
 
-    // 3️⃣ ROUTE → 1 Route = 1 Row
-    if (includeRoutes === 'true') {
-
+    // ใช้ shouldExportRoutes แทน
+    if (shouldExportRoutes) {
       const routes = await prisma.route.findMany({
         where: {
           ...(userId && { driverId: userId }),
           ...buildDateFilter()
         },
-        include: {
-          driver: true,
-          vehicle: true
-        },
+        include: { driver: true, vehicle: true },
         orderBy: { createdAt: 'desc' }
       });
 
       routes.forEach(route => {
         rows.push({
-          Section: "Route",
-
-          username: route.driver?.username || "",
-          email: route.driver?.email || "",
-
-          RouteID: route.id,
-          driverId: route.driverId,
-          vehicleId: route.vehicleId,
-          startLocation: route.startLocation,
-          endLocation: route.endLocation,
+          Section:       "Route",
+          username:      route.driver?.username || "",
+          email:         route.driver?.email   || "",
+          RouteID:       route.id,
+          driverId:      route.driverId,
+          vehicleId:     route.vehicleId,
+          startLocation: JSON.stringify(route.startLocation),
+          endLocation:   JSON.stringify(route.endLocation),
           departureTime: route.departureTime.toISOString(),
           availableSeats: route.availableSeats,
-          pricePerSeat: route.pricePerSeat,
-          createdAt: route.createdAt.toISOString(),
-          updatedAt: route.updatedAt.toISOString(),
-
-          licensePlate: route.vehicle?.licensePlate || "",
-          vehicleType: route.vehicle?.vehicleType || "",
-          color: route.vehicle?.color || "",
-          seatCapacity: route.vehicle?.seatCapacity || ""
+          pricePerSeat:   route.pricePerSeat,
+          createdAt:      route.createdAt.toISOString(),
+          updatedAt:      route.updatedAt.toISOString(),
+          licensePlate:   route.vehicle?.licensePlate  || "",
+          vehicleType:    route.vehicle?.vehicleType   || "",
+          color:          route.vehicle?.color         || "",
+          seatCapacity:   route.vehicle?.seatCapacity  || ""
         });
       });
     }
 
-    // Final Check - ถ้าไม่มีข้อมูลเลย  404
     if (!rows.length) {
       return res.status(404).json({ message: "No data found" });
     }
 
-    const parser = new Parser();
+    // defaultValue: '' กัน error เวลา columns ต่างกัน
+    const parser = new Parser({ defaultValue: '' });
     const csv = parser.parse(rows);
 
-    res.header("Content-Type", "text/csv");
-    //  Build File Name From Log Owner 
-    let fileName = `${Date.now()}.csv`;
-
     const uniqueUsers = [...new Set(rows.map(r => r.username).filter(Boolean))];
-
     const today = new Date().toISOString().split("T")[0];
 
+    let fileName = `${Date.now()}.csv`;
     if (uniqueUsers.length === 1) {
-      const safeUsername = uniqueUsers[0].replace(/\s+/g, "_");
-      fileName = `${safeUsername}_${today}.csv`;
+      fileName = `${uniqueUsers[0].replace(/\s+/g, "_")}_${today}.csv`;
     } else if (uniqueUsers.length > 1) {
       fileName = `export_multiple_users_${today}.csv`;
     }
@@ -291,10 +259,7 @@ const exportLogs = async (req, res) => {
 
   } catch (error) {
     console.error("Export Error:", error);
-    return res.status(500).json({
-      message: "Export failed",
-      error: error.message
-    });
+    return res.status(500).json({ message: "Export failed", error: error.message });
   }
 };
 
