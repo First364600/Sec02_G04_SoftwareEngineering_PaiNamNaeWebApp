@@ -2,11 +2,11 @@
 Library    RequestsLibrary
 Library    Collections
 Library    String
-Resource    ${CURDIR}/../../resources/services/admin_serive.robot
-Resource    ${CURDIR}/../../resources/services/driver_service.robot
-Resource    ${CURDIR}/../../resources/services/passenger_service.robot
-Resource    ${CURDIR}/../../resources/services/guest_service.robot
-Resource    ${CURDIR}/../../resources/variables.robot
+Resource    ${CURDIR}/../../../resources/services/admin_serive.robot
+Resource    ${CURDIR}/../../../resources/services/driver_service.robot
+Resource    ${CURDIR}/../../../resources/services/passenger_service.robot
+Resource    ${CURDIR}/../../../resources/services/guest_service.robot
+Resource    ${CURDIR}/../../../resources/variables.robot
 
 *** Variables ***
 
