@@ -2,7 +2,7 @@
 Library    RequestsLibrary
 Library    Collections
 Library    String
-Resource    ../card09/setup.robot
+Resource   setup.robot
 
 Suite Setup    Setup All Sessions
 Suite Teardown    Delete All Users
