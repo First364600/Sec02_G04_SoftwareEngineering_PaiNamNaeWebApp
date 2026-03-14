@@ -36,6 +36,7 @@
     "socket.io-client": "^4.8.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "web-push": "^3.6.7",
     "xlsx": "^0.18.5",
     "xss-clean": "^0.1.4",
     "zod": "^3.23.8"
