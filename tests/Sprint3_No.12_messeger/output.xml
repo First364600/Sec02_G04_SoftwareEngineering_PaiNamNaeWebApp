@@ -1,0 +1,1448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2026-03-16T01:15:54.963204" rpa="false" schemaversion="5">
+<suite id="s1" name="testNo12" source="D:\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp\tests\Sprint3_No.12_messeger\testNo12.robot">
+<test id="s1-t1" name="TC_Chat_01_Driver_Broadcast_Success_and_Passenger_Reply" line="275">
+<kw name="Open Driver">
+<kw name="Open Chrome Auto Allow">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-16T01:15:55.167412" level="INFO">${options} = &lt;selenium.webdriver.chrome.options.Options object at 0x00000227CF90E120&gt;</msg>
+<var>${options}</var>
+<arg>sys.modules['selenium.webdriver'].ChromeOptions()</arg>
+<arg>sys, selenium.webdriver</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-16T01:15:55.167158" elapsed="0.000283"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-16T01:15:55.167707" level="INFO">${prefs} = {'profile.default_content_setting_values.geolocation': '1', 'profile.default_content_setting_values.notifications': '1'}</msg>
+<var>${prefs}</var>
+<arg>profile.default_content_setting_values.geolocation=1</arg>
+<arg>profile.default_content_setting_values.notifications=1</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-16T01:15:55.167536" elapsed="0.000190"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_experimental_option</arg>
+<arg>prefs</arg>
+<arg>${prefs}</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:55.167790" elapsed="0.000084"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_argument</arg>
+<arg>--disable-notifications</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:55.167926" elapsed="0.000060"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_argument</arg>
+<arg>--disable-infobars</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:55.168034" elapsed="0.000056"/>
+</kw>
+<kw name="Create Webdriver" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:55.168269" level="INFO">Creating an instance of the Chrome WebDriver.</msg>
+<arg>Chrome</arg>
+<arg>alias=${alias}</arg>
+<arg>options=${options}</arg>
+<doc>Creates an instance of Selenium WebDriver.</doc>
+<status status="PASS" start="2026-03-16T01:15:55.168141" elapsed="1.121811"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:56.290302" level="INFO">Opening url 'http://localhost:3001/login'</msg>
+<arg>${url}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.290158" elapsed="0.322755"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.613195" elapsed="0.057485"/>
+</kw>
+<arg>${URL}/login</arg>
+<arg>Driver</arg>
+<status status="PASS" start="2026-03-16T01:15:55.166613" elapsed="1.504193"/>
+</kw>
+<kw name="Login">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>id=identifier</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.671311" elapsed="0.043507"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:56.715187" level="INFO">Typing text 'ohm159@gmail.com' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${user}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.714982" elapsed="0.114768"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:56.830453" level="INFO">Typing text 'Namidablack1' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${pass}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.830057" elapsed="0.099192"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:56.929643" level="INFO">Clicking button 'xpath=//button[contains(.,'เข้าสู่ระบบ')]'.</msg>
+<arg>xpath=//button[contains(.,'เข้าสู่ระบบ')]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.929414" elapsed="0.068980"/>
+</kw>
+<kw name="Wait Until Location Does Not Contain" owner="SeleniumLibrary">
+<arg>login</arg>
+<arg>20s</arg>
+<doc>Waits until the current URL does not contains ``location``.</doc>
+<status status="PASS" start="2026-03-16T01:15:56.998582" elapsed="0.209595"/>
+</kw>
+<arg>${DRIVER_USER}</arg>
+<arg>${DRIVER_PASS}</arg>
+<status status="PASS" start="2026-03-16T01:15:56.670970" elapsed="0.537316"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:15:55.166280" elapsed="2.042051"/>
+</kw>
+<kw name="Open Passenger">
+<kw name="Open Chrome Auto Allow">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-16T01:15:57.209275" level="INFO">${options} = &lt;selenium.webdriver.chrome.options.Options object at 0x00000227CF9A0190&gt;</msg>
+<var>${options}</var>
+<arg>sys.modules['selenium.webdriver'].ChromeOptions()</arg>
+<arg>sys, selenium.webdriver</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-16T01:15:57.209049" elapsed="0.000250"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-16T01:15:57.209498" level="INFO">${prefs} = {'profile.default_content_setting_values.geolocation': '1', 'profile.default_content_setting_values.notifications': '1'}</msg>
+<var>${prefs}</var>
+<arg>profile.default_content_setting_values.geolocation=1</arg>
+<arg>profile.default_content_setting_values.notifications=1</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-16T01:15:57.209381" elapsed="0.000133"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_experimental_option</arg>
+<arg>prefs</arg>
+<arg>${prefs}</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:57.209578" elapsed="0.000088"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_argument</arg>
+<arg>--disable-notifications</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:57.209718" elapsed="0.000064"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_argument</arg>
+<arg>--disable-infobars</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:57.209828" elapsed="0.000076"/>
+</kw>
+<kw name="Create Webdriver" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:57.210085" level="INFO">Creating an instance of the Chrome WebDriver.</msg>
+<arg>Chrome</arg>
+<arg>alias=${alias}</arg>
+<arg>options=${options}</arg>
+<doc>Creates an instance of Selenium WebDriver.</doc>
+<status status="PASS" start="2026-03-16T01:15:57.209959" elapsed="1.096797"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:58.307135" level="INFO">Opening url 'http://localhost:3001/login'</msg>
+<arg>${url}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.306976" elapsed="0.309580"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.616763" elapsed="0.042694"/>
+</kw>
+<arg>${URL}/login</arg>
+<arg>Passenger</arg>
+<status status="PASS" start="2026-03-16T01:15:57.208869" elapsed="1.450918"/>
+</kw>
+<kw name="Login">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>id=identifier</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.660592" elapsed="0.039105"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:58.700097" level="INFO">Typing text 'ohm163@gmail.com' into text field 'id=identifier'.</msg>
+<arg>id=identifier</arg>
+<arg>${user}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.699870" elapsed="0.076719"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:58.777081" level="INFO">Typing text 'Namidablack1' into text field 'id=password'.</msg>
+<arg>id=password</arg>
+<arg>${pass}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.776785" elapsed="0.073152"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:58.850329" level="INFO">Clicking button 'xpath=//button[contains(.,'เข้าสู่ระบบ')]'.</msg>
+<arg>xpath=//button[contains(.,'เข้าสู่ระบบ')]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.850119" elapsed="0.076214"/>
+</kw>
+<kw name="Wait Until Location Does Not Contain" owner="SeleniumLibrary">
+<arg>login</arg>
+<arg>20s</arg>
+<doc>Waits until the current URL does not contains ``location``.</doc>
+<status status="PASS" start="2026-03-16T01:15:58.926532" elapsed="0.221452"/>
+</kw>
+<arg>${PASS_USER}</arg>
+<arg>${PASS_PASS}</arg>
+<status status="PASS" start="2026-03-16T01:15:58.660023" elapsed="0.488112"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:15:57.208629" elapsed="1.939571"/>
+</kw>
+<kw name="Passenger Book Route">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Passenger</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:15:59.149062" elapsed="0.000249"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:59.149616" level="INFO">Opening url 'http://localhost:3001/findtrip'</msg>
+<arg>${URL_FINDTRIP}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:15:59.149458" elapsed="0.207188"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:15:59.357697" elapsed="0.064887"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:59.433440" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.58")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:15:59.422891" elapsed="0.010596"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:15:59.434156" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.58")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:15:59.433658" elapsed="0.010012"/>
+</kw>
+<arg>${BTN_SEARCH_ROUTE}</arg>
+<status status="PASS" start="2026-03-16T01:15:59.356979" elapsed="0.086870"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${ROUTE_CARD}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:15:59.444481" elapsed="1.264276"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.709355" elapsed="0.011177"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:00.725875" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.65")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.720700" elapsed="0.005237"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:00.726659" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.65")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.726137" elapsed="0.014750"/>
+</kw>
+<arg>${ROUTE_CARD}</arg>
+<status status="PASS" start="2026-03-16T01:16:00.709006" elapsed="0.032011"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.741528" elapsed="0.022149"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:00.788662" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.85")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.763957" elapsed="0.024775"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:00.789565" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.85")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.788959" elapsed="0.018568"/>
+</kw>
+<arg>${BTN_BOOK_ROUTE}</arg>
+<status status="PASS" start="2026-03-16T01:16:00.741190" elapsed="0.066500"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${INPUT_PICKUP}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.807868" elapsed="0.022566"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:00.830795" level="INFO">Typing text 'เปี่ยมสุขแมนชั่น' into text field 'xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[1]'.</msg>
+<arg>${INPUT_PICKUP}</arg>
+<arg>เปี่ยมสุขแมนชั่น</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.830583" elapsed="0.092348"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:02.923778" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:00.923294" elapsed="2.000604"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:02.924497" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[1] element.</msg>
+<msg time="2026-03-16T01:16:03.203108" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:03.203240" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_PICKUP}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:02.924057" elapsed="0.287055"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:03.211794" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[1] element.</msg>
+<msg time="2026-03-16T01:16:03.484391" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:03.484473" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_PICKUP}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:03.211349" elapsed="0.280045"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:03.491984" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[1] element.</msg>
+<msg time="2026-03-16T01:16:03.764607" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:03.764692" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_PICKUP}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:03.491577" elapsed="0.280387"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:03.772706" level="INFO">Sending key(s) ('ENTER',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[1] element.</msg>
+<msg time="2026-03-16T01:16:04.047761" level="INFO">Pressing special key ENTER to element.</msg>
+<msg time="2026-03-16T01:16:04.047850" level="INFO">Releasing special key ENTER.</msg>
+<arg>${INPUT_PICKUP}</arg>
+<arg>ENTER</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:03.772203" elapsed="0.282017"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:04.054553" level="INFO">Typing text 'SC09' into text field 'xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2]'.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>SC09</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:04.054374" elapsed="0.062431"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:06.117668" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:04.116998" elapsed="2.000789"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:06.118535" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2] element.</msg>
+<msg time="2026-03-16T01:16:06.397814" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:06.397876" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:06.118006" elapsed="0.286386"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:06.405014" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2] element.</msg>
+<msg time="2026-03-16T01:16:06.682675" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:06.682772" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:06.404606" elapsed="0.285203"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:06.690410" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2] element.</msg>
+<msg time="2026-03-16T01:16:06.968667" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:06.968762" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:06.690019" elapsed="0.285148"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:06.975715" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2] element.</msg>
+<msg time="2026-03-16T01:16:07.251104" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:07.251183" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:06.975346" elapsed="0.282300"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:07.258280" level="INFO">Sending key(s) ('ARROW_DOWN',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2] element.</msg>
+<msg time="2026-03-16T01:16:07.535399" level="INFO">Pressing special key ARROW_DOWN to element.</msg>
+<msg time="2026-03-16T01:16:07.535479" level="INFO">Releasing special key ARROW_DOWN.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>ARROW_DOWN</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:07.257838" elapsed="0.284156"/>
+</kw>
+<kw name="Press Keys" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:07.542676" level="INFO">Sending key(s) ('ENTER',) to xpath=(//input[contains(@placeholder,'พิมพ์ชื่อสถานที่')])[2] element.</msg>
+<msg time="2026-03-16T01:16:07.821954" level="INFO">Pressing special key ENTER to element.</msg>
+<msg time="2026-03-16T01:16:07.822049" level="INFO">Releasing special key ENTER.</msg>
+<arg>${INPUT_DROPOFF}</arg>
+<arg>ENTER</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<status status="PASS" start="2026-03-16T01:16:07.542239" elapsed="0.285918"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:09.829158" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:07.828375" elapsed="2.000929"/>
+</kw>
+<kw name="Wait Until Element Is Enabled" owner="SeleniumLibrary">
+<arg>${BTN_CONFIRM_BOOKING}</arg>
+<arg>10s</arg>
+<doc>Waits until the element ``locator`` is enabled.</doc>
+<status status="PASS" start="2026-03-16T01:16:09.829505" elapsed="0.020755"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:09.851142" elapsed="0.013559"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:09.871614" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.116")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:09.864994" elapsed="0.006660"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:09.872716" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.D501358361CAED60329FEE76F36761D2.e.116")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:09.871817" elapsed="0.006297"/>
+</kw>
+<arg>${BTN_CONFIRM_BOOKING}</arg>
+<status status="PASS" start="2026-03-16T01:16:09.850677" elapsed="0.027578"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:15:59.148690" elapsed="10.729625"/>
+</kw>
+<kw name="Driver Accept Booking">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Driver</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:16:09.878897" elapsed="0.000129"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:09.879194" level="INFO">Opening url 'http://localhost:3001/myroute'</msg>
+<arg>${URL_MY_ROUTE}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:16:09.879097" elapsed="0.240645"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:13.120628" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:10.120022" elapsed="3.000772"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.121452" elapsed="0.017582"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:13.146629" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.FDE8FF7CC6A7247A0D91643C1867905A.e.70")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.139263" elapsed="0.007439"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:13.147464" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.FDE8FF7CC6A7247A0D91643C1867905A.e.70")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.146911" elapsed="0.005400"/>
+</kw>
+<arg>${TAB_PENDING}</arg>
+<status status="PASS" start="2026-03-16T01:16:13.121066" elapsed="0.031342"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_ACCEPT_BOOKING}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.152531" elapsed="0.015548"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.168700" elapsed="0.012368"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:13.188113" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.FDE8FF7CC6A7247A0D91643C1867905A.e.71")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.181277" elapsed="0.006888"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:13.188740" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.FDE8FF7CC6A7247A0D91643C1867905A.e.71")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.188331" elapsed="0.007940"/>
+</kw>
+<arg>${BTN_ACCEPT_BOOKING}</arg>
+<status status="PASS" start="2026-03-16T01:16:13.168337" elapsed="0.028077"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_CONFIRM_MODAL}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.196551" elapsed="0.016886"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.213974" elapsed="0.014822"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:13.236925" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.FDE8FF7CC6A7247A0D91643C1867905A.e.74")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.229022" elapsed="0.007952"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:13.237471" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.FDE8FF7CC6A7247A0D91643C1867905A.e.74")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.237117" elapsed="0.006219"/>
+</kw>
+<arg>${BTN_CONFIRM_MODAL}</arg>
+<status status="PASS" start="2026-03-16T01:16:13.213696" elapsed="0.029782"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:15.244071" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:13.243634" elapsed="2.000589"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:16:09.878648" elapsed="5.365701"/>
+</kw>
+<kw name="Driver Start Trip">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Driver</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:16:15.245058" elapsed="0.000181"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:15.245474" level="INFO">Opening url 'http://localhost:3001/myroute'</msg>
+<arg>${URL_MY_ROUTE}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:16:15.245345" elapsed="0.133913"/>
+</kw>
+<kw name="Reload Page" owner="SeleniumLibrary">
+<doc>Simulates user reloading page.</doc>
+<status status="PASS" start="2026-03-16T01:16:15.379690" elapsed="0.114531"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:17.494707" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:15.494425" elapsed="2.000429"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:17.495423" elapsed="0.014893"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:17.517439" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.86")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:17.510534" elapsed="0.006960"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:17.518154" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.86")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:17.517670" elapsed="0.012040"/>
+</kw>
+<arg>${TAB_MY_ROUTE}</arg>
+<status status="PASS" start="2026-03-16T01:16:17.495096" elapsed="0.034770"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:19.530341" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:17.529998" elapsed="2.000491"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_START_TRIP}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.530703" elapsed="0.015178"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.546454" elapsed="0.012377"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.565763" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.94")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.559066" elapsed="0.006761"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.566546" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.94")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.566038" elapsed="0.006467"/>
+</kw>
+<arg>${BTN_START_TRIP}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.546139" elapsed="0.026506"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_MODAL_CONFIRM}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.572777" elapsed="0.014443"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.587848" elapsed="0.012956"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.607310" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.98")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.600992" elapsed="0.006383"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.608116" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.98")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.607541" elapsed="0.006311"/>
+</kw>
+<arg>${BTN_MODAL_CONFIRM}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.587499" elapsed="0.026542"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CARD}</arg>
+<arg>10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.614203" elapsed="0.016716"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.631499" elapsed="0.014638"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.653308" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.99")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.646389" elapsed="0.006970"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.653928" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.99")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.653508" elapsed="0.008771"/>
+</kw>
+<arg>${CARD}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.631159" elapsed="0.031285"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_CHECKPOINT}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.662623" elapsed="0.029907"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.693213" elapsed="0.014383"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.713685" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.108")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.707823" elapsed="0.005985"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.714391" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.108")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.713973" elapsed="0.019889"/>
+</kw>
+<arg>${BTN_CHECKPOINT}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.692834" elapsed="0.041225"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:16:15.244735" elapsed="4.489406"/>
+</kw>
+<kw name="Driver Send Quick Message">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Driver</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.734850" elapsed="0.000162"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_SEND_MESSAGE}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.735153" elapsed="0.036218"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.772144" elapsed="0.012907"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.793187" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.109")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.785274" elapsed="0.007982"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.793981" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.109")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.793466" elapsed="0.009341"/>
+</kw>
+<arg>${BTN_SEND_MESSAGE}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.771696" elapsed="0.031283"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_QUICK_MSG}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.803152" elapsed="0.020408"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.824256" elapsed="0.013635"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.846905" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.111")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.838157" elapsed="0.008813"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.847716" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.111")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.847164" elapsed="0.007387"/>
+</kw>
+<arg>${BTN_QUICK_MSG}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.823855" elapsed="0.030851"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.855317" elapsed="0.019575"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.881147" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.112")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.875113" elapsed="0.006104"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:19.881958" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.112")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.881427" elapsed="0.006232"/>
+</kw>
+<arg>${BTN_SEND_MESSAGER}</arg>
+<status status="PASS" start="2026-03-16T01:16:19.854945" elapsed="0.032861"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:20.888762" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:19.887967" elapsed="1.000965"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_CLOSE_MODAL}</arg>
+<arg>10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.889159" elapsed="0.015052"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.904781" elapsed="0.012679"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:20.925800" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.116")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.917712" elapsed="0.008153"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:20.926603" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.116")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.926067" elapsed="0.006642"/>
+</kw>
+<arg>${BTN_CLOSE_MODAL}</arg>
+<status status="PASS" start="2026-03-16T01:16:20.904435" elapsed="0.028687"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${TAB_MY_ROUTE}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.933281" elapsed="0.013873"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.947893" elapsed="0.013183"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:20.968524" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.86")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.961242" elapsed="0.007347"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:20.969309" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.86")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.968800" elapsed="0.005160"/>
+</kw>
+<arg>${TAB_MY_ROUTE}</arg>
+<status status="PASS" start="2026-03-16T01:16:20.947483" elapsed="0.026598"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CARD}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.974207" elapsed="0.012131"/>
+</kw>
+<kw name="Scroll Element Into View" owner="SeleniumLibrary">
+<arg>${CARD}</arg>
+<doc>Scrolls the element identified by ``locator`` into view.</doc>
+<status status="PASS" start="2026-03-16T01:16:20.986570" elapsed="0.275047"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-16T01:16:22.262324" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-16T01:16:21.261825" elapsed="1.000656"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.263134" elapsed="0.012159"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.281400" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.99")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.275498" elapsed="0.005947"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.282057" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.665F2B37F14BA2952F57E59FBE24DBF5.e.99")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.281631" elapsed="0.009057"/>
+</kw>
+<arg>${CARD}</arg>
+<status status="PASS" start="2026-03-16T01:16:22.262766" elapsed="0.028022"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:16:19.734544" elapsed="2.556285"/>
+</kw>
+<kw name="Passenger Reply Chat">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Passenger</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.291555" elapsed="0.000222"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.292073" level="INFO">Opening url 'http://localhost:3001/mytrip'</msg>
+<arg>${URL_MY_TRIPS}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.291919" elapsed="0.188305"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.481059" elapsed="0.046793"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.624888" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.134")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.528087" elapsed="0.096861"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.625490" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.134")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.625113" elapsed="0.022852"/>
+</kw>
+<arg>${PASSENGER_TAB_CONFIRMED}</arg>
+<status status="PASS" start="2026-03-16T01:16:22.480541" elapsed="0.167559"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${TRIP_CARD_PASSENGER}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.648236" elapsed="0.029675"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.678403" elapsed="0.020615"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.711028" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.139")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.699227" elapsed="0.011865"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.711761" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.139")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.711300" elapsed="0.004977"/>
+</kw>
+<arg>${TRIP_CARD_PASSENGER}</arg>
+<status status="PASS" start="2026-03-16T01:16:22.678131" elapsed="0.038258"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.716985" elapsed="0.014966"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.738657" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.150")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.732133" elapsed="0.006592"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.739324" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.150")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.738896" elapsed="0.006898"/>
+</kw>
+<arg>${BTN_OPEN_CHAT_PASS}</arg>
+<status status="PASS" start="2026-03-16T01:16:22.716669" elapsed="0.029242"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>${QUICK_MSG_TEXT}</arg>
+<arg>30s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.746039" elapsed="0.239351"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:22.985861" level="INFO">Typing text 'ขอบคุณครับ เดี๋ยวไปที่จุดรับ' into text field 'xpath=//input[@placeholder='พิมพ์ข้อความตอบกลับ...']'.</msg>
+<arg>${PASS_REPLY_INPUT}</arg>
+<arg>${MSG_TC1_PASS}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:22.985590" elapsed="0.096851"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.082988" elapsed="0.042501"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.131807" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.167")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.125696" elapsed="0.006176"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.132481" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="3a72b7e6d518dccf838e9e777363cfea", element="f.488A1BB0F91F82C28D6FBFEEA8752D96.d.CE040B7AE0FC603401A27CD5049A3BA8.e.167")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.132048" elapsed="0.009364"/>
+</kw>
+<arg>${PASS_SEND_REPLY_BTN}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.082693" elapsed="0.058871"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:16:22.291189" elapsed="0.850436"/>
+</kw>
+<kw name="Verify Driver Receive Reply">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Driver</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.142232" elapsed="0.000156"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.142589" level="INFO">Opening url 'http://localhost:3001/myroute'</msg>
+<arg>${URL_MY_ROUTE}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.142485" elapsed="0.140107"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${TAB_MY_ROUTE}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.282790" elapsed="0.036538"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.319899" elapsed="0.068847"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.397918" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.122")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.388959" elapsed="0.009060"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.398957" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.122")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.398337" elapsed="0.017673"/>
+</kw>
+<arg>${TAB_MY_ROUTE}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.319592" elapsed="0.096551"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CARD}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.416255" elapsed="0.025182"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.442057" elapsed="0.018639"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.471011" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.127")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.460940" elapsed="0.010137"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.471742" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.127")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.471284" elapsed="0.008598"/>
+</kw>
+<arg>${CARD}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.441709" elapsed="0.038299"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_SEND_MESSAGE}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.480177" elapsed="0.021447"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.502246" elapsed="0.013081"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.525943" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.135")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.515529" elapsed="0.010487"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.526613" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.135")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.526184" elapsed="0.008551"/>
+</kw>
+<arg>${BTN_SEND_MESSAGE}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.501925" elapsed="0.032983"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>${MSG_TC1_PASS}</arg>
+<arg>30s</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.535128" elapsed="0.036453"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:16:23.141969" elapsed="0.429764"/>
+</kw>
+<kw name="Driver Send Broadcast Message">
+<kw name="Switch Browser" owner="SeleniumLibrary">
+<arg>Driver</arg>
+<doc>Switches between active browsers using ``index_or_alias``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.572436" elapsed="0.000177"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_SEND_TO_ALL}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.572714" elapsed="0.017975"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.591326" elapsed="0.014862"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.625236" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.136")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.606424" elapsed="0.018876"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.626131" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.136")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.625536" elapsed="0.014612"/>
+</kw>
+<arg>${BTN_SEND_TO_ALL}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.590964" elapsed="0.049329"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_SELECT_ALL_CHAT}</arg>
+<arg>20s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.640422" elapsed="0.015382"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.656486" elapsed="0.019045"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.684630" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.160")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.675766" elapsed="0.008920"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.685291" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.160")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.684913" elapsed="0.007529"/>
+</kw>
+<arg>${BTN_SELECT_ALL_CHAT}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.656097" elapsed="0.036502"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${BTN_QUICK_MSG_2}</arg>
+<arg>10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.692770" elapsed="0.016327"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.709702" elapsed="0.013741"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.732822" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.161")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.723697" elapsed="0.009203"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.733570" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.161")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.733097" elapsed="0.007273"/>
+</kw>
+<arg>${BTN_QUICK_MSG_2}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.709313" elapsed="0.031176"/>
+</kw>
+<kw name="Wait Until Element Is Enabled" owner="SeleniumLibrary">
+<arg>${BTN_CONFIRM_SEND}</arg>
+<arg>10s</arg>
+<doc>Waits until the element ``locator`` is enabled.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.740655" elapsed="0.027163"/>
+</kw>
+<kw name="Click JS">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${locator}</arg>
+<arg>30s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.768442" elapsed="0.014736"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.794876" level="INFO">${el} = &lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.136")&gt;</msg>
+<var>${el}</var>
+<arg>${locator}</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.783427" elapsed="0.011548"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-03-16T01:16:23.795709" level="INFO">Executing JavaScript:
+arguments[0].click();
+By using argument:
+'&lt;selenium.webdriver.remote.webelement.WebElement (session="836e48a004a520f86f09bd3fdc48ae53", element="f.A0A915558FB7CF2367068E46E563586E.d.71CE14CC05B2E3377AFFF98632366EE6.e.136")&gt;'</msg>
+<arg>arguments[0].click();</arg>
+<arg>ARGUMENTS</arg>
+<arg>${el}</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.795196" elapsed="0.010530"/>
+</kw>
+<arg>${BTN_CONFIRM_SEND}</arg>
+<status status="PASS" start="2026-03-16T01:16:23.768113" elapsed="0.037735"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>ส่งข้อความ Broadcast เรียบร้อยแล้ว</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.805992" elapsed="0.000339"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:16:23.572106" elapsed="0.234300"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:15:55.165592" elapsed="28.641115"/>
+</test>
+<kw name="Close All Browsers" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" start="2026-03-16T01:16:23.807486" elapsed="4.511748"/>
+</kw>
+<status status="PASS" start="2026-03-16T01:15:54.964495" elapsed="33.354836"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="testNo12" id="s1" pass="1" fail="0" skip="0">testNo12</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
