@@ -2,6 +2,7 @@ const { PrismaClient, LogType } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { Parser } = require('json2csv');
 const crypto = require('crypto');
+const stringify = require('fast-json-stable-stringify');
 
 
 const getLogs = async (req, res) => {
@@ -273,7 +274,7 @@ const verifyLogIntegrity = async (req, res) => {
     return res.status(404).json({ message: "Log not found" });
   }
 
-  const rawDataString = JSON.stringify(log.details);
+  const rawDataString = stringify(log.details);
 
   const computedHash = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
                                .update(rawDataString)
@@ -289,4 +290,60 @@ const verifyLogIntegrity = async (req, res) => {
     });
 };
 
-module.exports = { getLogs, exportLogs, verifyLogIntegrity };
+const auditAllLogs = async (req, res) => {
+    try {
+        const logs = await prisma.systemLog.findMany({
+            select: { 
+                id: true, 
+                details: true, 
+                logHash: true 
+            }
+        });
+
+        const tamperedLogIds = [];
+
+        for (const log of logs) {
+            if (log.details && log.logHash) {
+                // ใช้ fast-json-stable-stringify เพื่อจัดเรียง Key ให้เหมือนตอนสร้าง
+                const rawDataString = stringify(log.details);
+                
+                const computedHash = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
+                                           .update(rawDataString)
+                                           .digest('hex');
+                
+                // ถ้าไม่ตรงกัน แปลว่าโดนแก้
+                if (computedHash !== log.logHash) {
+                    tamperedLogIds.push(log.id);
+                }
+            }
+        }
+
+        if (tamperedLogIds.length === 0) {
+            return res.status(200).json({ 
+                success: true,
+                status: "Secure", 
+                message: "All logs are perfectly intact. No tampering detected.",
+                totalScanned: logs.length,
+                tamperedLogIds: []
+            });
+        } else {
+            return res.status(200).json({ 
+                success: true,
+                status: "Warning", 
+                message: `Alert! Found ${tamperedLogIds.length} tampered logs!`,
+                totalScanned: logs.length,
+                tamperedLogIds: tamperedLogIds 
+            });
+        }
+
+    } catch (error) {
+        console.error("Audit Error:", error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Audit failed", 
+            error: error.message 
+        });
+    }
+};
+
+module.exports = { getLogs, exportLogs, verifyLogIntegrity, auditAllLogs };

@@ -1,0 +1,1531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.13.1 on win32)" generated="2026-03-15T16:28:01.471367" rpa="false" schemaversion="5">
+<suite id="s1" name="System Log Tests 3" source="Z:\GIT\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp#\tests\sprint3\card01\system_log_tests_3.robot">
+<kw name="Setup Test Environment" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:01.686858" level="INFO">Creating Session using : alias=api, url=http://localhost:3000, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-03-15T16:28:01.686698" elapsed="0.000343"/>
+</kw>
+<kw name="Connect To Database" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:01.687449" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-03-15T16:28:01.687570" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-03-15T16:28:01.697814" level="INFO">Connect to DB using : psycopg2.connect(database='postgres', user='postgres', password=***, host='localhost', port=5432)</msg>
+<arg>psycopg2</arg>
+<arg>${DB_NAME}</arg>
+<arg>${DB_USER}</arg>
+<arg>${DB_PASS}</arg>
+<arg>${DB_HOST}</arg>
+<arg>${DB_PORT}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.687162" elapsed="0.066518"/>
+</kw>
+<doc>สร้าง Session HTTP และเชื่อมต่อ Database ตอนเริ่มเทสต์</doc>
+<status status="PASS" start="2026-03-15T16:28:01.686165" elapsed="0.067639"/>
+</kw>
+<test id="s1-t1" name="TC-1.1: Verify AUTH Log Generation" line="24">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:01.755129" level="INFO">${body} = {'email': 'admin@example.com', 'password': '123456789'}</msg>
+<var>${body}</var>
+<arg>email=${ADMIN_EMAIL}</arg>
+<arg>password=${ADMIN_PASS}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.754589" elapsed="0.000569"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:01.825013" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+ path_url=/api/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '55', 'Content-Type': 'application/json'} 
+ body=b'{"email": "admin@example.com", "password": "123456789"}' 
+ </msg>
+<msg time="2026-03-15T16:28:01.825126" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '419', 'ETag': 'W/"1a3-9CffTosToDuGPVFjXTj6n84rzXE"', 'Date': 'Sun, 15 Mar 2026 09:28:01 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Login successful","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0","user":{"id":"cmlkpxt160000m62aw5muawr6","firstName":"RobotTest","lastName":"Administrator","profilePicture":null,"role":"ADMIN","passengerSuspendedUntil":null}}} 
+ </msg>
+<msg time="2026-03-15T16:28:01.825252" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/auth/login</arg>
+<arg>json=${body}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.755341" elapsed="0.069936"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.825576" elapsed="0.000232"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:01.826671" level="INFO">${ADMIN_TOKEN} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0</msg>
+<var>${ADMIN_TOKEN}</var>
+<arg>${response.json()['data']['token']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.826058" elapsed="0.000646"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:01.827215" level="INFO">${ADMIN_TOKEN} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0</msg>
+<arg>${ADMIN_TOKEN}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.826928" elapsed="0.000331"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-15T16:28:02.828594" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-15T16:28:01.827463" elapsed="1.001216"/>
+</kw>
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:02.829114" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT "logType" FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:02.831441" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:02.831658" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;logType&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;AUTH&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:02.831781" level="INFO">${query_result} = [('AUTH',)]</msg>
+<var>${query_result}</var>
+<arg>SELECT "logType" FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:02.828981" elapsed="0.002823"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${query_result[0][0]}</arg>
+<arg>AUTH</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:02.832207" elapsed="0.000585"/>
+</kw>
+<doc>ทดสอบว่าการ Login จะสร้าง Log ประเภท AUTH</doc>
+<status status="PASS" start="2026-03-15T16:28:01.753878" elapsed="1.079164"/>
+</test>
+<test id="s1-t2" name="TC-1.2: Verify BEHAVIOR Log Generation" line="36">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:02.834872" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:02.834546" elapsed="0.000353"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:02.838280" level="INFO">GET Request : url=http://localhost:3000/api/users/me 
+ path_url=/api/users/me 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:02.838364" level="INFO">GET Response : url=http://localhost:3000/api/users/me 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '531', 'ETag': 'W/"213-cng192+Zfglr8ifKjGBLmhohC1E"', 'Date': 'Sun, 15 Mar 2026 09:28:02 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"User retrieved","data":{"id":"cmlkpxt160000m62aw5muawr6","username":"admin123","email":"admin@example.com","firstName":"RobotTest","lastName":"Administrator","gender":null,"phoneNumber":null,"profilePicture":null,"nationalIdNumber":null,"nationalIdPhotoUrl":null,"nationalIdExpiryDate":null,"selfiePhotoUrl":null,"role":"ADMIN","isVerified":true,"isActive":true,"otpCode":null,"lastLogin":null,"createdAt":"2026-02-13T10:02:10.362Z","updatedAt":"2026-03-15T09:24:56.114Z","passengerSuspendedUntil":null}} 
+ </msg>
+<msg time="2026-03-15T16:28:02.838474" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/me</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:02.835132" elapsed="0.003371"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:02.838807" elapsed="0.000180"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-15T16:28:03.840262" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-15T16:28:02.839197" elapsed="1.001152"/>
+</kw>
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:03.840781" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT "logType" FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:03.841260" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:03.841449" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;logType&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;BEHAVIOR&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:03.841562" level="INFO">${query_result} = [('BEHAVIOR',)]</msg>
+<var>${query_result}</var>
+<arg>SELECT "logType" FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.840655" elapsed="0.000931"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${query_result[0][0]}</arg>
+<arg>BEHAVIOR</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.841831" elapsed="0.000573"/>
+</kw>
+<doc>ทดสอบว่าการเรียกดูข้อมูล (GET) สร้าง Log ประเภท BEHAVIOR</doc>
+<status status="PASS" start="2026-03-15T16:28:02.833753" elapsed="1.008891"/>
+</test>
+<test id="s1-t3" name="TC-1.3: Verify TRANSACTION Log and Password Sanitization" line="46">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:03.844427" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.844096" elapsed="0.000357"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:03.844952" level="INFO">${body} = {'firstName': 'RobotTest', 'password': 'SuperSecretPassword'}</msg>
+<var>${body}</var>
+<arg>firstName=RobotTest</arg>
+<arg>password=SuperSecretPassword</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.844688" elapsed="0.000289"/>
+</kw>
+<kw name="PUT On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:03.848886" level="INFO">PUT Request : url=http://localhost:3000/api/users/me 
+ path_url=/api/users/me 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0', 'Content-Length': '61', 'Content-Type': 'application/json'} 
+ body=b'{"firstName": "RobotTest", "password": "SuperSecretPassword"}' 
+ </msg>
+<msg time="2026-03-15T16:28:03.849056" level="INFO">PUT Response : url=http://localhost:3000/api/users/me 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '532', 'ETag': 'W/"214-30v1sEK0oyZH3cCNlv2LTyCcxRg"', 'Date': 'Sun, 15 Mar 2026 09:28:03 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Profile updated","data":{"id":"cmlkpxt160000m62aw5muawr6","username":"admin123","email":"admin@example.com","firstName":"RobotTest","lastName":"Administrator","gender":null,"phoneNumber":null,"profilePicture":null,"nationalIdNumber":null,"nationalIdPhotoUrl":null,"nationalIdExpiryDate":null,"selfiePhotoUrl":null,"role":"ADMIN","isVerified":true,"isActive":true,"otpCode":null,"lastLogin":null,"createdAt":"2026-02-13T10:02:10.362Z","updatedAt":"2026-03-15T09:28:03.847Z","passengerSuspendedUntil":null}} 
+ </msg>
+<msg time="2026-03-15T16:28:03.849196" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/me</arg>
+<arg>json=${body}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a PUT request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.845193" elapsed="0.004029"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.849520" elapsed="0.000171"/>
+</kw>
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:03.850038" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT "details"::text FROM "SystemLog" WHERE "logType" = 'AUTH' ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:03.850871" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:03.851054" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;details&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;{"ip": "::1", "method": "POST", "userId": null, "details": {"email": "admin@example.com", "password": "***REDACTED***"}, "logType": "AUTH", "endpoint": "/api/auth/login", "timestamp": "2026-03-15T09:28:01.763Z", "statusCode": 200}&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:03.851164" level="INFO">${query_result} = [('{"ip": "::1", "method": "POST", "userId": null, "details": {"email": "admin@example.com", "password": "***REDACTED***"}, "logType": "AUTH", "endpoint": "/api/auth/login", "timestamp": "2026-03-15T0...</msg>
+<var>${query_result}</var>
+<arg>SELECT "details"::text FROM "SystemLog" WHERE "logType" = 'AUTH' ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.849931" elapsed="0.001257"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${query_result[0][0]}</arg>
+<arg>***REDACTED***</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.851433" elapsed="0.000669"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${query_result[0][0]}</arg>
+<arg>SuperSecretPassword</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.852314" elapsed="0.000517"/>
+</kw>
+<doc>ทดสอบว่าการทำ PUT สร้าง TRANSACTION Log และเซ็นเซอร์รหัสผ่าน</doc>
+<status status="PASS" start="2026-03-15T16:28:03.843280" elapsed="0.009775"/>
+</test>
+<test id="s1-t4" name="TC-1.4: Verify SECURITY Log on Unauthorized Access" line="60">
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:03.857438" level="INFO">GET Request : url=http://localhost:3000/api/logs 
+ path_url=/api/logs 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:03.857528" level="INFO">GET Response : url=http://localhost:3000/api/logs 
+ status=401, reason=Unauthorized 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '66', 'ETag': 'W/"42-VIvuqXCkSos5B2HjVRGsrV8/u7s"', 'Date': 'Sun, 15 Mar 2026 09:28:03 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"message":"Not authorized, no token","data":null} 
+ </msg>
+<msg time="2026-03-15T16:28:03.857641" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/logs</arg>
+<arg>expected_status=401</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.854413" elapsed="0.003253"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.859217" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-15T16:28:03.857960" elapsed="1.001344"/>
+</kw>
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:04.859730" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT "logType" FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:04.860179" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:04.860411" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;logType&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;SECURITY&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:04.860528" level="INFO">${query_result} = [('SECURITY',)]</msg>
+<var>${query_result}</var>
+<arg>SELECT "logType" FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.859609" elapsed="0.000943"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${query_result[0][0]}</arg>
+<arg>SECURITY</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.860816" elapsed="0.000575"/>
+</kw>
+<doc>ทดสอบว่าเข้าถึงโดยไม่มีสิทธิ์ จะเกิด SECURITY Log</doc>
+<status status="PASS" start="2026-03-15T16:28:03.853651" elapsed="1.007987"/>
+</test>
+<test id="s1-t5" name="TC-2.1: Admin Can Get All Logs" line="70">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.863500" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.863150" elapsed="0.000378"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:04.869514" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs 
+ path_url=/api/users/admin/logs 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:04.869603" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '2494', 'ETag': 'W/"9be-iCb2E+cO4BYBLKEHX3YMnfoQ0ZU"', 'Date': 'Sun, 15 Mar 2026 09:28:04 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":1092,"routeId":null,"bookingId":null,"userId":null,"logType":"SECURITY","action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":401,"details":{"ip":"::1","method":"GET","userId":null,"details":{},"logType":"SECURITY","endpoint":"/api/logs","timestamp":"2026-03-15T09:28:03.854Z","statusCode":401},"logHash":"c928a28f2369fb4b2657b3555d73eacab923eb1a522dde6e964c54162bfe0509","createdAt":"2026-03-15T09:28:03.854Z","user":null},{"id":1091,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"TRANSACTION","action":"PUT /api/users/me","method":"PUT","endpoint":"/api/users/me","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"PUT","userId":"cmlkpxt160000m62aw5muawr6","details":{"firstName":"RobotTest"},"logType":"TRANSACTION","endpoint":"/api/users/me","timestamp":"2026-03-15T09:28:03.845Z","statusCode":200},"logHash":"b5c21bb0e0ca0571074f1eeefaa817e4346ab13cd37a0a4bd059a1b55f41f288","createdAt":"2026-03-15T09:28:03.845Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1090,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"BEHAVIOR","action":"GET /api/users/me","method":"GET","endpoint":"/api/users/me","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"BEHAVIOR","endpoint":"/api/users/me","timestamp":"2026-03-15T09:28:02.835Z","statusCode":200},"logHash":"623846bb1410d5b56f4b67e5dfdad971b0debfc5eef1c21e3cdabcec8b015bf0","createdAt":"2026-03-15T09:28:02.835Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1089,"routeId":null,"bookingId":null,"userId":null,"logType":"AUTH","action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"POST","userId":null,"details":{"email":"admin@example.com","password":"***REDACTED***"},"logType":"AUTH","endpoint":"/api/auth/login","timestamp":"2026-03-15T09:28:01.763Z","statusCode":200},"logHash":"551634123b95e05c0884e7bdfdfba45a23ffdd7bc81efdfb5f514ef98db74dae","createdAt":"2026-03-15T09:28:01.763Z","user":null}],"meta":{"total_items":4,"total_pages":1,"current_page":1,"items_per_page":20}} 
+ </msg>
+<msg time="2026-03-15T16:28:04.869739" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.863776" elapsed="0.005987"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.870060" elapsed="0.000179"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.871031" level="INFO">${LATEST_LOG_ID} = 1092</msg>
+<var>${LATEST_LOG_ID}</var>
+<arg>${response.json()['data'][0]['id']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.870435" elapsed="0.000621"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.871566" level="INFO">${LATEST_LOG_ID} = 1092</msg>
+<arg>${LATEST_LOG_ID}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.871305" elapsed="0.000300"/>
+</kw>
+<doc>แอดมินดึงข้อมูล Log ได้ และดึง ID ล่าสุดมาใช้ใน TC ถัดไป</doc>
+<status status="PASS" start="2026-03-15T16:28:04.862294" elapsed="0.009625"/>
+</test>
+<test id="s1-t6" name="TC-2.2: Filter Logs by Type" line="80">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.873509" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.873155" elapsed="0.000383"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:04.878475" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs?type=SECURITY&amp;limit=100 
+ path_url=/api/users/admin/logs?type=SECURITY&amp;limit=100 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:04.878687" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs?type=SECURITY&amp;limit=100 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '3157', 'ETag': 'W/"c55-WjJtFEQPmRvgbz3J/01qdjz+pWo"', 'Date': 'Sun, 15 Mar 2026 09:28:04 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":1093,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs","method":"GET","endpoint":"/api/users/admin/logs","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs","timestamp":"2026-03-15T09:28:04.864Z","statusCode":200},"logHash":"90bf08995d78c76231f1fed1abbb620dd4297ce1448ff4e0820fdc9ace73ea53","createdAt":"2026-03-15T09:28:04.864Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1092,"routeId":null,"bookingId":null,"userId":null,"logType":"SECURITY","action":"GET /api/logs","method":"GET","endpoint":"/api/logs","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":401,"details":{"ip":"::1","method":"GET","userId":null,"details":{},"logType":"SECURITY","endpoint":"/api/logs","timestamp":"2026-03-15T09:28:03.854Z","statusCode":401},"logHash":"c928a28f2369fb4b2657b3555d73eacab923eb1a522dde6e964c54162bfe0509","createdAt":"2026-03-15T09:28:03.854Z","user":null},{"id":1091,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"TRANSACTION","action":"PUT /api/users/me","method":"PUT","endpoint":"/api/users/me","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"PUT","userId":"cmlkpxt160000m62aw5muawr6","details":{"firstName":"RobotTest"},"logType":"TRANSACTION","endpoint":"/api/users/me","timestamp":"2026-03-15T09:28:03.845Z","statusCode":200},"logHash":"b5c21bb0e0ca0571074f1eeefaa817e4346ab13cd37a0a4bd059a1b55f41f288","createdAt":"2026-03-15T09:28:03.845Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1090,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"BEHAVIOR","action":"GET /api/users/me","method":"GET","endpoint":"/api/users/me","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"BEHAVIOR","endpoint":"/api/users/me","timestamp":"2026-03-15T09:28:02.835Z","statusCode":200},"logHash":"623846bb1410d5b56f4b67e5dfdad971b0debfc5eef1c21e3cdabcec8b015bf0","createdAt":"2026-03-15T09:28:02.835Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1089,"routeId":null,"bookingId":null,"userId":null,"logType":"AUTH","action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"POST","userId":null,"details":{"email":"admin@example.com","password":"***REDACTED***"},"logType":"AUTH","endpoint":"/api/auth/login","timestamp":"2026-03-15T09:28:01.763Z","statusCode":200},"logHash":"551634123b95e05c0884e7bdfdfba45a23ffdd7bc81efdfb5f514ef98db74dae","createdAt":"2026-03-15T09:28:01.763Z","user":null}],"meta":{"total_items":5,"total_pages":1,"current_page":1,"items_per_page":100}} 
+ </msg>
+<msg time="2026-03-15T16:28:04.879067" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>url=/api/users/admin/logs?type=SECURITY&amp;limit=100</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.873765" elapsed="0.005379"/>
+</kw>
+<kw name="Convert To String" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.880200" level="INFO">${body_string} = {'status': 'success', 'data': [{'id': 1093, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs', 'method': 'GET', 'e...</msg>
+<var>${body_string}</var>
+<arg>${response.json()}</arg>
+<doc>Converts the given item to a Unicode string.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.879476" elapsed="0.000752"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${body_string}</arg>
+<arg>SECURITY</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.880488" elapsed="0.000278"/>
+</kw>
+<status status="PASS" start="2026-03-15T16:28:04.872691" elapsed="0.008300"/>
+</test>
+<test id="s1-t7" name="TC-3.1: User Cannot Access Admin Logs" line="94">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.882830" level="INFO">${headers} = {'Authorization': 'Bearer invalid_or_user_token'}</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer invalid_or_user_token</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.882539" elapsed="0.000319"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:04.888626" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs 
+ path_url=/api/users/admin/logs 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer invalid_or_user_token'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:04.888761" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs 
+ status=401, reason=Unauthorized 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '70', 'ETag': 'W/"46-w2Z3gATrNC7hMBgk4VM6pVfFyx8"', 'Date': 'Sun, 15 Mar 2026 09:28:04 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"message":"Not authorized, token failed","data":null} 
+ </msg>
+<msg time="2026-03-15T16:28:04.888881" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=401</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.883102" elapsed="0.005804"/>
+</kw>
+<doc>จำกัดสิทธิ์ User ไม่ให้เข้าถึง API ของแอดมิน (RBAC Test)</doc>
+<status status="PASS" start="2026-03-15T16:28:04.881709" elapsed="0.007462"/>
+</test>
+<test id="s1-t8" name="TC-3.2: Verify Valid Log HMAC" line="101">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:04.891106" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.890735" elapsed="0.000422"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:04.894566" level="INFO">GET Request : url=http://localhost:3000/api/users/me 
+ path_url=/api/users/me 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:04.894653" level="INFO">GET Response : url=http://localhost:3000/api/users/me 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '531', 'ETag': 'W/"213-WgNTMNgtGs+eBHmPf/85/BEqMm0"', 'Date': 'Sun, 15 Mar 2026 09:28:04 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"User retrieved","data":{"id":"cmlkpxt160000m62aw5muawr6","username":"admin123","email":"admin@example.com","firstName":"RobotTest","lastName":"Administrator","gender":null,"phoneNumber":null,"profilePicture":null,"nationalIdNumber":null,"nationalIdPhotoUrl":null,"nationalIdExpiryDate":null,"selfiePhotoUrl":null,"role":"ADMIN","isVerified":true,"isActive":true,"otpCode":null,"lastLogin":null,"createdAt":"2026-02-13T10:02:10.362Z","updatedAt":"2026-03-15T09:28:03.847Z","passengerSuspendedUntil":null}} 
+ </msg>
+<arg>api</arg>
+<arg>/api/users/me</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.891407" elapsed="0.003315"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.895521" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-03-15T16:28:04.894993" elapsed="1.000616"/>
+</kw>
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:05.896040" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:05.896487" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:05.896673" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;id&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;1096&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:05.896785" level="INFO">${query_result} = [(1096,)]</msg>
+<var>${query_result}</var>
+<arg>SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.895918" elapsed="0.000889"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.897604" level="INFO">${NEW_LOG_ID} = 1096</msg>
+<var>${NEW_LOG_ID}</var>
+<arg>${query_result[0][0]}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.897051" elapsed="0.000577"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.900914" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs/1096/verify 
+ path_url=/api/users/admin/logs/1096/verify 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.901092" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs/1096/verify 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '105', 'ETag': 'W/"69-ndWlXFA9mv3S5J0lCYfLvOrE4pM"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"logId":"1096","isValid":true,"status":"Verified (No tampering)","timestamp":"2026-03-15T09:28:05.899Z"} 
+ </msg>
+<msg time="2026-03-15T16:28:05.901221" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>url=/api/users/admin/logs/${NEW_LOG_ID}/verify</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.897855" elapsed="0.003391"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.901526" elapsed="0.000177"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['isValid']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.901939" elapsed="0.000565"/>
+</kw>
+<doc>ทดสอบ Verify ข้อมูล Log ที่ยังไม่ถูกแก้ไข (ต้องผ่าน)</doc>
+<status status="PASS" start="2026-03-15T16:28:04.889860" elapsed="1.012877"/>
+</test>
+<test id="s1-t9" name="TC-3.3: Tamper Detection (HMAC Catching Payload Modification)" line="118">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:05.904929" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "SystemLog" SET "details" = '{"tampered": true}' WHERE id = '1092';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:05.905723" level="INFO">Commit the transaction</msg>
+<arg>UPDATE "SystemLog" SET "details" = '{"tampered": true}' WHERE id = '${LATEST_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.904743" elapsed="0.002117"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.907643" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.907174" elapsed="0.000500"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.910776" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs/1092/verify 
+ path_url=/api/users/admin/logs/1092/verify 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.910861" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs/1092/verify 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '107', 'ETag': 'W/"6b-0/5D1AL+bRsGV5L2UKGDOawUXjU"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"logId":"1092","isValid":false,"status":"Tampered (Data changed!)","timestamp":"2026-03-15T09:28:05.909Z"} 
+ </msg>
+<msg time="2026-03-15T16:28:05.910973" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs/${LATEST_LOG_ID}/verify</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.907917" elapsed="0.003079"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.911288" elapsed="0.000186"/>
+</kw>
+<kw name="Should Not Be True" owner="BuiltIn">
+<arg>${response.json()['isValid']}</arg>
+<doc>Fails if the given condition is true.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.911698" elapsed="0.000531"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>Tampered (Data changed!)</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.912432" elapsed="0.000559"/>
+</kw>
+<doc>จำลองการแฮกแก้ข้อมูลเนื้อหา Log (แก้คอลัมน์ details ที่ใช้คำนวณ Hash)</doc>
+<status status="PASS" start="2026-03-15T16:28:05.903513" elapsed="0.009687"/>
+</test>
+<test id="s1-t10" name="TC-3.4: Tamper Detection (HMAC Catching Hash Modification)" line="133">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:05.914763" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "SystemLog" SET "logHash" = 'fake_hash_123456789abcdef' WHERE id = '1092';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:05.915134" level="INFO">Commit the transaction</msg>
+<arg>UPDATE "SystemLog" SET "logHash" = 'fake_hash_123456789abcdef' WHERE id = '${LATEST_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.914596" elapsed="0.001086"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.916246" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.915896" elapsed="0.000376"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.920170" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs/1092/verify 
+ path_url=/api/users/admin/logs/1092/verify 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.920338" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs/1092/verify 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '107', 'ETag': 'W/"6b-cyGjKBprVU4WeE8fmdTNsdQu2Yg"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"logId":"1092","isValid":false,"status":"Tampered (Data changed!)","timestamp":"2026-03-15T09:28:05.918Z"} 
+ </msg>
+<msg time="2026-03-15T16:28:05.920468" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs/${LATEST_LOG_ID}/verify</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.916565" elapsed="0.003928"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.920785" elapsed="0.000181"/>
+</kw>
+<kw name="Should Not Be True" owner="BuiltIn">
+<arg>${response.json()['isValid']}</arg>
+<doc>Fails if the given condition is true.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.921169" elapsed="0.000529"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>Tampered (Data changed!)</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.921936" elapsed="0.000499"/>
+</kw>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:05.922757" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "SystemLog" WHERE id = '1092';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:05.923085" level="INFO">Commit the transaction</msg>
+<arg>DELETE FROM "SystemLog" WHERE id = '${LATEST_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.922611" elapsed="0.000974"/>
+</kw>
+<doc>จำลองการแฮกโดยการเดา/เปลี่ยนค่า Hash โดยตรงใน Database</doc>
+<status status="PASS" start="2026-03-15T16:28:05.913800" elapsed="0.010027"/>
+</test>
+<test id="s1-t11" name="TC-3.5: Verify All Logs in First Page" line="150">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.925197" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.924868" elapsed="0.000356"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.925674" level="INFO">${query} = {'logType': 'TRANSACTION', 'limit': '100'}</msg>
+<var>${query}</var>
+<arg>logType=TRANSACTION</arg>
+<arg>limit=100</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.925416" elapsed="0.000282"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.931064" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs?logType=TRANSACTION&amp;limit=100 
+ path_url=/api/users/admin/logs?logType=TRANSACTION&amp;limit=100 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.931157" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs?logType=TRANSACTION&amp;limit=100 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '775', 'ETag': 'W/"307-Eln6H0jbpqILxXeTORHMIWhtYzI"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":1091,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"TRANSACTION","action":"PUT /api/users/me","method":"PUT","endpoint":"/api/users/me","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"PUT","userId":"cmlkpxt160000m62aw5muawr6","details":{"firstName":"RobotTest"},"logType":"TRANSACTION","endpoint":"/api/users/me","timestamp":"2026-03-15T09:28:03.845Z","statusCode":200},"logHash":"b5c21bb0e0ca0571074f1eeefaa817e4346ab13cd37a0a4bd059a1b55f41f288","createdAt":"2026-03-15T09:28:03.845Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}}],"meta":{"total_items":1,"total_pages":1,"current_page":1,"items_per_page":100}} 
+ </msg>
+<msg time="2026-03-15T16:28:05.931288" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>url=/api/users/admin/logs</arg>
+<arg>params=${query}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.925992" elapsed="0.005320"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.932316" level="INFO">${logs} = [{'id': 1091, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'TRANSACTION', 'action': 'PUT /api/users/me', 'method': 'PUT', 'endpoint': '/api/users/me', 'ipAddre...</msg>
+<var>${logs}</var>
+<arg>${response.json()['data']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.931698" elapsed="0.000645"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.933390" level="INFO">${log_id} = 1091</msg>
+<var>${log_id}</var>
+<arg>${log['id']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.932810" elapsed="0.000615"/>
+</kw>
+<kw name="Continue For Loop If" owner="BuiltIn">
+<arg>'${log_id}' == '${LATEST_LOG_ID}'</arg>
+<doc>Skips the current FOR loop iteration if the ``condition`` is true.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.933528" elapsed="0.000348"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.936836" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs/1091/verify 
+ path_url=/api/users/admin/logs/1091/verify 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.936918" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs/1091/verify 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '105', 'ETag': 'W/"69-SiY7xIYMVa6a/yW74zgNEOxH3QE"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"logId":"1091","isValid":true,"status":"Verified (No tampering)","timestamp":"2026-03-15T09:28:05.935Z"} 
+ </msg>
+<msg time="2026-03-15T16:28:05.937024" level="INFO">${v_res} = &lt;Response [200]&gt;</msg>
+<var>${v_res}</var>
+<arg>api</arg>
+<arg>url=/api/users/admin/logs/${log_id}/verify</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.933969" elapsed="0.003078"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>Checking Log ID: ${log_id} - Status: ${v_res.json()['isValid']}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.937164" elapsed="0.000826"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${v_res.json()['isValid']}</arg>
+<arg>msg=Log ID ${log_id} has been tampered!</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.938110" elapsed="0.000661"/>
+</kw>
+<var name="${log}">{'id': 1091, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'TRANSACTION', 'action': 'PUT /api/users/me', 'method': 'PUT', 'endpoint': '/api/users/me', 'ipAddres...</var>
+<status status="PASS" start="2026-03-15T16:28:05.932721" elapsed="0.006092"/>
+</iter>
+<var>${log}</var>
+<value>@{logs}</value>
+<status status="PASS" start="2026-03-15T16:28:05.932536" elapsed="0.006317"/>
+</for>
+<status status="PASS" start="2026-03-15T16:28:05.924528" elapsed="0.014576"/>
+</test>
+<test id="s1-t12" name="TC-4.1: Admin Can Export Logs to CSV" line="168">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.941282" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.940923" elapsed="0.000388"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.979258" level="INFO">GET Request : url=http://localhost:3000/api/logs/export 
+ path_url=/api/logs/export 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.979353" level="INFO">GET Response : url=http://localhost:3000/api/logs/export 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="admin123_2026-03-15.csv"', 'Content-Length': '2473', 'ETag': 'W/"9a9-j5xJS1f7qwpMC3VpP3OOxnQYEnE"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body="Section","username","email","firstName","lastName","gender","phoneNumber","role","LogID","LogType","Action","Method","Endpoint","StatusCode","DateTime"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1101,"SECURITY","GET /api/users/admin/logs/1091/verify","GET","/api/users/admin/logs/1091/verify",200,"2026-03-15T09:28:05.934Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1100,"SECURITY","GET /api/users/admin/logs?logType=TRANSACTION&amp;limit=100","GET","/api/users/admin/logs?logType=TRANSACTION&amp;limit=100",200,"2026-03-15T09:28:05.927Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1099,"SECURITY","GET /api/users/admin/logs/1092/verify","GET","/api/users/admin/logs/1092/verify",200,"2026-03-15T09:28:05.917Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1098,"SECURITY","GET /api/users/admin/logs/1092/verify","GET","/api/users/admin/logs/1092/verify",200,"2026-03-15T09:28:05.908Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1097,"SECURITY","GET /api/users/admin/logs/1096/verify","GET","/api/users/admin/logs/1096/verify",200,"2026-03-15T09:28:05.898Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1096,"BEHAVIOR","GET /api/users/me","GET","/api/users/me",200,"2026-03-15T09:28:04.892Z"
+"Personal","","","","","","","",1095,"SECURITY","GET /api/users/admin/logs","GET","/api/users/admin/logs",401,"2026-03-15T09:28:04.883Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1094,"SECURITY","GET /api/users/admin/logs?type=SECURITY&amp;limit=100","GET","/api/users/admin/logs?type=SECURITY&amp;limit=100",200,"2026-03-15T09:28:04.874Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1093,"SECURITY","GET /api/users/admin/logs","GET","/api/users/admin/logs",200,"2026-03-15T09:28:04.864Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1091,"TRANSACTION","PUT /api/users/me","PUT","/api/users/me",200,"2026-03-15T09:28:03.845Z"
+"Personal","admin123","admin@example.com","RobotTest","Administrator","","","ADMIN",1090,"BEHAVIOR","GET /api/users/me","GET","/api/users/me",200,"2026-03-15T09:28:02.835Z"
+"Personal","","","","","","","",1089,"AUTH","POST /api/auth/login","POST","/api/auth/login",200,"2026-03-15T09:28:01.763Z" 
+ </msg>
+<msg time="2026-03-15T16:28:05.979553" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>url=/api/logs/export</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.941559" elapsed="0.038020"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.headers}</arg>
+<arg>Content-Disposition</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.979854" elapsed="0.000516"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.headers['Content-Disposition']}</arg>
+<arg>attachment</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.980626" elapsed="0.000544"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.headers['Content-Disposition']}</arg>
+<arg>.csv</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.981338" elapsed="0.000616"/>
+</kw>
+<kw name="Convert To String" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.983443" level="INFO">${file_content} = "Section","username","email","firstName","lastName","gender","phoneNumber","role","LogID","LogType","Action","Method","Endpoint","StatusCode","DateTime"
+"Personal","admin123","admin@example.com","Rob...</msg>
+<var>${file_content}</var>
+<arg>${response.content}</arg>
+<doc>Converts the given item to a Unicode string.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.982235" elapsed="0.001252"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${file_content}</arg>
+<arg>ID</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.983858" elapsed="0.000432"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${file_content}</arg>
+<arg>Action</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.984516" elapsed="0.000277"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${file_content}</arg>
+<arg>Status</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.984971" elapsed="0.000264"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${file_content}</arg>
+<arg>Date</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.985606" elapsed="0.000285"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>\nExport Verified: Found matching headers in CSV!</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.986092" elapsed="0.000369"/>
+</kw>
+<doc>ทดสอบการดาวน์โหลดไฟล์ Log และตรวจสอบเนื้อหา</doc>
+<status status="PASS" start="2026-03-15T16:28:05.940071" elapsed="0.046571"/>
+</test>
+<test id="s1-t13" name="TC-5.1: Filter Logs by Date Range" line="191">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.988256" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.987929" elapsed="0.000353"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.988743" level="INFO">${date_from} = 2024-01-01</msg>
+<var>${date_from}</var>
+<arg>2024-01-01</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.988478" elapsed="0.000297"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.989367" level="INFO">${date_to} = 2024-12-31</msg>
+<var>${date_to}</var>
+<arg>2024-12-31</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.989014" elapsed="0.000390"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.990161" level="INFO">${query} = {'dateFrom': '2024-01-01', 'dateTo': '2024-12-31', 'limit': '50'}</msg>
+<var>${query}</var>
+<arg>dateFrom=${date_from}</arg>
+<arg>dateTo=${date_to}</arg>
+<arg>limit=50</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.989757" elapsed="0.000432"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:05.994499" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50 
+ path_url=/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:05.994589" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '108', 'ETag': 'W/"6c-T7dnNNqnoamoH55BhjHO6+7Jha0"', 'Date': 'Sun, 15 Mar 2026 09:28:05 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[],"meta":{"total_items":0,"total_pages":0,"current_page":1,"items_per_page":50}} 
+ </msg>
+<msg time="2026-03-15T16:28:05.994700" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs</arg>
+<arg>params=${query}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.990399" elapsed="0.004324"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.994959" elapsed="0.000174"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:05.996129" level="INFO">${logs} = []</msg>
+<var>${logs}</var>
+<arg>${response.json()['data']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.995302" elapsed="0.000862"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${log_date}</var>
+<arg>"${log['createdAt']}"[:10]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:05.996618" elapsed="0.000021"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${is_in_range}</var>
+<arg>"${date_from}" &lt;= "${log_date}" &lt;= "${date_to}"</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:05.996805" elapsed="0.000028"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_in_range}</arg>
+<arg>msg=Log ID ${log['id']} (Date: ${log_date}) หลุดกรอบเวลาที่ค้นหา!</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:05.996946" elapsed="0.000019"/>
+</kw>
+<var name="${log}"/>
+<status status="NOT RUN" start="2026-03-15T16:28:05.996523" elapsed="0.000476"/>
+</iter>
+<var>${log}</var>
+<value>@{logs}</value>
+<status status="NOT RUN" start="2026-03-15T16:28:05.996358" elapsed="0.000672"/>
+</for>
+<doc>ทดสอบการดึงข้อมูล Log โดยกรองจากช่วงวันที่ (dateFrom ถึง dateTo)</doc>
+<status status="PASS" start="2026-03-15T16:28:05.987139" elapsed="0.010082"/>
+</test>
+<test id="s1-t14" name="TC-5.2: Filter Logs by Date Range (Exclude Out-of-Range Data)" line="212">
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:05.998849" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:05.999177" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:05.999283" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;id&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;1103&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:05.999384" level="INFO">${query_result} = [(1103,)]</msg>
+<var>${query_result}</var>
+<arg>SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.998726" elapsed="0.000683"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.000152" level="INFO">${TARGET_LOG_ID} = 1103</msg>
+<var>${TARGET_LOG_ID}</var>
+<arg>${query_result[0][0]}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:05.999591" elapsed="0.000586"/>
+</kw>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:06.000501" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "SystemLog" SET "createdAt" = '2020-01-01 10:00:00' WHERE id = '1103';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:06.001444" level="INFO">Commit the transaction</msg>
+<arg>UPDATE "SystemLog" SET "createdAt" = '2020-01-01 10:00:00' WHERE id = '${TARGET_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.000345" elapsed="0.001517"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.002554" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.002091" elapsed="0.000493"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.003098" level="INFO">${date_from} = 2024-01-01</msg>
+<var>${date_from}</var>
+<arg>2024-01-01</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.002813" elapsed="0.000312"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.003665" level="INFO">${date_to} = 2024-12-31</msg>
+<var>${date_to}</var>
+<arg>2024-12-31</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.003341" elapsed="0.000352"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.004244" level="INFO">${query} = {'dateFrom': '2024-01-01', 'dateTo': '2024-12-31', 'limit': '50'}</msg>
+<var>${query}</var>
+<arg>dateFrom=${date_from}</arg>
+<arg>dateTo=${date_to}</arg>
+<arg>limit=50</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.003892" elapsed="0.000377"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:06.007943" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50 
+ path_url=/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:06.008028" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '108', 'ETag': 'W/"6c-T7dnNNqnoamoH55BhjHO6+7Jha0"', 'Date': 'Sun, 15 Mar 2026 09:28:06 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[],"meta":{"total_items":0,"total_pages":0,"current_page":1,"items_per_page":50}} 
+ </msg>
+<msg time="2026-03-15T16:28:06.008150" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs</arg>
+<arg>params=${query}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.004446" elapsed="0.003727"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.008464" elapsed="0.000172"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.009564" level="INFO">${logs} = []</msg>
+<var>${logs}</var>
+<arg>${response.json()['data']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.008960" elapsed="0.000631"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<var>${log_id}</var>
+<arg>${log['id']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:06.009943" elapsed="0.000019"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${log_date}</var>
+<arg>"${log['createdAt']}"[:10]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:06.010043" elapsed="0.000016"/>
+</kw>
+<kw name="Should Not Be Equal As Strings" owner="BuiltIn">
+<arg>'${log_id}'</arg>
+<arg>'${TARGET_LOG_ID}'</arg>
+<arg>msg=บั๊ก! API ดึงข้อมูลนอกกรอบเวลามาด้วย</arg>
+<doc>Fails if objects are equal after converting them to strings.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:06.010132" elapsed="0.000015"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${is_in_range}</var>
+<arg>"${date_from}" &lt;= "${log_date}" &lt;= "${date_to}"</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:06.010222" elapsed="0.000015"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_in_range}</arg>
+<arg>msg=Log ID ${log_id} (Date: ${log_date}) หลุดกรอบเวลาที่ค้นหา!</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2026-03-15T16:28:06.010306" elapsed="0.000015"/>
+</kw>
+<var name="${log}"/>
+<status status="NOT RUN" start="2026-03-15T16:28:06.009864" elapsed="0.000485"/>
+</iter>
+<var>${log}</var>
+<value>@{logs}</value>
+<status status="NOT RUN" start="2026-03-15T16:28:06.009729" elapsed="0.000644"/>
+</for>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:06.010695" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "SystemLog" SET "createdAt" = CURRENT_TIMESTAMP WHERE id = '1103';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:06.011521" level="INFO">Commit the transaction</msg>
+<arg>UPDATE "SystemLog" SET "createdAt" = CURRENT_TIMESTAMP WHERE id = '${TARGET_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.010538" elapsed="0.001402"/>
+</kw>
+<doc>จำลองข้อมูลที่หลุดกรอบเวลา และทดสอบว่า API จะไม่ดึงข้อมูลนั้นมาให้</doc>
+<status status="PASS" start="2026-03-15T16:28:05.997703" elapsed="0.014416"/>
+</test>
+<test id="s1-t15" name="TC-5.3: Filter Logs by Multiple Log Types" line="244">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.014087" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.013729" elapsed="0.000388"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.014555" level="INFO">${query} = {'logType': 'SECURITY,AUTH', 'limit': '50'}</msg>
+<var>${query}</var>
+<arg>logType=SECURITY,AUTH</arg>
+<arg>limit=50</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.014294" elapsed="0.000286"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:06.020098" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs?logType=SECURITY%2CAUTH&amp;limit=50 
+ path_url=/api/users/admin/logs?logType=SECURITY%2CAUTH&amp;limit=50 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:06.020189" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs?logType=SECURITY%2CAUTH&amp;limit=50 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '7956', 'ETag': 'W/"1f14-SQu6E7fYuk+heUECz1BT7o4kGDY"', 'Date': 'Sun, 15 Mar 2026 09:28:06 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"success","data":[{"id":1103,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50","method":"GET","endpoint":"/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{"limit":"50","dateTo":"2024-12-31","dateFrom":"2024-01-01"},"logType":"SECURITY","endpoint":"/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50","timestamp":"2026-03-15T09:28:05.991Z","statusCode":200},"logHash":"08bfd0d551e5ccdd29f59bc05769bf8efee21fd3ff31b2b6b0f06b6495d3e4f0","createdAt":"2026-03-15T16:28:06.011Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1104,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50","method":"GET","endpoint":"/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{"limit":"50","dateTo":"2024-12-31","dateFrom":"2024-01-01"},"logType":"SECURITY","endpoint":"/api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50","timestamp":"2026-03-15T09:28:06.005Z","statusCode":200},"logHash":"fff898be49149e71875c32135716141579a847435de62027254a51671debad6d","createdAt":"2026-03-15T09:28:06.005Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1101,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs/1091/verify","method":"GET","endpoint":"/api/users/admin/logs/1091/verify","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs/1091/verify","timestamp":"2026-03-15T09:28:05.934Z","statusCode":200},"logHash":"09e01d96eeb70acab85fb3bea6905fb5813e7eb3d04210542f00c2ea384644c1","createdAt":"2026-03-15T09:28:05.934Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1100,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs?logType=TRANSACTION&amp;limit=100","method":"GET","endpoint":"/api/users/admin/logs?logType=TRANSACTION&amp;limit=100","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{"limit":"100","logType":"TRANSACTION"},"logType":"SECURITY","endpoint":"/api/users/admin/logs?logType=TRANSACTION&amp;limit=100","timestamp":"2026-03-15T09:28:05.927Z","statusCode":200},"logHash":"b55e93feddfdb0c2e61dcb9c567fb8f1be4d833ff75fe7f8676378602e1d639e","createdAt":"2026-03-15T09:28:05.927Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1099,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs/1092/verify","method":"GET","endpoint":"/api/users/admin/logs/1092/verify","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs/1092/verify","timestamp":"2026-03-15T09:28:05.917Z","statusCode":200},"logHash":"fff06d0da2d77f0971404bde633f3ee766fe30054c0f5809b9b26136e3c82b06","createdAt":"2026-03-15T09:28:05.917Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1098,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs/1092/verify","method":"GET","endpoint":"/api/users/admin/logs/1092/verify","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs/1092/verify","timestamp":"2026-03-15T09:28:05.908Z","statusCode":200},"logHash":"0f41cacc50853c9d7dfa441df68b8c69d7405701a0cc363e4677a81ef31e844c","createdAt":"2026-03-15T09:28:05.908Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1097,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs/1096/verify","method":"GET","endpoint":"/api/users/admin/logs/1096/verify","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs/1096/verify","timestamp":"2026-03-15T09:28:05.898Z","statusCode":200},"logHash":"1b9574ea2312f8a8ed094ce49ddb646ddd7e8b4e14bd5b1f0cef544ef9dab32f","createdAt":"2026-03-15T09:28:05.898Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1095,"routeId":null,"bookingId":null,"userId":null,"logType":"SECURITY","action":"GET /api/users/admin/logs","method":"GET","endpoint":"/api/users/admin/logs","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":401,"details":{"ip":"::1","method":"GET","userId":null,"details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs","timestamp":"2026-03-15T09:28:04.883Z","statusCode":401},"logHash":"c6c8fd10fadda80896f43b8cee129eedb701ac7b6b9b8681c8cde0c5d4430bac","createdAt":"2026-03-15T09:28:04.883Z","user":null},{"id":1094,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs?type=SECURITY&amp;limit=100","method":"GET","endpoint":"/api/users/admin/logs?type=SECURITY&amp;limit=100","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{"type":"SECURITY","limit":"100"},"logType":"SECURITY","endpoint":"/api/users/admin/logs?type=SECURITY&amp;limit=100","timestamp":"2026-03-15T09:28:04.874Z","statusCode":200},"logHash":"91b67dbadef8f5ae2065b575988f73426c766d4f00d36f51fa2714e37ccb8952","createdAt":"2026-03-15T09:28:04.874Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1093,"routeId":null,"bookingId":null,"userId":"cmlkpxt160000m62aw5muawr6","logType":"SECURITY","action":"GET /api/users/admin/logs","method":"GET","endpoint":"/api/users/admin/logs","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"GET","userId":"cmlkpxt160000m62aw5muawr6","details":{},"logType":"SECURITY","endpoint":"/api/users/admin/logs","timestamp":"2026-03-15T09:28:04.864Z","statusCode":200},"logHash":"90bf08995d78c76231f1fed1abbb620dd4297ce1448ff4e0820fdc9ace73ea53","createdAt":"2026-03-15T09:28:04.864Z","user":{"id":"cmlkpxt160000m62aw5muawr6","email":"admin@example.com","role":"ADMIN"}},{"id":1089,"routeId":null,"bookingId":null,"userId":null,"logType":"AUTH","action":"POST /api/auth/login","method":"POST","endpoint":"/api/auth/login","ipAddress":"::1","userAgent":"python-requests/2.32.5","statusCode":200,"details":{"ip":"::1","method":"POST","userId":null,"details":{"email":"admin@example.com","password":"***REDACTED***"},"logType":"AUTH","endpoint":"/api/auth/login","timestamp":"2026-03-15T09:28:01.763Z","statusCode":200},"logHash":"551634123b95e05c0884e7bdfdfba45a23ffdd7bc81efdfb5f514ef98db74dae","createdAt":"2026-03-15T09:28:01.763Z","user":null}],"meta":{"total_items":11,"total_pages":1,"current_page":1,"items_per_page":50}} 
+ </msg>
+<msg time="2026-03-15T16:28:06.020417" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs</arg>
+<arg>params=${query}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.014743" elapsed="0.005701"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.020686" elapsed="0.000176"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.021826" level="INFO">${logs} = [{'id': 1103, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50', 'm...</msg>
+<var>${logs}</var>
+<arg>${response.json()['data']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.021046" elapsed="0.000812"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.022814" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.022266" elapsed="0.000574"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.023332" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.022938" elapsed="0.000421"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.023512" elapsed="0.000866"/>
+</kw>
+<var name="${log}">{'id': 1103, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50', 'me...</var>
+<status status="PASS" start="2026-03-15T16:28:06.022181" elapsed="0.002257"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.025183" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.024647" elapsed="0.000561"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.025602" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.025303" elapsed="0.000324"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.025712" elapsed="0.000594"/>
+</kw>
+<var name="${log}">{'id': 1104, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs?dateFrom=2024-01-01&amp;dateTo=2024-12-31&amp;limit=50', 'me...</var>
+<status status="PASS" start="2026-03-15T16:28:06.024557" elapsed="0.001789"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.027016" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.026525" elapsed="0.000516"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.027435" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.027129" elapsed="0.000346"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.027580" elapsed="0.000666"/>
+</kw>
+<var name="${log}">{'id': 1101, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs/1091/verify', 'method': 'GET', 'endpoint': '/api/use...</var>
+<status status="PASS" start="2026-03-15T16:28:06.026457" elapsed="0.001831"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.029002" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.028472" elapsed="0.000556"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.029425" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.029121" elapsed="0.000330"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.029540" elapsed="0.000628"/>
+</kw>
+<var name="${log}">{'id': 1100, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs?logType=TRANSACTION&amp;limit=100', 'method': 'GET', 'en...</var>
+<status status="PASS" start="2026-03-15T16:28:06.028402" elapsed="0.001808"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.030931" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.030384" elapsed="0.000573"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.031353" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.031053" elapsed="0.000325"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.031474" elapsed="0.000637"/>
+</kw>
+<var name="${log}">{'id': 1099, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs/1092/verify', 'method': 'GET', 'endpoint': '/api/use...</var>
+<status status="PASS" start="2026-03-15T16:28:06.030313" elapsed="0.001839"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.032946" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.032325" elapsed="0.000704"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.033446" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.033132" elapsed="0.000340"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.033566" elapsed="0.000648"/>
+</kw>
+<var name="${log}">{'id': 1098, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs/1092/verify', 'method': 'GET', 'endpoint': '/api/use...</var>
+<status status="PASS" start="2026-03-15T16:28:06.032255" elapsed="0.001999"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.035062" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.034443" elapsed="0.000652"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.035999" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.035528" elapsed="0.000503"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.036150" elapsed="0.000693"/>
+</kw>
+<var name="${log}">{'id': 1097, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs/1096/verify', 'method': 'GET', 'endpoint': '/api/use...</var>
+<status status="PASS" start="2026-03-15T16:28:06.034361" elapsed="0.002527"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.037874" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.037138" elapsed="0.000770"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.038519" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.038038" elapsed="0.000509"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.038651" elapsed="0.000664"/>
+</kw>
+<var name="${log}">{'id': 1095, 'routeId': None, 'bookingId': None, 'userId': None, 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs', 'method': 'GET', 'endpoint': '/api/users/admin/logs', 'ipAddress': '::1',...</var>
+<status status="PASS" start="2026-03-15T16:28:06.037047" elapsed="0.002311"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.040091" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.039564" elapsed="0.000552"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.040519" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.040209" elapsed="0.000336"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.040636" elapsed="0.000628"/>
+</kw>
+<var name="${log}">{'id': 1094, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs?type=SECURITY&amp;limit=100', 'method': 'GET', 'endpoint...</var>
+<status status="PASS" start="2026-03-15T16:28:06.039489" elapsed="0.001817"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.042006" level="INFO">${current_type} = SECURITY</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.041493" elapsed="0.000537"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.042412" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.042117" elapsed="0.000321"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.042522" elapsed="0.000583"/>
+</kw>
+<var name="${log}">{'id': 1093, 'routeId': None, 'bookingId': None, 'userId': 'cmlkpxt160000m62aw5muawr6', 'logType': 'SECURITY', 'action': 'GET /api/users/admin/logs', 'method': 'GET', 'endpoint': '/api/users/admin/log...</var>
+<status status="PASS" start="2026-03-15T16:28:06.041422" elapsed="0.001721"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.043819" level="INFO">${current_type} = AUTH</msg>
+<var>${current_type}</var>
+<arg>${log['logType']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.043304" elapsed="0.000636"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.044520" level="INFO">${is_valid_type} = True</msg>
+<var>${is_valid_type}</var>
+<arg>"${current_type}" in ["SECURITY", "AUTH"]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.044080" elapsed="0.000473"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_valid_type}</arg>
+<arg>msg=เจอ Log ชนิดอื่นหลุดมา! (Log ID: ${log['id']}, Type: ${current_type})</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.044669" elapsed="0.000687"/>
+</kw>
+<var name="${log}">{'id': 1089, 'routeId': None, 'bookingId': None, 'userId': None, 'logType': 'AUTH', 'action': 'POST /api/auth/login', 'method': 'POST', 'endpoint': '/api/auth/login', 'ipAddress': '::1', 'userAgent': ...</var>
+<status status="PASS" start="2026-03-15T16:28:06.043238" elapsed="0.002166"/>
+</iter>
+<var>${log}</var>
+<value>@{logs}</value>
+<status status="PASS" start="2026-03-15T16:28:06.022023" elapsed="0.023415"/>
+</for>
+<doc>ทดสอบการกรอง Log ด้วยประเภทหลายๆ แบบพร้อมกัน (เช่น SECURITY และ AUTH)</doc>
+<status status="PASS" start="2026-03-15T16:28:06.012611" elapsed="0.033086"/>
+</test>
+<test id="s1-t16" name="TC-6.1: Audit All Logs (Secure State)" line="262">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.047555" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.047148" elapsed="0.000438"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:06.050632" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs/audit 
+ path_url=/api/users/admin/logs/audit 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:06.050716" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs/audit 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '138', 'ETag': 'W/"8a-LdvMwfKH7oXmBFX1auyCIu2LlB8"', 'Date': 'Sun, 15 Mar 2026 09:28:06 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"status":"Secure","message":"All logs are perfectly intact. No tampering detected.","totalScanned":16,"tamperedLogIds":[]} 
+ </msg>
+<msg time="2026-03-15T16:28:06.050826" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs/audit</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.047767" elapsed="0.003082"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>Tampered IDs: ${response.json()['tamperedLogIds']}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.051125" elapsed="0.000744"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.052065" elapsed="0.000215"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>Secure</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.052477" elapsed="0.000575"/>
+</kw>
+<kw name="Should Be Empty" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.053726" level="INFO">Length is 0.</msg>
+<arg>${response.json()['tamperedLogIds']}</arg>
+<doc>Verifies that the given item is empty.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.053221" elapsed="0.000550"/>
+</kw>
+<doc>ทดสอบ API สแกน Log ทั้งระบบ ในสถานะที่ไม่มีการโดนแฮก</doc>
+<status status="PASS" start="2026-03-15T16:28:06.046169" elapsed="0.007763"/>
+</test>
+<test id="s1-t17" name="TC-6.2: Audit All Logs (Detect Tampering)" line="275">
+<kw name="Query" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:06.055468" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:06.056183" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-15T16:28:06.056340" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;id&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;1103&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<msg time="2026-03-15T16:28:06.056583" level="INFO">${query_result} = [(1103,)]</msg>
+<var>${query_result}</var>
+<arg>SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 1;</arg>
+<doc>Runs a query with the ``select_statement`` and returns the result as list of rows.
+The type of row values depends on the database module -
+usually they are tuples or tuple-like objects.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.055222" elapsed="0.001420"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.057569" level="INFO">${TARGET_LOG_ID} = 1103</msg>
+<var>${TARGET_LOG_ID}</var>
+<arg>${query_result[0][0]}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.056962" elapsed="0.000635"/>
+</kw>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:06.057972" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;UPDATE "SystemLog" SET "logHash" = 'hacked_hash_123456789' , "details" = '{"tampered": true}' WHERE id = '1103';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:06.058391" level="INFO">Commit the transaction</msg>
+<arg>UPDATE "SystemLog" SET "logHash" = 'hacked_hash_123456789' , "details" = '{"tampered": true}' WHERE id = '${TARGET_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.057804" elapsed="0.001121"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.059604" level="INFO">${headers} = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7M...</msg>
+<var>${headers}</var>
+<arg>Authorization=Bearer ${ADMIN_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.059220" elapsed="0.000413"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:06.062877" level="INFO">GET Request : url=http://localhost:3000/api/users/admin/logs/audit 
+ path_url=/api/users/admin/logs/audit 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczNTY2ODgxLCJleHAiOjE4MDUxMjQ0ODF9.yM5o8D8frgvCZ-1ls6V0_A7MCIzWpJRysJpFsEaIVC0'} 
+ body=None 
+ </msg>
+<msg time="2026-03-15T16:28:06.062980" level="INFO">GET Response : url=http://localhost:3000/api/users/admin/logs/audit 
+ status=200, reason=OK 
+ headers={'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Expose-Headers': 'Content-Disposition', 'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '119', 'ETag': 'W/"77-zTNkcmSM+mCcOuBerX20f3wRUvg"', 'Date': 'Sun, 15 Mar 2026 09:28:06 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"status":"Warning","message":"Alert! Found 1 tampered logs!","totalScanned":17,"tamperedLogIds":[1103]} 
+ </msg>
+<msg time="2026-03-15T16:28:06.063103" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>api</arg>
+<arg>/api/users/admin/logs/audit</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.059867" elapsed="0.003262"/>
+</kw>
+<kw name="Status Should Be" owner="RequestsLibrary">
+<arg>200</arg>
+<arg>${response}</arg>
+<doc>Fails if response status code is different than the expected.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.063377" elapsed="0.000214"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>Warning</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.063765" elapsed="0.000570"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.065091" level="INFO">${tampered_ids} = [1103]</msg>
+<var>${tampered_ids}</var>
+<arg>${response.json()['tamperedLogIds']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.064542" elapsed="0.000576"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-03-15T16:28:06.065689" level="INFO">${is_id_found} = True</msg>
+<var>${is_id_found}</var>
+<arg>${TARGET_LOG_ID} in ${tampered_ids}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.065327" elapsed="0.000388"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${is_id_found}</arg>
+<arg>msg=Audit API หา Log ที่โดนแฮกไม่เจอ!</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.066023" elapsed="0.000275"/>
+</kw>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:06.066608" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "SystemLog" WHERE id = '1103';&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:06.066909" level="INFO">Commit the transaction</msg>
+<arg>DELETE FROM "SystemLog" WHERE id = '${TARGET_LOG_ID}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.066466" elapsed="0.000839"/>
+</kw>
+<doc>จำลองการแฮกข้อมูล แล้วสั่ง Audit เพื่อดูว่าระบบตรวจเจอไหม</doc>
+<status status="PASS" start="2026-03-15T16:28:06.054381" elapsed="0.013095"/>
+</test>
+<kw name="Teardown Test Environment" type="TEARDOWN">
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-15T16:28:06.068653" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "SystemLog" WHERE id IN (SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 17);&lt;/code&gt;</msg>
+<msg time="2026-03-15T16:28:06.069506" level="INFO">Commit the transaction</msg>
+<arg>DELETE FROM "SystemLog" WHERE id IN (SELECT id FROM "SystemLog" ORDER BY "createdAt" DESC LIMIT 17);</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.068547" elapsed="0.001385"/>
+</kw>
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<msg time="2026-03-15T16:28:06.070142" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2026-03-15T16:28:06.070065" elapsed="0.000151"/>
+</kw>
+<kw name="Disconnect From Database" owner="DatabaseLibrary">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-03-15T16:28:06.070301" elapsed="0.000163"/>
+</kw>
+<doc>ปิด Session และยกเลิกการเชื่อมต่อ Database เมื่อเทสต์เสร็จ</doc>
+<status status="PASS" start="2026-03-15T16:28:06.068349" elapsed="0.002179"/>
+</kw>
+<status status="PASS" start="2026-03-15T16:28:01.472922" elapsed="4.597641"/>
+</suite>
+<statistics>
+<total>
+<stat pass="17" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="System Log Tests 3" id="s1" pass="17" fail="0" skip="0">System Log Tests 3</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const crypto = require('crypto');
+const stringify = require('fast-json-stable-stringify');
 
 const logger = (req, res, next) => {
     const start = Date.now();
@@ -38,7 +39,7 @@ const logger = (req, res, next) => {
                 timestamp: requestTime.toISOString(),
                 details: payload
             };
-            const rawDataString = JSON.stringify(rawDataObj);
+            const rawDataString = stringify(rawDataObj);
 
             const hmac = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
                                .update(rawDataString)
