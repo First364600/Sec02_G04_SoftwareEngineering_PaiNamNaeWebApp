@@ -151,11 +151,10 @@
                                                 </button>
 
                                                 <div v-if="getTripState(route.id).completed" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-center text-sm text-green-700 font-medium">
-                                                     การเดินทางนี้เสร็จสิ้นสมบูรณ์แล้ว
+                                                    การเดินทางนี้เสร็จสิ้นสมบูรณ์แล้ว
                                                 </div>
                                         </div>
                                     </div>
-
                                     <div class="mt-4 space-y-4">
                                         <div v-if="route.conditions">
                                             <h5 class="mb-2 font-medium text-gray-900">เงื่อนไขการเดินทาง</h5>
@@ -250,7 +249,8 @@
                                                         </div>
                                                         <button
                                                             @click.stop="openPassengerChat(route.id, p)"
-                                                            class="relative mt-2 px-3 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition flex items-center gap-1">
+                                                            :disabled="route.status === 'COMPLETED'"
+                                                            class="relative mt-2 px-3 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
                                                             ส่งข้อความ
                                                             <span v-if="unreadPerPassenger[p.id] > 0"
                                                                 class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
@@ -304,11 +304,12 @@
                                                                     type="text"
                                                                     :placeholder="`ส่งข้อความถึง ${p.name}...`"
                                                                     class="flex-1 text-sm border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:border-purple-400 bg-white"
-                                                                    @keyup.enter="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)" />
+                                                                    @keyup.enter="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)"
+                                                                />
                                                                 <button
                                                                     @click.stop="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)"
-                                                                    :disabled="isReplying || !replyContent[p.id]?.trim()"
-                                                                    class="px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 transition">
+                                                                    :disabled="isReplying || !replyContent[p.id]?.trim() || route.status === 'COMPLETED'"
+                                                                    class="px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
                                                                     ส่ง
                                                                 </button>
                                                             </div>
@@ -320,8 +321,9 @@
                                                 <button
                                                     v-if="route.passengers && route.passengers.length > 0"
                                                     @click.stop="openMessageModal(route)"
-                                                    class="px-3 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition flex items-center gap-1">
-                                                     ส่งข้อความทุกคน
+                                                    :disabled="getTripState(route.id).completed"
+                                                    class="px-3 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    ส่งข้อความทุกคน
                                                 </button>
 
                                                 <button
@@ -569,7 +571,6 @@
                                                                             {{ point.actionType === 'pickup' ? '↑ รับ' : '↓ ส่ง' }}คุณ {{ point.passengerName }}
                                                                         </span>
                                                                     </div>
-
                                                                     <p v-if="point.address && !point.address.includes('จุดแวะ')" 
                                                                     class="text-[10px] text-gray-400 truncate leading-tight mt-1">
                                                                         {{ point.address }}
@@ -789,8 +790,8 @@
                                 @input="$event.target.style.height = 'auto'; $event.target.style.height = $event.target.scrollHeight + 'px'" />
                             <button
                                 @click="sendDriverMessage"
-                                :disabled="isReplying || !replyContent[chatModal.passenger?.id]?.trim()"
-                                class="p-2.5 text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 transition flex-shrink-0">
+                                :disabled="isReplying || !replyContent[chatModal.passenger?.id]?.trim() || getTripState(chatModal.routeId).completed"
+                                class="p-2.5 text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-purple-600 transition flex-shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                 </svg>
@@ -1304,7 +1305,7 @@ const closeTripActionModal = () => {
     pendingRouteId.value = null;
 };
 
-//  เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล ลำดับการ source
+// เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล ลำดับการ source
 const sortedMyRoutes = computed(() => {
   return [...myRoutes.value].sort((a, b) => {
     const stateA = getTripState(a.id);
@@ -1482,7 +1483,7 @@ async function fetchMyRoutes() {
                     });
                 }
             });
-            // วางหลัง }); ของ allPotentialStops.forEach
+            // วางหลัง }; ของ allPotentialStops.forEach
                 console.log('=== STOPS DEBUG ===')
                 console.log('allPotentialStops:', JSON.stringify(allPotentialStops.map(s => ({
                     name: s.name, isPassengerPoint: s.isPassengerPoint, actionType: s.actionType
