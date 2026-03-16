@@ -1,6 +1,7 @@
 const { PrismaClient, LogType } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { Parser } = require('json2csv');
+const ExcelJS = require('exceljs');
 const crypto = require('crypto');
 const stringify = require('fast-json-stable-stringify');
 
@@ -70,7 +71,12 @@ const getLogs = async (req, res) => {
                         select: {
                             id: true,
                             email: true,
-                            role: true
+                            role: true,
+                            username:    true,  
+                            firstName:   true,  
+                            lastName:    true,  
+                            gender:      true, 
+                            phoneNumber: true 
                         }
                     }
                 }
@@ -100,169 +106,337 @@ const getLogs = async (req, res) => {
     }
 };
 
-
+// ฟังก์ชันสำหรับ Export Logs เป็น Excel
 const exportLogs = async (req, res) => {
   try {
-    const { userId, dateFrom, dateTo } = req.query;
-    // normalize เป็น boolean
-    const includePersonal = req.query.includePersonal === 'true';
-    const includeTravel   = req.query.includeTravel   === 'true';
-    const includeRoutes   = req.query.includeRoutes   === 'true';
 
-    // ถ้าไม่เลือกอะไร → export ทั้งหมด
-    const exportAll = !includePersonal && !includeTravel && !includeRoutes;
-    const shouldExportPersonal = exportAll || includePersonal;
-    const shouldExportTravel   = exportAll || includeTravel;
-    const shouldExportRoutes   = exportAll || includeRoutes;
+    const { userId, dateFrom, dateTo } = req.query
 
+    const includePersonal = req.query.includePersonal === "true"
+    const includeTravel   = req.query.includeTravel === "true"
+    const includeRoutes   = req.query.includeRoutes === "true"
 
+    // -------- logType filter --------
+    let logTypeFilter = []
 
-    // declare ก่อนใช้
+    if (req.query.logType) {
+
+      const raw = req.query.logType
+      let types = []
+
+      if (Array.isArray(raw)) {
+        types = raw
+      } else if (typeof raw === "string") {
+        types = raw.split(",")
+      }
+
+      logTypeFilter = types
+        .map(t => LogType[t])
+        .filter(Boolean)
+    }
+
     const buildDateFilter = () => {
       if (!dateFrom && !dateTo) return {};
+      if (!dateFrom && !dateTo) return {}
+
       return {
         createdAt: {
           ...(dateFrom && { gte: new Date(new Date(dateFrom).setHours(0, 0, 0, 0)) }),
           ...(dateTo   && { lte: new Date(new Date(dateTo).setHours(23, 59, 59, 999)) })
+          ...(dateFrom && {
+            gte: new Date(new Date(dateFrom).setHours(0,0,0,0))
+          }),
+          ...(dateTo && {
+            lte: new Date(new Date(dateTo).setHours(23,59,59,999))
+          })
         }
-      };
-    };
-
-    // declare ก่อนใช้
-    let logTypeFilter = [];
-    if (req.query.logType) {
-      const types = Array.isArray(req.query.logType)
-        ? req.query.logType
-        : req.query.logType.split(',');
-      logTypeFilter = types.map(t => LogType[t]).filter(Boolean);
+      }
     }
 
-    let rows = [];
+    const workbook = new ExcelJS.Workbook()
+    workbook.creator = "PaiNamNae System"
 
-    // ใช้ shouldExportPersonal แทน
-    if (shouldExportPersonal) {
-      const logs = await prisma.systemLog.findMany({
+    let hasData = false
+
+    // =========================
+    // SHEET 1 : USER PROFILE
+    // =========================
+    if (includePersonal) {
+
+      const users = await prisma.user.findMany({
         where: {
-          ...(userId && { userId }),
-          ...(logTypeFilter.length && { logType: { in: logTypeFilter } }),
-          ...buildDateFilter()
+          ...(userId && { id: userId })
         },
-        include: { user: true },
-        orderBy: { createdAt: 'desc' }
-      });
+        select: {
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          gender: true,
+          phoneNumber: true,
+          role: true
+        }
+      })
 
-      console.log('logs', logs);
+      if (users.length) {
+
+        hasData = true
+
+        const sheet = workbook.addWorksheet("User Profile")
+
+        sheet.columns = [
+          { header: "Username", key: "username", width: 20 },
+          { header: "Email", key: "email", width: 30 },
+          { header: "First Name", key: "firstName", width: 15 },
+          { header: "Last Name", key: "lastName", width: 15 },
+          { header: "Gender", key: "gender", width: 10 },
+          { header: "Phone Number", key: "phoneNumber", width: 15 },
+          { header: "Role", key: "role", width: 12 }
+        ]
+
+        sheet.getRow(1).font = { bold: true }
+
+        users.forEach(user => {
+          sheet.addRow(user)
+        })
+
+      }
+    }
+
+    // =========================
+    // SHEET 2 : SYSTEM LOGS
+    // =========================
+    const logs = await prisma.systemLog.findMany({
+
+      where: {
+
+        ...(userId && { userId }),
+
+        ...(logTypeFilter.length && {
+          logType: {
+            in: logTypeFilter
+          }
+        }),
+
+        ...buildDateFilter()
+
+      },
+
+      orderBy: {
+        createdAt: "desc"
+      }
+
+    })
+
+    if (logs.length) {
+
+      hasData = true
+
+      const sheet = workbook.addWorksheet("System Logs")
+
+      sheet.columns = [
+
+        { header: "Log ID", key: "logId", width: 10 },
+        { header: "Log Type", key: "logType", width: 14 },
+        { header: "Action", key: "action", width: 40 },
+        { header: "Method", key: "method", width: 10 },
+        { header: "Endpoint", key: "endpoint", width: 50 },
+        { header: "IP Address", key: "ipAddress", width: 15 },
+        { header: "User Agent", key: "userAgent", width: 50 },
+        { header: "Status Code", key: "statusCode", width: 12 },
+        { header: "Details", key: "details", width: 50 },
+        { header: "Log Hash", key: "logHash", width: 70 },
+        { header: "Date Time", key: "dateTime", width: 22 }
+
+      ]
+
+      sheet.getRow(1).font = { bold: true }
 
       logs.forEach(log => {
-        rows.push({
-          Section: "Personal",
-          username:    log.user?.username    || "",
-          email:       log.user?.email       || "",
-          firstName:   log.user?.firstName   || "",
-          lastName:    log.user?.lastName    || "",
-          gender:      log.user?.gender      || "",
-          phoneNumber: log.user?.phoneNumber || "",
-          role:        log.user?.role        || "",
-          LogID:      log.id,
-          LogType:    log.logType,
-          Action:     log.action,
-          Method:     log.method,
-          Endpoint:   log.endpoint,
-          StatusCode: log.statusCode || "",
-          DateTime:   log.createdAt.toISOString()
-        });
-      });
+
+        sheet.addRow({
+
+          logId: log.id,
+          logType: log.logType,
+          action: log.action,
+          method: log.method,
+          endpoint: log.endpoint,
+          ipAddress: log.ipAddress || "",
+          userAgent: log.userAgent || "",
+          statusCode: log.statusCode || "",
+          details: log.details ? JSON.stringify(log.details) : "",
+          logHash: log.logHash || "",
+          dateTime: log.createdAt.toISOString()
+
+        })
+
+      })
+
     }
 
-    // ใช้ shouldExportTravel แทน
-    if (shouldExportTravel) {
-      const bookings = await prisma.booking.findMany({
-        where: {
-          ...(userId && { passengerId: userId }),
-          ...buildDateFilter()
-        },
-        include: { passenger: true },
-        orderBy: { createdAt: 'desc' }
-      });
+    // =========================
+    // SHEET 3 : ACTIVITY
+    // =========================
+    if (includeTravel || includeRoutes) {
 
-      bookings.forEach(booking => {
-        rows.push({
-          Section:         "Travel",
-          username:        booking.passenger?.username || "",
-          email:           booking.passenger?.email   || "",
-          bookingID:       booking.id,
-          routeID:         booking.routeId,
-          numberOfSeats:   booking.numberOfSeats,
-          status:          booking.status,
-          pickupLocation:  JSON.stringify(booking.pickupLocation),
-          dropoffLocation: JSON.stringify(booking.dropoffLocation),
-          createdAt:       booking.createdAt.toISOString(),
-          cancelledAt:     booking.cancelledAt?.toISOString() ?? ""
-        });
-      });
+      const sheet = workbook.addWorksheet("Activity")
+
+      sheet.columns = [
+
+        { header: "Section", key: "section", width: 10 },
+        { header: "Username", key: "username", width: 20 },
+        { header: "Email", key: "email", width: 30 },
+
+        { header: "Booking ID", key: "bookingID", width: 30 },
+        { header: "Route ID", key: "routeID", width: 30 },
+        { header: "Seats", key: "numberOfSeats", width: 8 },
+        { header: "Booking Status", key: "bookingStatus", width: 16 },
+
+        { header: "Pickup", key: "pickupLocation", width: 40 },
+        { header: "Dropoff", key: "dropoffLocation", width: 40 },
+
+        { header: "Route Status", key: "routeStatus", width: 14 },
+        { header: "Start Location", key: "startLocation", width: 40 },
+        { header: "End Location", key: "endLocation", width: 40 },
+
+        { header: "Created At", key: "createdAt", width: 22 }
+
+      ]
+
+      sheet.getRow(1).font = { bold: true }
+
+      if (includeTravel) {
+
+        const bookings = await prisma.booking.findMany({
+
+          where: {
+            ...(userId && { passengerId: userId }),
+            ...buildDateFilter()
+          },
+
+          include: {
+            passenger: {
+              select: { username: true, email: true }
+            }
+          }
+
+        })
+
+        bookings.forEach(b => {
+
+          sheet.addRow({
+
+            section: "Travel",
+            username: b.passenger?.username || "",
+            email: b.passenger?.email || "",
+
+            bookingID: b.id,
+            routeID: b.routeId,
+            numberOfSeats: b.numberOfSeats,
+            bookingStatus: b.status,
+
+            pickupLocation: JSON.stringify(b.pickupLocation),
+            dropoffLocation: JSON.stringify(b.dropoffLocation),
+
+            createdAt: b.createdAt.toISOString()
+
+          })
+
+        })
+
+      }
+
+      if (includeRoutes) {
+
+        const routes = await prisma.route.findMany({
+
+          where: {
+            ...(userId && { driverId: userId }),
+            ...buildDateFilter()
+          },
+
+          include: {
+            driver: {
+              select: { username: true, email: true }
+            }
+          }
+
+        })
+
+        routes.forEach(r => {
+
+          sheet.addRow({
+
+            section: "Route",
+            username: r.driver?.username || "",
+            email: r.driver?.email || "",
+
+            routeID: r.id,
+            routeStatus: r.status,
+            startLocation: JSON.stringify(r.startLocation),
+            endLocation: JSON.stringify(r.endLocation),
+
+            createdAt: r.createdAt.toISOString()
+
+          })
+
+        })
+
+      }
+
     }
 
-    // ใช้ shouldExportRoutes แทน
-    if (shouldExportRoutes) {
-      const routes = await prisma.route.findMany({
-        where: {
-          ...(userId && { driverId: userId }),
-          ...buildDateFilter()
-        },
-        include: { driver: true, vehicle: true },
-        orderBy: { createdAt: 'desc' }
-      });
-
-      routes.forEach(route => {
-        rows.push({
-          Section:       "Route",
-          username:      route.driver?.username || "",
-          email:         route.driver?.email   || "",
-          RouteID:       route.id,
-          driverId:      route.driverId,
-          vehicleId:     route.vehicleId,
-          startLocation: JSON.stringify(route.startLocation),
-          endLocation:   JSON.stringify(route.endLocation),
-          departureTime: route.departureTime.toISOString(),
-          availableSeats: route.availableSeats,
-          pricePerSeat:   route.pricePerSeat,
-          createdAt:      route.createdAt.toISOString(),
-          updatedAt:      route.updatedAt.toISOString(),
-          licensePlate:   route.vehicle?.licensePlate  || "",
-          vehicleType:    route.vehicle?.vehicleType   || "",
-          color:          route.vehicle?.color         || "",
-          seatCapacity:   route.vehicle?.seatCapacity  || ""
-        });
-      });
+    if (!hasData) {
+      return res.status(404).json({ message: "No data found" })
     }
 
-    if (!rows.length) {
-      return res.status(404).json({ message: "No data found" });
+    let userName = "all_users"
+
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          firstName: true,
+          lastName: true,
+          username: true
+        }
+      })
+
+      if (user) {
+        userName = `${user.firstName || ""}_${user.lastName || ""}` 
+          || user.username 
+          || "user"
+      }
     }
 
-    // defaultValue: '' กัน error เวลา columns ต่างกัน
-    const parser = new Parser({ defaultValue: '' });
-    const csv = parser.parse(rows);
+    const today = new Date().toISOString().split("T")[0]
+    const fileName = `${userName}_${today}.xlsx`
 
-    const uniqueUsers = [...new Set(rows.map(r => r.username).filter(Boolean))];
-    const today = new Date().toISOString().split("T")[0];
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-    let fileName = `${Date.now()}.csv`;
-    if (uniqueUsers.length === 1) {
-      fileName = `${uniqueUsers[0].replace(/\s+/g, "_")}_${today}.csv`;
-    } else if (uniqueUsers.length > 1) {
-      fileName = `export_multiple_users_${today}.csv`;
-    }
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${fileName}"`
+    )
 
-    res.header("Content-Type", "text/csv");
-    res.attachment(fileName);
-    return res.send(csv);
+    await workbook.xlsx.write(res)
+
+    res.end()
 
   } catch (error) {
-    console.error("Export Error:", error);
-    return res.status(500).json({ message: "Export failed", error: error.message });
+
+    console.error("Export Error:", error)
+
+    return res.status(500).json({
+      message: "Export failed",
+      error: error.message
+    })
+
   }
-};
+}
 
 const verifyLogIntegrity = async (req, res) => {
     const { id } = req.params;
