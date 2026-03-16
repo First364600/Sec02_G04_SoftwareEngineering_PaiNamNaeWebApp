@@ -17,6 +17,14 @@ router.get(
     logController.getLogs // ใช้ฟังก์ชันนี้แทน SQL ดิบ
 );
 
+// GET /api/users/admin/logs/audit (check all log)
+router.get(
+    '/admin/logs/audit',
+    protect,
+    requireAdmin,
+    logController.auditAllLogs
+);
+
 // GET /api/users/admin/logs/:id/verify (สำหรับ Admin ตรวจสอบความสมบูรณ์ของ Log รายการเดียว)
 router.get(
     '/admin/logs/:id/verify',
