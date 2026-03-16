@@ -141,8 +141,6 @@ const exportLogs = async (req, res) => {
 
       return {
         createdAt: {
-          ...(dateFrom && { gte: new Date(new Date(dateFrom).setHours(0, 0, 0, 0)) }),
-          ...(dateTo   && { lte: new Date(new Date(dateTo).setHours(23, 59, 59, 999)) })
           ...(dateFrom && {
             gte: new Date(new Date(dateFrom).setHours(0,0,0,0))
           }),
