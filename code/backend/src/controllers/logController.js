@@ -255,7 +255,7 @@ const exportLogs = async (req, res) => {
           logId: log.id,
           logType: log.logType,
           action: log.action,
-          method: log.method,
+          method: log.method, 
           endpoint: log.endpoint,
           ipAddress: log.ipAddress || "",
           userAgent: log.userAgent || "",
@@ -273,114 +273,165 @@ const exportLogs = async (req, res) => {
     // =========================
     // SHEET 3 : ACTIVITY
     // =========================
-    if (includeTravel || includeRoutes) {
-
-      const sheet = workbook.addWorksheet("Activity")
-
-      sheet.columns = [
-
-        { header: "Section", key: "section", width: 10 },
-        { header: "Username", key: "username", width: 20 },
-        { header: "Email", key: "email", width: 30 },
-
-        { header: "Booking ID", key: "bookingID", width: 30 },
-        { header: "Route ID", key: "routeID", width: 30 },
-        { header: "Seats", key: "numberOfSeats", width: 8 },
-        { header: "Booking Status", key: "bookingStatus", width: 16 },
-
-        { header: "Pickup", key: "pickupLocation", width: 40 },
-        { header: "Dropoff", key: "dropoffLocation", width: 40 },
-
-        { header: "Route Status", key: "routeStatus", width: 14 },
-        { header: "Start Location", key: "startLocation", width: 40 },
-        { header: "End Location", key: "endLocation", width: 40 },
-
-        { header: "Created At", key: "createdAt", width: 22 }
-
-      ]
-
-      sheet.getRow(1).font = { bold: true }
-
       if (includeTravel) {
 
         const bookings = await prisma.booking.findMany({
-
           where: {
             ...(userId && { passengerId: userId }),
             ...buildDateFilter()
           },
-
           include: {
             passenger: {
               select: { username: true, email: true }
             }
           }
-
         })
 
-        bookings.forEach(b => {
+        if (bookings.length) {
 
-          sheet.addRow({
+          hasData = true
 
-            section: "Travel",
-            username: b.passenger?.username || "",
-            email: b.passenger?.email || "",
+          const sheet = workbook.addWorksheet("Travel")
 
-            bookingID: b.id,
-            routeID: b.routeId,
-            numberOfSeats: b.numberOfSeats,
-            bookingStatus: b.status,
+          sheet.columns = [
+            { header: "Username", key: "username", width: 20 },
+            { header: "Email", key: "email", width: 30 },
 
-            pickupLocation: JSON.stringify(b.pickupLocation),
-            dropoffLocation: JSON.stringify(b.dropoffLocation),
+            { header: "Booking ID", key: "bookingID", width: 30 },
+            { header: "Route ID", key: "routeID", width: 30 },
+            { header: "Seats", key: "numberOfSeats", width: 8 },
+            { header: "Booking Status", key: "bookingStatus", width: 16 },
 
-            createdAt: b.createdAt.toISOString()
+            { header: "Pickup Name", key: "pickupName", width: 25 },
+            { header: "Pickup Address", key: "pickupAddress", width: 40 },
+            { header: "Pickup Map", key: "pickupMap", width: 40 },
+            { header: "Pickup Lat", key: "pickupLat", width: 12 },
+            { header: "Pickup Lng", key: "pickupLng", width: 12 },
 
+            { header: "Dropoff Name", key: "dropoffName", width: 25 },
+            { header: "Dropoff Address", key: "dropoffAddress", width: 40 },
+            { header: "Dropoff Map", key: "dropoffMap", width: 40 },
+            { header: "Dropoff Lat", key: "dropoffLat", width: 12 },
+            { header: "Dropoff Lng", key: "dropoffLng", width: 12 },
+
+            { header: "Created At", key: "createdAt", width: 22 }
+          ]
+
+          sheet.getRow(1).font = { bold: true }
+
+          bookings.forEach(b => {
+            sheet.addRow({
+              username: b.passenger?.username || "",
+              email: b.passenger?.email || "",
+
+              bookingID: b.id,
+              routeID: b.routeId,
+              numberOfSeats: b.numberOfSeats,
+              bookingStatus: b.status,
+
+              pickupName: b.pickupLocation?.name || "",
+              pickupAddress: b.pickupLocation?.address || "",
+              pickupMap: b.pickupLocation
+                ? `https://www.google.com/maps?q=${b.pickupLocation.lat},${b.pickupLocation.lng}`
+                : "",
+              pickupLat: b.pickupLocation?.lat || "",
+              pickupLng: b.pickupLocation?.lng || "",
+
+              dropoffName: b.dropoffLocation?.name || "",
+              dropoffAddress: b.dropoffLocation?.address || "",
+              dropoffMap: b.dropoffLocation
+                ? `https://www.google.com/maps?q=${b.dropoffLocation.lat},${b.dropoffLocation.lng}`
+                : "",
+              dropoffLat: b.dropoffLocation?.lat || "",
+              dropoffLng: b.dropoffLocation?.lng || "",
+
+              createdAt: b.createdAt.toISOString()
+            })
           })
 
-        })
+        }
 
       }
 
       if (includeRoutes) {
 
         const routes = await prisma.route.findMany({
-
           where: {
             ...(userId && { driverId: userId }),
             ...buildDateFilter()
           },
-
           include: {
             driver: {
               select: { username: true, email: true }
             }
           }
-
         })
 
-        routes.forEach(r => {
+        if (routes.length) {
 
-          sheet.addRow({
+          hasData = true
 
-            section: "Route",
-            username: r.driver?.username || "",
-            email: r.driver?.email || "",
+          const sheet = workbook.addWorksheet("Routes")
 
-            routeID: r.id,
-            routeStatus: r.status,
-            startLocation: JSON.stringify(r.startLocation),
-            endLocation: JSON.stringify(r.endLocation),
+          sheet.columns = [
+            { header: "Username", key: "username", width: 20 },
+            { header: "Email", key: "email", width: 30 },
 
-            createdAt: r.createdAt.toISOString()
+            { header: "Route ID", key: "routeID", width: 30 },
+            { header: "Route Status", key: "routeStatus", width: 14 },
+
+            { header: "Start Name", key: "startName", width: 25 },
+            { header: "Start Address", key: "startAddress", width: 40 },
+            { header: "Start Map", key: "startMap", width: 40 },
+            { header: "Start Lat", key: "startLat", width: 12 },
+            { header: "Start Lng", key: "startLng", width: 12 },
+
+            { header: "End Name", key: "endName", width: 25 },
+            { header: "End Address", key: "endAddress", width: 40 },
+            { header: "End Map", key: "endMap", width: 40 },
+            { header: "End Lat", key: "endLat", width: 12 },
+            { header: "End Lng", key: "endLng", width: 12 },
+
+            { header: "Created At", key: "createdAt", width: 22 }
+          ]
+
+          sheet.getRow(1).font = { bold: true }
+
+          routes.forEach(r => {
+
+            sheet.addRow({
+
+              username: r.driver?.username || "",
+              email: r.driver?.email || "",
+
+              routeID: r.id,
+              routeStatus: r.status,
+
+              startName: r.startLocation?.name || "",
+              startAddress: r.startLocation?.address || "",
+              startMap: r.startLocation
+                ? `https://www.google.com/maps?q=${r.startLocation.lat},${r.startLocation.lng}`
+                : "",
+              startLat: r.startLocation?.lat || "",
+              startLng: r.startLocation?.lng || "",
+
+              endName: r.endLocation?.name || "",
+              endAddress: r.endLocation?.address || "",
+              endMap: r.endLocation
+                ? `https://www.google.com/maps?q=${r.endLocation.lat},${r.endLocation.lng}`
+                : "",
+              endLat: r.endLocation?.lat || "",
+              endLng: r.endLocation?.lng || "",
+
+              createdAt: r.createdAt.toISOString()
+
+            })
 
           })
 
-        })
+        }
 
       }
-
-    }
 
     if (!hasData) {
       return res.status(404).json({ message: "No data found" })
