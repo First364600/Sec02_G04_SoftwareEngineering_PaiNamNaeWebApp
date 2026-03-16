@@ -27,7 +27,7 @@ const server = http.createServer(app);
 
 
 webpush.setVapidDetails(
-  '3224oonchira@gmail.com',
+  'mailto:3224oonchira@gmail.com', // must include "mailto:"
   process.env.VAPID_PUBLIC_KEY,
   process.env.VAPID_PRIVATE_KEY
 );

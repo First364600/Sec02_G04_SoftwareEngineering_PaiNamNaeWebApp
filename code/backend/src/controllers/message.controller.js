@@ -52,6 +52,8 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   const { bookingIds, presetKey, customText } = req.body;
 
+  if (customText === "") throw new ApiError(400, "ไม่สามารถส่งข้อความที่ว่างเปล่าได้")
+  
   const route = await prisma.route.findUnique({
     where: { id: routeId },
     include: {
@@ -61,10 +63,12 @@ const sendMessage = asyncHandler(async (req, res) => {
       }
     }
   });
-
+  
   if (!route) throw new ApiError(404, 'ไม่พบเส้นทางนี้');
   if (route.driverId !== driverId) throw new ApiError(403, 'คุณไม่มีสิทธิ์ส่งข้อความในเส้นทางนี้');
-
+  if (route.status === "AVAILABLE") throw new ApiError(400, 'ไม่สามารถส่งข้อความได้ เนื่องจากเส้นทางยังไม่เริ่มต้น');
+  if (route.status === "COMPLETED") throw new ApiError(400, 'ไม่สามารถส่งข้อความได้ เนื่องจากเส้นทางเสร็จสิ้นแล้ว');
+  if (route.status === "CANCELLED") throw new ApiError(400, 'ไม่สามารถส่งข้อความได้ เนื่องจากเส้นทางถูกยกเลิก');
 
   let content = customText?.trim();
   if (!content && presetKey) {
@@ -78,6 +82,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     ? route.bookings.filter(b => bookingIds.includes(b.id))
     : route.bookings;
 
+  console.log("targetBookings", targetBookings)
   if (targetBookings.length === 0) throw new ApiError(400, 'ไม่พบผู้โดยสารเป้าหมายที่ต้องการส่ง');
 
   // สร้าง Message และแจ้งเตือนแยกรายบุคคล
@@ -218,7 +223,10 @@ const replyMessage = asyncHandler(async (req, res) => {
   });
 
   if (!message) throw new ApiError(404, 'Message not found');
-  if (message.booking?.passengerId !== passengerId) throw new ApiError(403, 'Forbidden');
+  if (message.route?.status === "COMPLETED") throw new  ApiError(400, 'ไม่สามารถส่งข้อความได้ เนื่องจากการเดินทางของคุณเสร็จสิ้นแล้ว');
+  if (message.route?.status === "CANCELLED") throw new ApiError(400, 'ไม่สามารถส่งข้อความได้ เนื่องจากเส้นทางถูกยกเลิกไปแล้ว');
+  if (message.booking?.status === "CANCELLED") throw new ApiError(400, 'ไม่สามารถส่งข้อความได้ เนื่องจากเส้นทางถูกยกเลิก');
+  if (message.booking?.passengerId !== passengerId) throw new ApiError(400, 'Forbidden');
 
   const reply = await prisma.tripMessageReply.create({
     data: { messageId, senderId: passengerId, content },

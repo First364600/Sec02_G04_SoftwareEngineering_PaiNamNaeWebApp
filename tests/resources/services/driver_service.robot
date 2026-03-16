@@ -140,3 +140,21 @@ Driver Cancel the Passenger Journey
     ...    ${BOOKING_ROUTE_URL}/${bookingId}/driver-cancel-request
 
     RETURN    ${response.json()}
+
+Driver Send Message to Passenger (one or more)
+    [Arguments]    ${sessionName}    ${routeId}    ${bookingIds}    ${message}
+    [Documentation]    คนขับส่งข้อความไปที่ผู้ใช้ คนนั้นๆ หรือส่งไปพร้อมๆ กันหลายคน
+    ${payload}=    Create Dictionary
+    ...    bookingIds=${bookingIds}
+    ...    customText=${message}
+    # Log To Console    ${payload}
+
+    ${response}=    POST On Session
+    ...    ${sessionName}
+    ...    ${MESSAGES_URL}/route/${routeId}
+    ...    json=${payload}
+    ...    expected_status=any
+
+    # Log To Console    status=${response.status_code}
+    # Log To Console    body=${response.text}
+    RETURN    ${response.json()}

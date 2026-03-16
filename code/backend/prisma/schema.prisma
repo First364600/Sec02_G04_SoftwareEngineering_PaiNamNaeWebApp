@@ -272,9 +272,9 @@ model SystemLog {
   logHash    String?
   createdAt  DateTime @default(now())
 
-  user    User?    @relation(fields: [userId], references: [id])
-  route   Route?   @relation(fields: [routeId], references: [id])
-  booking Booking? @relation(fields: [bookingId], references: [id])
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  route   Route?   @relation(fields: [routeId], references: [id], onDelete: SetNull)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
 }
 
 model WebPushSubscription {
@@ -292,11 +292,11 @@ model TripMessage {
   routeId     String
   route       Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
   senderId    String
-  sender      User     @relation("TripMessageSender", fields: [senderId], references: [id])
+  sender      User     @relation("TripMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   
   // null = broadcast ทุกคน มีค่า = ส่งเฉพาะ booking นี้
   bookingId   String?
-  booking     Booking? @relation(fields: [bookingId], references: [id])
+  booking     Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   
   content     String   // preset key เช่น "ON_MY_WAY" หรือ custom text
   isPreset    Boolean  @default(true)
@@ -311,7 +311,7 @@ model TripMessageReply {
   messageId String
   message   TripMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   senderId  String
-  sender    User        @relation("TripMessageReplySender", fields: [senderId], references: [id])
+  sender    User        @relation("TripMessageReplySender", fields: [senderId], references: [id], onDelete: Cascade)
   content   String
   isRead    Boolean     @default(false)
   createdAt DateTime    @default(now())

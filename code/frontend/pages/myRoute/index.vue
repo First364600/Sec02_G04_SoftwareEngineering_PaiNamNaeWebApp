@@ -930,7 +930,7 @@ const chatModal = ref({
 const openPassengerChat = async (routeId, passenger) => {
     chatModal.value = { open: true, passenger, routeId };
     try {
-        const res = await $api(`/messages/booking/${passenger.id}`);
+        const res = await $api(`/messages/booking/${passenger.id}`);// test api
         bookingMessages.value = {
             ...bookingMessages.value,
             [passenger.id]: Array.isArray(res) ? res : (res.data || [])
@@ -951,7 +951,7 @@ const sendDriverMessage = async () => {
     if (!replyContent.value[passenger.id]?.trim()) return;
     isReplying.value = true;
     try {
-        await $api(`/messages/route/${routeId}`, {
+        await $api(`/messages/route/${routeId}`, { // test api
             method: 'POST',
             body: {
                 bookingIds: [passenger.id],
@@ -959,7 +959,7 @@ const sendDriverMessage = async () => {
             }
         });
         replyContent.value[passenger.id] = '';
-        const res = await $api(`/messages/booking/${passenger.id}`);
+        const res = await $api(`/messages/booking/${passenger.id}`); // test api
         bookingMessages.value = {
             ...bookingMessages.value,
             [passenger.id]: Array.isArray(res) ? res : (res.data || [])
@@ -993,7 +993,7 @@ const selectAllPassengers = () => {
 onMounted(async () => {
     subscribe(); 
     try {
-        const res = await $api('/messages/presets');
+        const res = await $api('/messages/presets'); // test api
         console.log("RAW res:", JSON.stringify(res)); 
         
         // รองรับหลายรูปแบบ response
@@ -1036,7 +1036,7 @@ const sendMessage = async () => {
 
     try {
         isProcessing.value = true;
-        await $api(`/messages/route/${messageTarget.value.routeId}`, {
+        await $api(`/messages/route/${messageTarget.value.routeId}`, { // test api
             method: 'POST',
             body: {
                
@@ -1057,7 +1057,7 @@ const sendMessage = async () => {
 // โหลด messages ของ route
 const loadRouteMessages = async (routeId) => {
     try {
-        const res = await $api(`/messages/route/${routeId}`);
+        const res = await $api(`/messages/route/${routeId}`); // test api
         console.log('loadRouteMessages raw:', res); // debug
         
         const messages = Array.isArray(res) ? res : (res.data || []);
