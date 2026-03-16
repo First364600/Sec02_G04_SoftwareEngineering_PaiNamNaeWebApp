@@ -13,6 +13,9 @@ ${DRIVER_PASS}        Namidablack1
 ${PASS_USER}          ohm163@gmail.com
 ${PASS_PASS}          Namidablack1
 
+${PASS2_USER}        ohm168@gmail.com    
+${PASS2_PASS}        Namidablack1       
+
 ${MSG_TC1_PASS}       ขอบคุณครับ เดี๋ยวไปที่จุดรับ
 ${QUICK_MSG_TEXT}     คนขับกำลังมาหาคุณแล้ว
 
@@ -54,6 +57,8 @@ ${BTN_SELECT_ALL_CHAT}    xpath=//button[contains(.,'เลือกทุกค
 ${BTN_QUICK_MSG_2}        xpath=//button[contains(.,'คนขับกำลังมาหาคุณแล้ว เตรียมตัวได้เลย!')]
 ${BTN_CONFIRM_SEND}       xpath=//button[contains(@class, 'bg-purple-600') and contains(.,'ส่งข้อความ')]
 ${BTN_CLOSE_MODAL}    xpath=//button[contains(@class, 'text-gray-400') and .//*[local-name()='svg']]
+
+
 *** Keywords ***
 # AIช่วยในส่วนOpen chrome
 Open Chrome Auto Allow
@@ -93,6 +98,10 @@ Open Passenger
     Open Chrome Auto Allow    ${URL}/login    Passenger
     Login    ${PASS_USER}    ${PASS_PASS}
 
+Open Passenger 2
+    Open Chrome Auto Allow    ${URL}/login    Passenger2
+    Login    ${PASS2_USER}    ${PASS2_PASS}
+
 Click JS
     [Arguments]    ${locator}
     Wait Until Element Is Visible    ${locator}    30s
@@ -101,7 +110,8 @@ Click JS
 
 
 Passenger Book Route
-    Switch Browser    Passenger
+    [Arguments]    ${alias}=Passenger
+    Switch Browser    ${alias}
 
     Go To    ${URL_FINDTRIP}
 
@@ -119,13 +129,12 @@ Passenger Book Route
     Press Keys    ${INPUT_PICKUP}    ARROW_DOWN
     Press Keys    ${INPUT_PICKUP}    ARROW_DOWN
     Press Keys    ${INPUT_PICKUP}    ARROW_DOWN
-    Press Keys    ${INPUT_PICKUP}    ARROW_DOWN
-    Press Keys    ${INPUT_PICKUP}    ARROW_DOWN
     Press Keys    ${INPUT_PICKUP}    ENTER
 
     Input Text    ${INPUT_DROPOFF}    ตึกกลม
     Sleep    2s
     Press Keys    ${INPUT_DROPOFF}    ARROW_DOWN
+
     Press Keys    ${INPUT_DROPOFF}    ENTER
 
     Sleep    2s
@@ -210,7 +219,8 @@ Driver Send Quick Message
 
 
 Passenger Reply Chat
-    Switch Browser    Passenger
+    [Arguments]    ${alias}=Passenger
+    Switch Browser    ${alias}
 
 
     Go To    ${URL_MY_TRIPS}
@@ -264,21 +274,27 @@ Verify Driver Receive Reply
 
 *** Test Cases ***
 
-TC_Chat_01_Driver_Broadcast_Success_and_Passenger_Reply
+TC01_Driver_Accept_Two_Passengers
+    # เปิด Browser สำหรับ 3 ไอดี
+    Open Driver
+    Open Passenger
+    Open Passenger 2
 
-    Open Driver
-    Open Passenger
+    # คนที่ 1 จอง -> คนขับกดรับ
+    Passenger Book Route    Passenger
+    Driver Accept Booking
 
-    Passenger Book Route
+    # คนที่ 2 จอง -> คนขับกดรับ
+    Passenger Book Route    Passenger2
+    Driver Accept Booking
 
-    Driver Accept Booking
+TC02_Driver_Start_Trip
+    # เริ่มเดินทาง
+    Driver Start Trip
 
-    Driver Start Trip
-
-    Driver Send Quick Message
-
-    Passenger Reply Chat
-
-    Verify Driver Receive Reply
-
-    Driver Send Broadcast Message
+TC03_Driver_And_Passenger_Chat
+    # ส่งข้อความหาคนที่ 1 และทดสอบระบบแชทกลุ่ม
+    Driver Send Quick Message
+    Passenger Reply Chat    Passenger    # ให้คนที่ 1 เป็นคนตอบแชท
+    Verify Driver Receive Reply
+    Driver Send Broadcast Message
