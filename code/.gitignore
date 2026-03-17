@@ -3,3 +3,4 @@ node_modules
 
 Back-end/prisma/migrations/
 config.php
+docker-compose.yml

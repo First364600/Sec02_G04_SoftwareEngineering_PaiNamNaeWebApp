@@ -1,0 +1,6 @@
+./code/backend/node_modules
+./code/frontend/node_modules
+./code/backend/npm-debug.log
+./code/frontend/npm-debug.log
+Dockerfile
+.dockerignore
