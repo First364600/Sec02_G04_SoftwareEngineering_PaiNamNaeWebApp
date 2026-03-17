@@ -248,9 +248,9 @@
                                                             </button>
                                                         </div>
                                                         <button
+                                                            v-if="route.status !== 'available' && route.status !== 'cancelled'"
                                                             @click.stop="openPassengerChat(route.id, p)"
-                                                            :disabled="route.status === 'COMPLETED'"
-                                                            class="relative mt-2 px-3 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                            class="relative mt-2 px-3 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition flex items-center gap-1">
                                                             ส่งข้อความ
                                                             <span v-if="unreadPerPassenger[p.id] > 0"
                                                                 class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
@@ -302,13 +302,14 @@
                                                                 <input
                                                                     v-model="replyContent[p.id]"
                                                                     type="text"
+                                                                    :disabled="route.status === 'completed'"
                                                                     :placeholder="`ส่งข้อความถึง ${p.name}...`"
-                                                                    class="flex-1 text-sm border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:border-purple-400 bg-white"
+                                                                    class="flex-1 text-sm border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:border-purple-400 bg-white disabled:cursor-not-allowed"
                                                                     @keyup.enter="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)"
                                                                 />
                                                                 <button
                                                                     @click.stop="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)"
-                                                                    :disabled="isReplying || !replyContent[p.id]?.trim() || route.status === 'COMPLETED'"
+                                                                    :disabled="isReplying || !replyContent[p.id]?.trim() || route.status === 'completed'"
                                                                     class="px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
                                                                     ส่ง
                                                                 </button>
@@ -319,15 +320,15 @@
                                         </div>
                                          <div class="mt-4 flex gap-2 items-center">
                                                 <button
-                                                    v-if="route.passengers && route.passengers.length > 0"
+                                                    v-if="route.passengers && route.passengers.length > 0 && route.status !== 'available' && route.status !== 'cancelled'"
                                                     @click.stop="openMessageModal(route)"
                                                     :disabled="getTripState(route.id).completed"
-                                                    class="px-3 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    class="px-3 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition flex items-center gap-1 disabled:bg-grey-600 disabled:opacity-80 disabled:cursor-not-allowed">
                                                     ส่งข้อความทุกคน
                                                 </button>
 
                                                 <button
-                                                    v-if="route.passengers && route.passengers.length > 0"
+                                                    v-if="route.passengers && route.passengers.length > 0 && route.status !== 'available' && route.status !== 'cancelled'"
                                                     @click.stop="onToggleMsgPanel(route)"
                                                     class="relative px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex items-center gap-1">
                                                     การตอบกลับ
@@ -735,7 +736,7 @@
                         </div>
 
                         <!-- Preset buttons -->
-                        <div class="px-4 py-2 border-b border-gray-100 flex gap-1.5 overflow-x-auto">
+                        <div class="px-4 py-2 border-b border-gray-100 flex gap-1.5 overflow-x-auto" v-if="!getTripState(chatModal.routeId).completed">
                             <button v-for="p in presetMessages" :key="p.key"
                                 @click="replyContent[chatModal.passenger?.id] = p.text"
                                 class="flex-shrink-0 px-2.5 py-1 text-[10px] border border-gray-200 rounded-full hover:bg-purple-50 hover:border-purple-200 transition text-gray-600 bg-white whitespace-nowrap">
@@ -782,16 +783,17 @@
                         <div class="px-4 py-3 border-t border-gray-100 flex gap-2 items-end">
                             <textarea
                                 v-model="replyContent[chatModal.passenger?.id]"
-                                :placeholder="`ส่งข้อความถึง ${chatModal.passenger?.name}...`"
+                                :placeholder="getTripState(chatModal.routeId).completed ? `การเดินทางเสร็จสิ้นแล้ว` : `ส่งข้อความถึง ${chatModal.passenger?.name}...`"
                                 rows="1"
-                                class="flex-1 text-sm border border-gray-200 rounded-2xl px-4 py-2.5 focus:outline-none focus:border-purple-400 bg-gray-50 resize-none leading-relaxed"
+                                :disabled="getTripState(chatModal.routeId).completed"
+                                class="flex-1 text-sm border border-gray-200 rounded-2xl px-4 py-2.5 focus:outline-none focus:border-purple-400 bg-gray-50 resize-none leading-relaxed disabled: transition flex-shrink-0"
                                 style="max-height: 100px; overflow-y: auto"
                                 @keyup.enter.exact.prevent="sendDriverMessage"
                                 @input="$event.target.style.height = 'auto'; $event.target.style.height = $event.target.scrollHeight + 'px'" />
                             <button
                                 @click="sendDriverMessage"
                                 :disabled="isReplying || !replyContent[chatModal.passenger?.id]?.trim() || getTripState(chatModal.routeId).completed"
-                                class="p-2.5 text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-purple-600 transition flex-shrink-0">
+                                class="p-2.5 text-white bg-purple-600 rounded-full hover:bg-purple-700  hover:bg-purple-600 transition flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                 </svg>
@@ -1289,6 +1291,7 @@ const handleConfirmModal = async () => {
 
         
         closeTripActionModal(); 
+        fetchMyRoutes();
         
     } catch (error) {
         console.error('Modal Action Error:', error);

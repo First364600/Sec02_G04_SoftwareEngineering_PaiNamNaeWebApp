@@ -2,27 +2,40 @@ export const usePushNotification = () => {
   const { $api } = useNuxtApp();
 
   const subscribe = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
-    try {
-      const reg = await navigator.serviceWorker.register('/sw.js');
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') return;
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
 
-      const config = useRuntimeConfig();
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(config.public.vapidPublicKey)
-      });
+    const config = useRuntimeConfig();
+    const publicVapidKey = config.public.vapidPublicKey;
 
-      await $api('/messages/push/subscribe', {
-        method: 'POST',
-        body: sub.toJSON()
-      });
-    } catch (e) {
-      console.warn('Push subscription failed:', e);
-    }
-  };
+    // // --- เพิ่มการเช็คตรงนี้ ---
+    // console.log('Original Key from config:', publicVapidKey);
+    
+    // if (!publicVapidKey) {
+    //   console.error('VAPID Public Key is missing from config!');
+    //   return;
+    // }
+    // // -----------------------
+
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+    });
+
+    await $api('/messages/push/subscribe', {
+      method: 'POST',
+      body: sub.toJSON()
+    });
+    
+    // console.log('Successfully subscribed to Push!');
+  } catch (e) {
+    console.error('Push subscription failed:', e); // ใช้ console.error เพื่อให้เห็นรายละเอียด Error ชัดเจนขึ้น
+  }
+};
 
   return { subscribe };
 };

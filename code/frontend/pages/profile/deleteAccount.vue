@@ -272,8 +272,8 @@ async function handleAfterDelete() {
 
 async function handleAfterCanNotDelete() {
   showPendingTripModal.value = false
-  await logout()
-  router.replace('/')
+  // await logout()
+  // router.replace('/')
 }
 
 async function sendToUserEmail() {
