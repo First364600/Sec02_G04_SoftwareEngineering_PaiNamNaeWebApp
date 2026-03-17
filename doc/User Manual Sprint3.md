@@ -119,8 +119,10 @@
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/9287e46e-b375-49a9-ae24-9a807cd2af19" />
 
 <br><br>
+<img width="1919" height="1044" alt="image" src="https://github.com/user-attachments/assets/469bd559-e637-4648-8e3d-d83eafb87526" />
 
 
+<br><br>
 
 ### 4. ผู้โดยสารสามารถดูแจ้งเตือนที่คนขับส่งมา และสามารถส่งข้อความกลับไปยังคนขับได้
 <img width="1918" height="1048" alt="image" src="https://github.com/user-attachments/assets/14747beb-ce66-4e91-b6ea-8412a9d51df0" />
