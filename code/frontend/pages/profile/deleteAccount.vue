@@ -22,48 +22,99 @@
         </h1>
 
         <!-- Warning -->
-        <div class="mb-6 text-sm text-red-600">
-          <p class="mb-2 font-semibold">หากลบบัญชี:</p>
-          <ul class="space-y-1 list-disc pl-5">
-            <li>ข้อมูลส่วนตัวทั้งหมดจะถูกลบ</li>
-            <li>ไม่สามารถกู้คืนบัญชีได้</li>
-            <li>ระบบจะเก็บ Log ตามที่กฎหมายกำหนด (อย่างน้อย 90 วัน)</li>
-            <li>จะมีการแจ้งเตือนการลบข้อมูลอีกครั้ง</li>
-            <li>ข้อมูลส่วนบุคคลของคุณจะถูกลบเมื่อการลบบัญชีเสร็จสิ้น</li>
-          </ul>
-        </div>
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center gap-2 mb-2">
+                <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <p class="text-sm font-semibold text-red-700">หากลบบัญชี:</p>
+              </div>
+              <ul class="space-y-1 text-sm text-red-600 pl-6">
+                <li class="flex items-start gap-1.5"><span class="mt-1.5 w-1 h-1 rounded-full bg-red-400 flex-shrink-0"></span>ข้อมูลส่วนตัวทั้งหมดจะถูกลบ</li>
+                <li class="flex items-start gap-1.5"><span class="mt-1.5 w-1 h-1 rounded-full bg-red-400 flex-shrink-0"></span>ไม่สามารถกู้คืนบัญชีได้</li>
+                <li class="flex items-start gap-1.5"><span class="mt-1.5 w-1 h-1 rounded-full bg-red-400 flex-shrink-0"></span>ระบบจะเก็บ Log ตามที่กฎหมายกำหนด (อย่างน้อย 90 วัน)</li>
+                <li class="flex items-start gap-1.5"><span class="mt-1.5 w-1 h-1 rounded-full bg-red-400 flex-shrink-0"></span>จะมีการแจ้งเตือนการลบข้อมูลอีกครั้ง</li>
+                <li class="flex items-start gap-1.5"><span class="mt-1.5 w-1 h-1 rounded-full bg-red-400 flex-shrink-0"></span>ข้อมูลส่วนบุคคลของคุณจะถูกลบเมื่อการลบบัญชีเสร็จสิ้น</li>
+              </ul>
+            </div>
 
         <!-- แก้ไขและเพิ่มเติมโค้ดตรงนี้ -->
         <div class="p-4 mb-6 border rounded-md bg-gray-50">
-          <p class="mb-3 font-medium">ข้อมูลส่วนบุคคลที่ต้องการจะรับ (ระบบจะส่งข้อมูลไปที่อีเมลของคุณ)</p>
+            <p class="mb-3 font-medium">ข้อมูลส่วนบุคคลที่ต้องการจะรับ (ระบบจะส่งข้อมูลไปที่อีเมลของคุณ)</p>
 
-          <label class="flex items-center gap-2 mb-2">
-            <input type="checkbox" v-model="selectProfileData" />
-            <span>ประวัติส่วนตัว</span>
-          </label>
+            <div class="space-y-2">
+              
+              <!-- ประวัติส่วนตัว -->
+              <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all"
+                :class="selectProfileData ? 'bg-blue-50 border-blue-400' : 'bg-white border-gray-200 hover:border-gray-300'">
+                <div class="flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                  :class="selectProfileData ? 'bg-blue-500 border-blue-500' : 'border-gray-300'">
+                  <svg v-if="selectProfileData" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <input type="checkbox" v-model="selectProfileData" class="hidden" />
+                <div>
+                  <p class="text-sm font-medium text-gray-800">ประวัติส่วนตัว</p>
+                  <p class="text-xs text-gray-500">ข้อมูลโปรไฟล์ ชื่อ อีเมล และรูปภาพ</p>
+                </div>
+              </label>
 
-          <label class="flex items-center gap-2 mb-2">
-            <input type="checkbox" v-model="selectTripHistoryData" />
-            <span>ประวัติการเดินทาง</span>
-          </label>
+              <!-- ประวัติการเดินทาง -->
+              <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all"
+                :class="selectTripHistoryData ? 'bg-blue-50 border-blue-400' : 'bg-white border-gray-200 hover:border-gray-300'">
+                <div class="flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                  :class="selectTripHistoryData ? 'bg-blue-500 border-blue-500' : 'border-gray-300'">
+                  <svg v-if="selectTripHistoryData" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <input type="checkbox" v-model="selectTripHistoryData" class="hidden" />
+                <div>
+                  <p class="text-sm font-medium text-gray-800">ประวัติการเดินทาง</p>
+                  <p class="text-xs text-gray-500">บันทึกการจองและการเดินทางทั้งหมด</p>
+                </div>
+              </label>
 
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="selectRouteAndVehicleData" />
-            <span>ประวัติการสร้างเส้นทางและข้อมูลรถยนต์ (กรณีเป็นผู้ขับขี่)</span>
-          </label>
+              <!-- ประวัติเส้นทาง (เฉพาะ Driver) -->
+              <label v-if="isDriver" class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all"
+                :class="selectRouteAndVehicleData ? 'bg-blue-50 border-blue-400' : 'bg-white border-gray-200 hover:border-gray-300'">
+                <div class="flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                  :class="selectRouteAndVehicleData ? 'bg-blue-500 border-blue-500' : 'border-gray-300'">
+                  <svg v-if="selectRouteAndVehicleData" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <input type="checkbox" v-model="selectRouteAndVehicleData" class="hidden" />
+                <div>
+                  <p class="text-sm font-medium text-gray-800">ประวัติการสร้างเส้นทางและข้อมูลรถยนต์</p>
+                  <p class="text-xs text-gray-500">เส้นทางที่สร้าง รายละเอียดรถ และประวัติการขับ</p>
+                </div>
+              </label>
 
-          <p
-            v-if="!hasSelectedData"
-            class="mt-2 text-xs text-red-500"
-          >
-            กรุณาเลือกข้อมูลอย่างน้อย 1 รายการ
-          </p>
-        </div>
+            </div>
+
+            <p v-if="!hasSelectedData" class="mt-3 text-xs text-red-500 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              กรุณาเลือกข้อมูลอย่างน้อย 1 รายการ
+            </p>
+       </div>
 
         
-        <label class="flex items-center gap-2 mb-6">
-          <input type="checkbox" v-model="accepted" />
-          <span>รับทราบข้อตกลง</span>
+        <label class="flex items-start gap-3 mb-6 cursor-pointer group">
+          <div class="flex-shrink-0 w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center transition-all"
+            :class="accepted ? 'bg-blue-500 border-blue-500' : 'border-gray-300 group-hover:border-blue-400'">
+            <svg v-if="accepted" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <input type="checkbox" v-model="accepted" class="hidden" />
+          <div>
+            <p class="text-sm font-medium text-gray-800">รับทราบข้อตกลง</p>
+            <p class="text-xs text-gray-400 mt-0.5">ฉันเข้าใจและยอมรับว่าการลบบัญชีนี้ไม่สามารถย้อนกลับได้</p>
+          </div>
         </label>
 
         
@@ -168,12 +219,18 @@ const profileImage = computed(() =>
   `https://ui-avatars.com/api/?name=${user?.value?.username || 'U'}`
 )
 
-
-const hasSelectedData = computed(() =>
-  selectProfileData.value ||
-  selectTripHistoryData.value ||
-  selectRouteAndVehicleData.value
+const isDriver = computed(() =>
+  user?.value?.role === 'DRIVER' || 
+  user?.value?.roles?.includes('DRIVER') ||
+  user?.value?.isDriver === true
 )
+
+const hasSelectedData = computed(() => {
+  if (isDriver.value) {
+    return selectProfileData.value || selectTripHistoryData.value || selectRouteAndVehicleData.value
+  }
+  return selectProfileData.value || selectTripHistoryData.value
+})
 
 const canDelete = computed(() =>
   accepted.value &&
@@ -215,8 +272,8 @@ async function handleAfterDelete() {
 
 async function handleAfterCanNotDelete() {
   showPendingTripModal.value = false
-  await logout()
-  router.replace('/')
+  // await logout()
+  // router.replace('/')
 }
 
 async function sendToUserEmail() {

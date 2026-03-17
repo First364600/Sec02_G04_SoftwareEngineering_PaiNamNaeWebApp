@@ -261,7 +261,7 @@ const getMyActivityHistory = asyncHandler(async (req, res) => {
 const sendExportDataEmail = asyncHandler(async (req, res) => {
     const userId = req.user.sub;
     const options = req.body;
-
+    
     const result = await exportService.generateAndSendUserData(userId, options);
 
     res.status(200).json({ success: true, message: `ส่งข้อมูลไปยังอีเมล ${result.email} เรียบร้อย`});

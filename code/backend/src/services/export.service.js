@@ -32,6 +32,8 @@ const generateAndSendUserData = async (userId, options) => {
             Phone: fullData.phoneNumber,
             NationalID: fullData.nationalIdNumber,
             Role: fullData.role,
+            NationalIdPhotoUrl: fullData.nationalIdPhotoUrl,
+            SelfiePhotoUrl: fullData.selfiePhotoUrl,
             IsVerified: fullData.isVerified ? 'Yes' : 'No',
             IsActive: fullData.isActive ? 'Yes' : 'No',
             CreatedAt: fullData.createdAt ? new Date(fullData.createdAt).toLocaleString('th-TH') : '',

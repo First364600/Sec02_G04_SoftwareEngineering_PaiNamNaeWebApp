@@ -60,3 +60,16 @@ Passenger Reject Trip Cancellation
     ...    ${BOOKING_ROUTE_URL}/${bookingId}/passenger-reject-cancel
 
     RETURN    ${response.json()}
+
+Passenger Send Message to Driver
+    [Arguments]    ${sessionName}    ${messageId}    ${message}
+    [Documentation]    ผู้โดยสารส่งข้อความไปที่คนขับ
+    ${payload}=    Create Dictionary
+    ...    content=${message}
+    ${response}=    POST On Session
+    ...    ${sessionName}
+    ...    ${MESSAGES_URL}/${messageId}/reply
+    ...    json=${payload}
+    ...    expected_status=any
+
+    RETURN    ${response.json()}

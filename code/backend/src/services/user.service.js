@@ -210,53 +210,56 @@ const deleteUser = async (id) => {
 const requestDeleteAccount = async (userId, ipAddress, userAgent) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    const uncompletedPassengerBooking = await prisma.booking.findFirst({
-    where: {
-        passengerId: userId,
-        AND: [
-        { status: { notIn: ['CANCELLED', 'REJECTED'] } },
-        {
-            OR: [
-            { passengerStatus: null },
-            {
-                passengerStatus: {
-                notIn: ['ARRIVED', 'CANCELLED', 'REJECTED_PICKUP']
-                }
-            }
-            ]
-        }
-        ]
-    }
-    });
-    const uncompletedRoute = await prisma.route.findFirst({
-    where: {
-        driverId: userId,
-        status: {
-        notIn: ['COMPLETED', 'CANCELLED']
-        }
-    }
-    });
     if (!user) {
         throw new ApiError(404, 'User not found');
     }
-    if (uncompletedRoute) {
-    throw new ApiError(400, 'You have active routes', {
-        code: 'ACTIVE_ROUTE'
+
+    const uncompletedPassengerBooking = await prisma.booking.findFirst({
+        where: {
+            passengerId: userId,
+            AND: [
+                { status: { notIn: ['CANCELLED', 'REJECTED'] } },
+                {
+                    OR: [
+                        { passengerStatus: null },
+                        {
+                            passengerStatus: {
+                                notIn: ['ARRIVED', 'CANCELLED', 'REJECTED_PICKUP']
+                            }
+                        }
+                    ]
+                },
+                {
+                    route: {
+                        status: {
+                            notIn: ['COMPLETED', 'CANCELLED']
+                        }
+                    }
+                }
+            ]
+        }
     });
+
+    const uncompletedRoute = await prisma.route.findFirst({
+        where: {
+            driverId: userId,
+            status: {
+                notIn: ['COMPLETED', 'CANCELLED']
+            }
+        }
+    });
+
+    if (uncompletedRoute) {
+        throw new ApiError(400, 'You have active routes', { code: 'ACTIVE_ROUTE' });
     }
 
     if (uncompletedPassengerBooking) {
-    throw new ApiError(400, 'You have active bookings', {
-        code: 'ACTIVE_BOOKING'
-    });
+        throw new ApiError(400, 'You have active bookings', { code: 'ACTIVE_BOOKING' });
     }
 
-
-    // คำนวณวันที่สำหรับการลบอัตโนมัติ (90 วันหลังจากวันนี้)
     const scheduledDeletionDate = new Date();
     scheduledDeletionDate.setDate(scheduledDeletionDate.getDate() + 90);
 
-    // สร้าง record ใน DeleteAccountRequest และ deactivate account พร้อมกัน
     const [deleteRequest] = await prisma.$transaction([
         prisma.deleteAccountRequest.create({
             data: {
@@ -267,7 +270,6 @@ const requestDeleteAccount = async (userId, ipAddress, userAgent) => {
                 scheduledDeletionDate: scheduledDeletionDate,
             },
         }),
-        // Deactivate account ทันทีเพื่อไม่ให้ login ได้
         prisma.user.update({
             where: { id: userId },
             data: { isActive: false },

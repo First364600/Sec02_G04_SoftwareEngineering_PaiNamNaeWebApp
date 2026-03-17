@@ -8,7 +8,8 @@ export default defineNuxtConfig({
       apiBase: "http://localhost:3000/api/",
       // apiBase: process.env.API_BASE || "",
       gatewaySecret: process.env.NUXT_PUBLIC_GATEWAY_SECRET || process.env.GATEWAY_SECRET || "",
-      googleMapsApiKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
+      googleMapsApiKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+      vapidPublicKey: process.env.NUXT_PUBLIC_VAPID_KEY || "BNf1ku3n9OwnnajszQB5Dwln-sqwo9jd5vuN05dZXzouGQ9f5mUR_mOSLa8AIBwYz1XgxDJA7fRRh6fAitNgKqc"
     },
   },
   devServer: {

@@ -151,11 +151,10 @@
                                                 </button>
 
                                                 <div v-if="getTripState(route.id).completed" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md text-center text-sm text-green-700 font-medium">
-                                                     การเดินทางนี้เสร็จสิ้นสมบูรณ์แล้ว
+                                                    การเดินทางนี้เสร็จสิ้นสมบูรณ์แล้ว
                                                 </div>
                                         </div>
                                     </div>
-
                                     <div class="mt-4 space-y-4">
                                         <div v-if="route.conditions">
                                             <h5 class="mb-2 font-medium text-gray-900">เงื่อนไขการเดินทาง</h5>
@@ -248,11 +247,143 @@
                                                                 ยกเลิกการเดินทาง
                                                             </button>
                                                         </div>
+                                                        <button
+                                                            v-if="route.status !== 'available' && route.status !== 'cancelled'"
+                                                            @click.stop="openPassengerChat(route.id, p)"
+                                                            class="relative mt-2 px-3 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition flex items-center gap-1">
+                                                            ส่งข้อความ
+                                                            <span v-if="unreadPerPassenger[p.id] > 0"
+                                                                class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                                                                {{ unreadPerPassenger[p.id] }}
+                                                            </span>
+                                                        </button>
                                                     </div>
+
+                                                    <div v-if="msgPanelOpen === p.id && bookingMessages[p.id]"
+                                                            class="mt-3 border border-purple-100 rounded-xl bg-purple-50/50 p-4 space-y-3">
+
+                                                            <p class="text-xs font-bold text-purple-600 mb-2">💬 แชทกับ {{ p.name }}</p>
+
+                                                            <div v-if="bookingMessages[p.id].length === 0" class="text-center text-xs text-gray-400 py-4">
+                                                                ยังไม่มีข้อความ กดส่งข้อความเริ่มต้นการสนทนาได้เลย
+                                                            </div>
+
+                                                            <!-- ข้อความและ replies -->
+                                                            <div class="max-h-64 overflow-y-auto space-y-3 pr-1">
+                                                                <div v-for="msg in bookingMessages[p.id]" :key="msg.id" class="space-y-2">
+
+                                                                    <!-- ข้อความที่คนขับส่ง (ฝั่งขวา) -->
+                                                                    <div class="flex justify-end">
+                                                                        <div class="bg-purple-600 text-white rounded-xl px-3 py-2 max-w-[80%] shadow-sm">
+                                                                            <p class="text-sm">{{ msg.content }}</p>
+                                                                            <p class="text-[10px] text-purple-200 mt-1 text-right">
+                                                                                {{ new Date(msg.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- replies จากผู้โดยสาร (ฝั่งซ้าย) -->
+                                                                    <div v-for="reply in msg.replies" :key="reply.id" class="flex items-end gap-2">
+                                                                        <img :src="p.image" class="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                                                                        <div class="bg-white border border-gray-200 text-gray-800 rounded-xl px-3 py-2 max-w-[80%] shadow-sm"
+                                                                            :class="{ 'border-purple-200 bg-purple-50': !reply.isRead }">
+                                                                            <p class="text-sm">{{ reply.content }}</p>
+                                                                            <p class="text-[10px] text-gray-400 mt-1">
+                                                                                {{ new Date(reply.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- ช่องพิมพ์ข้อความ -->
+                                                            <div class="flex gap-2 pt-2 border-t border-purple-100">
+                                                                <input
+                                                                    v-model="replyContent[p.id]"
+                                                                    type="text"
+                                                                    :disabled="route.status === 'completed'"
+                                                                    :placeholder="`ส่งข้อความถึง ${p.name}...`"
+                                                                    class="flex-1 text-sm border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:border-purple-400 bg-white disabled:cursor-not-allowed"
+                                                                    @keyup.enter="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)"
+                                                                />
+                                                                <button
+                                                                    @click.stop="sendDriverReplyToPassenger(p, bookingMessages[p.id]?.at(-1)?.id)"
+                                                                    :disabled="isReplying || !replyContent[p.id]?.trim() || route.status === 'completed'"
+                                                                    class="px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                                    ส่ง
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                         <div class="mt-4 flex gap-2 items-center">
+                                                <button
+                                                    v-if="route.passengers && route.passengers.length > 0 && route.status !== 'available' && route.status !== 'cancelled'"
+                                                    @click.stop="openMessageModal(route)"
+                                                    :disabled="getTripState(route.id).completed"
+                                                    class="px-3 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition flex items-center gap-1 disabled:bg-grey-600 disabled:opacity-80 disabled:cursor-not-allowed">
+                                                    ส่งข้อความทุกคน
+                                                </button>
+
+                                                <button
+                                                    v-if="route.passengers && route.passengers.length > 0 && route.status !== 'available' && route.status !== 'cancelled'"
+                                                    @click.stop="onToggleMsgPanel(route)"
+                                                    class="relative px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex items-center gap-1">
+                                                    การตอบกลับ
+                                                    <span v-if="unreadReplies[route.id] > 0"
+                                                        class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                                                        {{ unreadReplies[route.id] }}
+                                                    </span>
+                                                </button>
+                                                </div>
+
+                                                <!-- Panel ตอบกลับ -->
+
+                                                <div v-if="msgPanelOpen === route.id && routeMessages[route.id]"
+                                                    class="mt-3 border border-gray-200 rounded-xl bg-gray-50 p-4 max-h-72 overflow-y-auto space-y-3">
+                                                    
+                                                    <div v-if="routeMessages[route.id].length === 0" class="text-center text-xs text-gray-400">
+                                                        ยังไม่มีข้อความ
+                                                    </div>
+
+                                                    <div v-for="msg in routeMessages[route.id]" :key="msg.id" class="space-y-2">
+                                                        <!-- ข้อความที่คนขับส่ง -->
+                                                        <div class="flex items-start gap-2">
+                                                            <div class="flex-1 bg-purple-100 text-purple-800 text-xs rounded-lg px-3 py-2">
+                                                                <p class="font-semibold text-[10px] text-purple-500 mb-1">
+                                                                    ถึง: {{ msg.booking?.passenger?.firstName || 'ทุกคน' }}
+                                                                </p>
+                                                                {{ msg.content }}
+                                                                <p class="text-[10px] text-purple-400 mt-1">
+                                                                    {{ new Date(msg.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- replies จากผู้โดยสาร -->
+                                                        <div v-if="msg.replies && msg.replies.length > 0">
+                                                            <div v-for="reply in msg.replies" :key="reply.id" 
+                                                                class="ml-4 flex justify-end">
+                                                                <div class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg px-3 py-2 max-w-[85%]"
+                                                                    :class="{ 'border-blue-200 bg-blue-50': !reply.isRead }">
+                                                                    <p class="font-semibold text-[10px] text-gray-500 mb-1">
+                                                                        {{ reply.sender?.firstName || 'ผู้โดยสาร' }} ตอบกลับ:
+                                                                    </p>
+                                                                    {{ reply.content }}
+                                                                    <p class="text-[10px] text-gray-400 mt-1">
+                                                                        {{ new Date(reply.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div v-else class="ml-4 text-[10px] text-gray-400 italic">
+                                                            ยังไม่มีการตอบกลับ
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                                                    </div>
                                 </div>
 
                                 <!-- ปุ่มขวาล่าง --> <!--เพิ่มปุ่มเริ่มต้นการเดินทางและprocessการทำงานใหม่-->
@@ -441,7 +572,6 @@
                                                                             {{ point.actionType === 'pickup' ? '↑ รับ' : '↓ ส่ง' }}คุณ {{ point.passengerName }}
                                                                         </span>
                                                                     </div>
-
                                                                     <p v-if="point.address && !point.address.includes('จุดแวะ')" 
                                                                     class="text-[10px] text-gray-400 truncate leading-tight mt-1">
                                                                         {{ point.address }}
@@ -529,6 +659,148 @@
                 </div>
             </div>
         </div>
+<div v-if="messageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="messageModalOpen = false">
+    <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">ส่งข้อความถึงผู้โดยสาร</h3>
+
+<div class="mb-5">
+    <p class="text-xs font-bold text-gray-500 uppercase mb-2">ส่งถึง:</p>
+    <div class="flex flex-wrap gap-2">
+        <label v-for="p in messageTarget.passengers" :key="p.id" 
+            class="px-3 py-1.5 border rounded-full text-xs cursor-pointer transition-all"
+            :class="messageTarget.selectedBookingIds.includes(p.id) ? 'bg-purple-100 border-purple-500 text-purple-700' : 'bg-gray-50 border-gray-200'">
+            <input type="checkbox" :value="p.id" v-model="messageTarget.selectedBookingIds" class="hidden" />
+            {{ p.name }}
+        </label>
+        <button type="button" @click="selectAllPassengers" class="text-[10px] text-purple-600 font-bold underline ml-1">
+            เลือกทุกคน
+        </button>
+    </div>
+</div>
+
+<div class="mb-4">
+    <p class="text-xs font-bold text-gray-500 uppercase mb-2">ข้อความด่วน:</p>
+    <div class="flex flex-wrap gap-1 max-h-32 overflow-y-auto p-1">
+        <button 
+            v-for="p in presetMessages" 
+            :key="p.key"
+            type="button"
+            @click="customText = p.text" 
+            class="px-2 py-1 text-[10px] border border-gray-200 rounded-md hover:bg-purple-50 hover:border-purple-200 transition text-gray-600 bg-white"
+        >
+            {{ p.text }}
+        </button>
+    </div>
+</div>
+
+<div class="mb-6">
+    <p class="text-xs font-bold text-gray-500 uppercase mb-2">พิมพ์ข้อความเอง:</p>
+    <textarea v-model="customText" placeholder="พิมพ์สิ่งที่ต้องการแจ้งผู้โดยสาร..." 
+        class="w-full p-4 border border-gray-300 rounded-xl text-sm h-32 resize-none focus:ring-2 focus:ring-purple-500 outline-none"></textarea>
+</div>
+
+        <div class="flex justify-end gap-2">
+            <button @click="messageModalOpen = false" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg">ยกเลิก</button>
+            <button @click="sendMessage" :disabled="!customText.trim() || isProcessing" 
+                class="px-4 py-2 text-sm font-bold text-white bg-purple-600 rounded-lg disabled:opacity-50 transition">
+                {{ isProcessing ? 'กำลังส่ง...' : 'ส่งข้อความ' }}
+            </button>
+        </div>
+    </div>
+</div>
+                <div v-if="chatModal.open"
+                    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4"
+                    @click.self="closeChatModal">
+                    
+                    <div class="w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col"
+                        style="height: 85vh; max-height: 600px;">
+                        
+                        <!-- Header -->
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                            <img :src="chatModal.passenger?.image" 
+                                class="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-gray-900 text-sm truncate">
+                                    {{ chatModal.passenger?.name }}
+                                </p>
+                                <p class="text-[10px] text-gray-400">
+                                    รับ: {{ chatModal.passenger?.pickupName }} → ส่ง: {{ chatModal.passenger?.dropoffName }}
+                                </p>
+                            </div>
+                            <button @click="closeChatModal"
+                                class="p-1.5 rounded-full hover:bg-gray-100 transition text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Preset buttons -->
+                        <div class="px-4 py-2 border-b border-gray-100 flex gap-1.5 overflow-x-auto" v-if="!getTripState(chatModal.routeId).completed">
+                            <button v-for="p in presetMessages" :key="p.key"
+                                @click="replyContent[chatModal.passenger?.id] = p.text"
+                                class="flex-shrink-0 px-2.5 py-1 text-[10px] border border-gray-200 rounded-full hover:bg-purple-50 hover:border-purple-200 transition text-gray-600 bg-white whitespace-nowrap">
+                                {{ p.text }}
+                            </button>
+                        </div>
+
+                        <!-- Messages area -->
+                        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                            <div v-if="!bookingMessages[chatModal.passenger?.id]?.length"
+                                class="h-full flex items-center justify-center text-xs text-gray-400">
+                                ยังไม่มีข้อความ เริ่มสนทนาได้เลย
+                            </div>
+
+                            <div v-for="msg in bookingMessages[chatModal.passenger?.id]" :key="msg.id" class="space-y-2">
+                                
+                                <!-- ข้อความจากคนขับ (ฝั่งขวา) -->
+                                <div class="flex justify-end">
+                                    <div class="bg-purple-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[75%] shadow-sm">
+                                        <p class="text-sm leading-relaxed">{{ msg.content }}</p>
+                                        <p class="text-[10px] text-purple-200 mt-1 text-right">
+                                            {{ new Date(msg.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- replies จากผู้โดยสาร (ฝั่งซ้าย) -->
+                                <div v-for="reply in msg.replies" :key="reply.id" class="flex items-end gap-2">
+                                    <img :src="chatModal.passenger?.image" 
+                                        class="w-6 h-6 rounded-full object-cover flex-shrink-0 mb-1" />
+                                    <div class="bg-gray-100 text-gray-800 rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[75%]"
+                                        :class="{ 'bg-purple-50 border border-purple-100': !reply.isRead }">
+                                        <p class="text-sm leading-relaxed">{{ reply.content }}</p>
+                                        <p class="text-[10px] text-gray-400 mt-1">
+                                            {{ new Date(reply.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Input -->
+                        <div class="px-4 py-3 border-t border-gray-100 flex gap-2 items-end">
+                            <textarea
+                                v-model="replyContent[chatModal.passenger?.id]"
+                                :placeholder="getTripState(chatModal.routeId).completed ? `การเดินทางเสร็จสิ้นแล้ว` : `ส่งข้อความถึง ${chatModal.passenger?.name}...`"
+                                rows="1"
+                                :disabled="getTripState(chatModal.routeId).completed"
+                                class="flex-1 text-sm border border-gray-200 rounded-2xl px-4 py-2.5 focus:outline-none focus:border-purple-400 bg-gray-50 resize-none leading-relaxed disabled: transition flex-shrink-0"
+                                style="max-height: 100px; overflow-y: auto"
+                                @keyup.enter.exact.prevent="sendDriverMessage"
+                                @input="$event.target.style.height = 'auto'; $event.target.style.height = $event.target.scrollHeight + 'px'" />
+                            <button
+                                @click="sendDriverMessage"
+                                :disabled="isReplying || !replyContent[chatModal.passenger?.id]?.trim() || getTripState(chatModal.routeId).completed"
+                                class="p-2.5 text-white bg-purple-600 rounded-full hover:bg-purple-700  hover:bg-purple-600 transition flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                         <ConfirmModal 
                     :show="isModalVisible" 
@@ -563,12 +835,19 @@ import 'dayjs/locale/th'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
 import ConfirmModal from '~/components/ConfirmModal.vue'
 import { useToast } from '~/composables/useToast'
+import { usePushNotification } from '~/composables/usePushNotification';
+const { subscribe } = usePushNotification();
 
 dayjs.locale('th')
 dayjs.extend(buddhistEra)
 
 const { $api } = useNuxtApp()
 const { toast } = useToast()
+const customText = ref('');
+const presetMessages = ref([]); // สำหรับเก็บข้อความด่วนจาก API
+const messageModalOpen = ref(false);
+const messageTarget = ref({ routeId: null, passengers: [], selectedBookingIds: [] });
+
 
 let directionsService = null;
 let activePolylines = []; // เก็บเส้น Polyline ที่วาดบนแผนที่ (เพื่อลบออกเมื่อเปลี่ยนสเตป)
@@ -581,12 +860,21 @@ const isLoading = ref(false)
 const mapContainer = ref(null)
 const allTrips = ref([])
 const myRoutes = ref([])
-
-// --- ต่อท้าย State Management เดิม ---
-
 const tripStates = ref({}); 
 const isProcessing = ref(false);
 let pollingInterval = null
+
+
+// --- Messaging State ---
+
+const selectedPreset = ref('');
+const routeMessages = ref({}); // { [routeId]: messages[] }
+const unreadReplies = ref({}); // { [routeId]: count }
+const msgPanelOpen = ref(null); // routeId ที่เปิด panel
+const bookingMessages = ref({}); // { [bookingId]: messages[] }
+const replyContent = ref({});   // { [bookingId]: string } แยกแต่ละคน
+const isReplying = ref(false);
+
 
 // --- State Trip---
 const getTripState = (routeId) => {
@@ -635,7 +923,176 @@ const getRouteTimeline = (t) => {
     return timeline;
 };
 
+const chatModal = ref({
+    open: false,
+    passenger: null,
+    routeId: null
+});
 
+// เปิด modal แชทกับผู้โดยสาร และโหลดข้อความทั้งหมดของ booking นั้น
+const openPassengerChat = async (routeId, passenger) => {
+    chatModal.value = { open: true, passenger, routeId };
+    try {
+        const res = await $api(`/messages/booking/${passenger.id}`);// test api
+        bookingMessages.value = {
+            ...bookingMessages.value,
+            [passenger.id]: Array.isArray(res) ? res : (res.data || [])
+        };
+    } catch (e) {
+        toast.error('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อความได้');
+    }
+};
+
+// ปิด modal แชท
+const closeChatModal = () => {
+    chatModal.value = { open: false, passenger: null, routeId: null };
+};
+
+// ส่งข้อความจากคนขับไปยังผู้โดยสาร (reply)
+const sendDriverMessage = async () => {
+    const { passenger, routeId } = chatModal.value;
+    if (!replyContent.value[passenger.id]?.trim()) return;
+    isReplying.value = true;
+    try {
+        await $api(`/messages/route/${routeId}`, { // test api
+            method: 'POST',
+            body: {
+                bookingIds: [passenger.id],
+                customText: replyContent.value[passenger.id]
+            }
+        });
+        replyContent.value[passenger.id] = '';
+        const res = await $api(`/messages/booking/${passenger.id}`); // test api
+        bookingMessages.value = {
+            ...bookingMessages.value,
+            [passenger.id]: Array.isArray(res) ? res : (res.data || [])
+        };
+    } catch (e) {
+        toast.error('เกิดข้อผิดพลาด', e?.data?.message || 'ส่งข้อความไม่สำเร็จ');
+    } finally {
+        isReplying.value = false;
+    }
+};
+
+// คำนวณจำนวนข้อความที่ยังไม่ได้อ่านของแต่ละ booking (สำหรับแสดง badge)
+const unreadPerPassenger = computed(() => {
+    const result = {};
+    Object.entries(bookingMessages.value).forEach(([bId, msgs]) => {
+        result[bId] = (msgs || []).reduce(
+            (sum, m) => sum + (m.replies || []).filter(r => !r.isRead).length, 0
+        );
+    });
+    return result;
+});
+
+// ฟังก์ชันช่วยเลือกผู้โดยสารทั้งหมดใน modal ส่งข้อความ
+const selectAllPassengers = () => {
+    if (messageTarget.value && messageTarget.value.passengers) {
+        messageTarget.value.selectedBookingIds = messageTarget.value.passengers.map(p => p.id);
+    }
+};
+
+// โหลด presets
+onMounted(async () => {
+    subscribe(); 
+    try {
+        const res = await $api('/messages/presets'); // test api
+        console.log("RAW res:", JSON.stringify(res)); 
+        
+        // รองรับหลายรูปแบบ response
+        if (Array.isArray(res)) {
+            presetMessages.value = res;
+        } else if (Array.isArray(res?.data)) {
+            presetMessages.value = res.data;
+        } else if (Array.isArray(res?.presets)) {
+            presetMessages.value = res.presets;
+        } else {
+            presetMessages.value = [];
+        }
+
+        console.log("presetMessages final:", presetMessages.value);
+    } catch (e) {
+        console.error("โหลดข้อความด่วนไม่สำเร็จ", e);
+        presetMessages.value = []; // ป้องกัน undefined
+    }
+    fetchMyRoutes();
+});
+
+// เปิด modal ส่งข้อความ
+const openMessageModal = (route, passenger = null) => {
+    messageTarget.value = {
+        routeId: route.id,
+        passengers: route.passengers,
+        // ถ้ากดที่ปุ่ม 'ส่งข้อความ' ท้ายชื่อคน จะเลือกคนนั้นไว้ให้เลย
+        selectedBookingIds: passenger ? [passenger.id] : [] 
+    };
+    customText.value = ''; // ล้างข้อความเก่า
+    messageModalOpen.value = true;
+};
+
+// ส่งข้อความ
+const sendMessage = async () => {
+   
+    if (!customText.value.trim()) {
+        return toast.error('กรุณาระบุข้อความ');
+    }
+
+    try {
+        isProcessing.value = true;
+        await $api(`/messages/route/${messageTarget.value.routeId}`, { // test api
+            method: 'POST',
+            body: {
+               
+                bookingIds: messageTarget.value.selectedBookingIds, 
+                customText: customText.value 
+            }
+        });
+        toast.success('ส่งข้อความสำเร็จ');
+        messageModalOpen.value = false;
+        customText.value = ''; 
+    } catch (e) {
+        toast.error('ล้มเหลว', e?.data?.message || 'ส่งข้อความไม่สำเร็จ');
+    } finally {
+        isProcessing.value = false;
+    }
+};
+
+// โหลด messages ของ route
+const loadRouteMessages = async (routeId) => {
+    try {
+        const res = await $api(`/messages/route/${routeId}`); // test api
+        console.log('loadRouteMessages raw:', res); // debug
+        
+        const messages = Array.isArray(res) ? res : (res.data || []);
+        
+        // reactive update
+        routeMessages.value = {
+            ...routeMessages.value,
+            [routeId]: messages
+        };
+        
+        unreadReplies.value = {
+            ...unreadReplies.value,
+            [routeId]: messages.reduce(
+                (sum, m) => sum + (m.replies || []).filter(r => !r.isRead).length, 0
+            )
+        };
+        
+        console.log('messages loaded:', routeMessages.value[routeId]);
+    } catch (e) {
+        console.error('loadRouteMessages error:', e); // ดู error จริงๆ
+    }
+};
+
+// สลับการเปิดปิด panel แสดงข้อความของแต่ละ route
+const onToggleMsgPanel = async (route) => {
+    if (msgPanelOpen.value === route.id) {
+        msgPanelOpen.value = null;
+        return;
+    }
+    msgPanelOpen.value = route.id;
+    await loadRouteMessages(route.id);
+};
 
 // แก้ไขฟังก์ชัน Checkpoint ให้รองรับการจบการเดินทาง
 // สูตรคำนวณระยะห่างระหว่างพิกัด 2 จุด (คืนค่าเป็นเมตรเพราะระยะห่างไม่่เกิน500เมตร)
@@ -834,6 +1291,7 @@ const handleConfirmModal = async () => {
 
         
         closeTripActionModal(); 
+        fetchMyRoutes();
         
     } catch (error) {
         console.error('Modal Action Error:', error);
@@ -850,7 +1308,7 @@ const closeTripActionModal = () => {
     pendingRouteId.value = null;
 };
 
-//  เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล ลำดับการ source
+// เพิ่ม Computed สำหรับจัดลำดับ My Routes ลำดับการแสดงผล ลำดับการ source
 const sortedMyRoutes = computed(() => {
   return [...myRoutes.value].sort((a, b) => {
     const stateA = getTripState(a.id);
@@ -1028,7 +1486,7 @@ async function fetchMyRoutes() {
                     });
                 }
             });
-            // วางหลัง }); ของ allPotentialStops.forEach
+            // วางหลัง }; ของ allPotentialStops.forEach
                 console.log('=== STOPS DEBUG ===')
                 console.log('allPotentialStops:', JSON.stringify(allPotentialStops.map(s => ({
                     name: s.name, isPassengerPoint: s.isPassengerPoint, actionType: s.actionType

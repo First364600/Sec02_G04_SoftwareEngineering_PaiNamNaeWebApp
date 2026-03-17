@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const crypto = require('crypto');
+const stringify = require('fast-json-stable-stringify');
 
 const logger = (req, res, next) => {
     const start = Date.now();
@@ -8,7 +9,17 @@ const logger = (req, res, next) => {
 
     res.on('finish', async () => {
         try {
-            const userId = req.user?.id || req.user?.sub || null;
+            const rawUserId = req.user?.id ?? null;
+            let safeUserId = null;
+
+            if (rawUserId) {
+                const userExists = await prisma.user.findUnique({
+                    where: { id: rawUserId },
+                    select: { id: true }
+                });
+                safeUserId = userExists ? rawUserId : null;
+            }
+
             const { method, originalUrl: url } = req;
             const statusCode = res.statusCode;
 
@@ -29,7 +40,7 @@ const logger = (req, res, next) => {
             const payload = method === 'GET' ? req.query : sanitize(req.body);
 
             const rawDataObj = {
-                userId,
+                userId: safeUserId,
                 logType,
                 method,
                 endpoint: url,
@@ -38,7 +49,7 @@ const logger = (req, res, next) => {
                 timestamp: requestTime.toISOString(),
                 details: payload
             };
-            const rawDataString = JSON.stringify(rawDataObj);
+            const rawDataString = stringify(rawDataObj);
 
             const hmac = crypto.createHmac('sha256', process.env.LOG_HMAC_SECRET)
                                .update(rawDataString)
@@ -46,7 +57,7 @@ const logger = (req, res, next) => {
 
             await prisma.systemLog.create({
                 data: {
-                    userId: userId,
+                    userId: safeUserId,
                     logType: logType,
                     action: `${method} ${url}`,
                     method: method,
