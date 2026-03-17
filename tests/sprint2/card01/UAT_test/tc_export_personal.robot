@@ -6,16 +6,12 @@ Suite Setup       Setup Suite Session
 Suite Teardown    Close All Browsers
 
 
-*** Test Cases ***
-
-# ตรวจสอบว่าสามารถเปิด Export Modal ได้สำเร็จ
 TC08 Export Modal Opens
     Open First User Log
     Open Export Modal
     Page Should Contain    ข้อมูลส่วนบุคคล
     Close Export Modal
 
-# ตรวจสอบว่า Export Modal แสดงทุก section ที่ต้องมี
 TC09 Export Modal Shows All Sections
     Open First User Log
     Open Export Modal
@@ -31,34 +27,30 @@ TC09 Export Modal Shows All Sections
     Page Should Contain    Security & Audit Logs
     Close Export Modal
 
-# ตรวจสอบว่าสามารถ Export ข้อมูล "ประวัติส่วนตัว" ของผู้ใช้ได้
 TC10 Export Personal History
     Open First User Log
     Open Export Modal
     Select Personal Section    ประวัติส่วนตัว
     Confirm Export
 
-# ตรวจสอบว่าสามารถ Export "ประวัติการเดินทาง" ของผู้ใช้ได้
 TC11 Export Travel History
     Open First User Log
     Open Export Modal
     Select Personal Section    ประวัติการเดินทาง
     Confirm Export
 
-# ตรวจสอบว่าสามารถ Export "ประวัติการสร้างเส้นทาง" ของผู้ใช้ได้
 TC12 Export Route History
     Open First User Log
     Open Export Modal
     Select Personal Section    ประวัติการสร้างเส้นทาง
     Confirm Export
 
-# ตรวจสอบการกด Export โดยที่ไม่เลือกตัวเลือกใดเลย
+
 TC13 Export No Options Selected
     Open First User Log
     Open Export Modal
     Confirm Export
 
-# ตรวจสอบว่าปุ่ม Cancel สามารถปิด Export Modal ได้
 TC14 Export Cancel Closes Modal
     Open First User Log
     Open Export Modal

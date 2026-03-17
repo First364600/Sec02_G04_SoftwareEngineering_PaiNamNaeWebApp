@@ -1,7 +1,7 @@
 *** Settings ***
 Library           SeleniumLibrary
-Resource          resources/variables.robot
-Resource          resources/keywords.robot
+Resource          resources_card1/variables.robot
+Resource          resources_card1/keywords.robot
 Suite Setup       Setup Suite Session
 Suite Teardown    Close All Browsers
 Test Setup        Ensure On Admin Users Page

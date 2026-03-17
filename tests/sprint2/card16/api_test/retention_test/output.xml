@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.13.1 on win32)" generated="2026-03-01T23:29:50.430582" rpa="false" schemaversion="5">
+<suite id="s1" name="Retention Tests" source="Z:\GIT\Sec02_G04_SoftwareEngineering_PaiNamNaeWebApp#\tests\retention_test\retention_tests.robot">
+<kw name="Connect To Database" owner="DatabaseLibrary" type="SETUP">
+<msg time="2026-03-01T23:29:50.632395" level="INFO">Looking for configuration file: 'resources\db.cfg'</msg>
+<msg time="2026-03-01T23:29:50.632582" level="INFO">Configuration file doesn't exist</msg>
+<msg time="2026-03-01T23:29:50.644586" level="INFO">Connect to DB using : psycopg2.connect(database='postgres', user='postgres', password=***, host='localhost', port=5432)</msg>
+<arg>psycopg2</arg>
+<arg>${DB_NAME}</arg>
+<arg>${DB_USER}</arg>
+<arg>${DB_PASS}</arg>
+<arg>${DB_HOST}</arg>
+<arg>${DB_PORT}</arg>
+<doc>Creates a database connection using the DB API 2.0 ``db_module`` and the parameters provided.
+Along with listed commonly used arguments (`db_name`, `db_host` etc.)
+you can set any other DB module specific parameters as key/value pairs.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.632034" elapsed="0.074033"/>
+</kw>
+<test id="s1-t1" name="TC-5.1: Verify 90-Day Data Retention" line="13">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-03-01T23:29:50.708003" level="INFO">${auth_body} = {'email': 'admin@example.com', 'password': '123456789'}</msg>
+<var>${auth_body}</var>
+<arg>email=${ADMIN_EMAIL}</arg>
+<arg>password=${ADMIN_PASS}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.707396" elapsed="0.000638"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2026-03-01T23:29:50.708374" level="INFO">Creating Session using : alias=api, url=http://localhost:3000, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>api</arg>
+<arg>${BASE_URL}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2026-03-01T23:29:50.708245" elapsed="0.000300"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2026-03-01T23:29:50.776383" level="INFO">POST Request : url=http://localhost:3000/api/auth/login 
+ path_url=/api/auth/login 
+ headers={'User-Agent': 'python-requests/2.32.5', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '55', 'Content-Type': 'application/json'} 
+ body=b'{"email": "admin@example.com", "password": "123456789"}' 
+ </msg>
+<msg time="2026-03-01T23:29:50.776551" level="INFO">POST Response : url=http://localhost:3000/api/auth/login 
+ status=200, reason=OK 
+ headers={'Content-Security-Policy': "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=15552000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Frame-Options': 'SAMEORIGIN', 'X-Permitted-Cross-Domain-Policies': 'none', 'X-XSS-Protection': '0', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'RateLimit-Policy': '100;w=900', 'RateLimit-Limit': '100', 'RateLimit-Remaining': '93', 'RateLimit-Reset': '630', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '419', 'ETag': 'W/"1a3-7oJaHZWwYJj8w4O8hBdY3nn12Do"', 'Date': 'Sun, 01 Mar 2026 16:29:50 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":true,"message":"Login successful","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcyMzgyNTkwLCJleHAiOjE3NzIzODYxOTB9.hZrTgv-DDP960iBIdwbJA3tGD8U248ceAUwjcKWPeMA","user":{"id":"cmlkpxt160000m62aw5muawr6","firstName":"RobotTest","lastName":"Administrator","profilePicture":null,"role":"ADMIN","passengerSuspendedUntil":null}}} 
+ </msg>
+<msg time="2026-03-01T23:29:50.776707" level="INFO">${login_res} = &lt;Response [200]&gt;</msg>
+<var>${login_res}</var>
+<arg>api</arg>
+<arg>/api/auth/login</arg>
+<arg>json=${auth_body}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.708717" elapsed="0.068017"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-01T23:29:50.777755" level="INFO">${token} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcyMzgyNTkwLCJleHAiOjE3NzIzODYxOTB9.hZrTgv-DDP960iBIdwbJA3tGD8U248ceAUwjcKWPeMA</msg>
+<var>${token}</var>
+<arg>${login_res.json()['data']['token']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.777033" elapsed="0.000757"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-03-01T23:29:50.778342" level="INFO">${ADMIN_TOKEN} = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWxrcHh0MTYwMDAwbTYyYXc1bXVhd3I2Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzcyMzgyNTkwLCJleHAiOjE3NzIzODYxOTB9.hZrTgv-DDP960iBIdwbJA3tGD8U248ceAUwjcKWPeMA</msg>
+<arg>${ADMIN_TOKEN}</arg>
+<arg>${token}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.778026" elapsed="0.000359"/>
+</kw>
+<kw name="Generate Random String" owner="String">
+<msg time="2026-03-01T23:29:50.778894" level="INFO">${random_num} = 91420043</msg>
+<var>${random_num}</var>
+<arg>8</arg>
+<arg>[NUMBERS]</arg>
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.778633" elapsed="0.000286"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-03-01T23:29:50.779364" level="INFO">${test_action} = RETENTION_TEST_91420043</msg>
+<var>${test_action}</var>
+<arg>RETENTION_TEST_${random_num}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.779098" elapsed="0.000291"/>
+</kw>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-01T23:29:50.779718" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;INSERT INTO "SystemLog" ("action", "logType", "method", "endpoint", "ipAddress", "statusCode", "createdAt", "details") VALUES ('RETENTION_TEST_91420043', 'AUTH', 'TEST', '/manual/test', '127.0.0.1', 200, NOW() - INTERVAL '90 days', '{"test":"RETENTION_TEST_91420043"}');&lt;/code&gt;</msg>
+<msg time="2026-03-01T23:29:50.781593" level="INFO">Commit the transaction</msg>
+<arg>INSERT INTO "SystemLog" ("action", "logType", "method", "endpoint", "ipAddress", "statusCode", "createdAt", "details") VALUES ('${test_action}', 'AUTH', 'TEST', '/manual/test', '127.0.0.1', 200, NOW() - INTERVAL '90 days', '{"test":"${test_action}"}');</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.779554" elapsed="0.002819"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-03-01T23:29:50.782823" level="INFO">Injected 90-day old log: RETENTION_TEST_91420043</msg>
+<arg>Injected 90-day old log: ${test_action}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.782573" elapsed="0.000293"/>
+</kw>
+<kw name="Check If Exists In Database" owner="DatabaseLibrary">
+<msg time="2026-03-01T23:29:50.783186" level="WARN">Keyword 'DatabaseLibrary.Check If Exists In Database' is deprecated. Use new `Check Row Count` keyword with assertion engine instead.
+The deprecated keyword will be removed in future versions.</msg>
+<msg time="2026-03-01T23:29:50.783845" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;SELECT id FROM "SystemLog" WHERE "action" = 'RETENTION_TEST_91420043';&lt;/code&gt;</msg>
+<msg time="2026-03-01T23:29:50.785081" level="INFO">Commit the transaction</msg>
+<msg time="2026-03-01T23:29:50.785251" level="INFO" html="true">&lt;div style="max-width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;"&gt;&lt;table style="width: auto; border-collapse: collapse; border: 2px solid rgb(140 140 140)"&gt;&lt;caption style="text-align: left; font-weight: bold; padding: 5px;"&gt;Query returned 1 rows&lt;/caption&gt;&lt;tr&gt;&lt;th scope="col" style="position: sticky; top: 0; color:black; background-color: #d6ecd4; border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;Row&lt;/th&gt;&lt;th scope="col" style="position: sticky; top: 0; background-color: #505050; color: #fff;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;id&lt;/th&gt;&lt;/tr&gt;&lt;tr style="background-color: var(--secondary-color, #eee)"&gt;&lt;th scope="row" style="color:black; background-color: #d6ecd4;border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;0&lt;/th&gt;&lt;td style="border: 1px solid rgb(160 160 160);padding: 8px 10px;text-align: center;"&gt;360&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;</msg>
+<arg>SELECT id FROM "SystemLog" WHERE "action" = '${test_action}';</arg>
+<doc>*DEPRECATED* Use new `Check Row Count` keyword with assertion engine instead.
+The deprecated keyword will be removed in future versions.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.783160" elapsed="0.002173"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2026-03-01T23:29:50.785869" level="INFO">Success! Data from 90 days ago is still retrievable.</msg>
+<arg>Success! Data from 90 days ago is still retrievable.</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.785612" elapsed="0.000304"/>
+</kw>
+<kw name="Execute Sql String" owner="DatabaseLibrary">
+<msg time="2026-03-01T23:29:50.786289" level="INFO" html="true">Executing sql:&lt;br&gt;&lt;code style="font-weight: bold;"&gt;DELETE FROM "SystemLog" WHERE "action" = 'RETENTION_TEST_91420043';&lt;/code&gt;</msg>
+<msg time="2026-03-01T23:29:50.803752" level="INFO">Commit the transaction</msg>
+<arg>DELETE FROM "SystemLog" WHERE "action" = '${test_action}';</arg>
+<doc>Executes the ``sql_string`` - as a single SQL command (default) or as separate statements.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.786121" elapsed="0.018335"/>
+</kw>
+<doc>จำลองการสร้างข้อมูลย้อนหลัง 90 วัน และตรวจสอบว่า Admin ยังดึงข้อมูลได้</doc>
+<status status="PASS" start="2026-03-01T23:29:50.706250" elapsed="0.098580"/>
+</test>
+<kw name="Disconnect From Database" owner="DatabaseLibrary" type="TEARDOWN">
+<doc>Disconnects from the database.</doc>
+<status status="PASS" start="2026-03-01T23:29:50.805623" elapsed="0.000320"/>
+</kw>
+<status status="PASS" start="2026-03-01T23:29:50.432575" elapsed="0.373419"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Retention Tests" id="s1" pass="1" fail="0" skip="0">Retention Tests</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-03-01T23:29:50.783186" level="WARN">Keyword 'DatabaseLibrary.Check If Exists In Database' is deprecated. Use new `Check Row Count` keyword with assertion engine instead.
+The deprecated keyword will be removed in future versions.</msg>
+</errors>
+</robot>
